@@ -1,5 +1,66 @@
 # Repository Guide for Agents
 
+## Embedded account devices in Harness (2026-11-09)
+
+Plugin registers “My devices” through the official sidebar.panellist and keyed
+main slots below SSH (order 80), framing the saved Server's
+`/app/embedded/devices`. The page reuses sign-in and devices without the website
+navigation/footer. No device token is passed to the frame. The self-hosted Server
+defaults to denying embedding; DSH_SERVER_FRAME_ANCESTORS accepts exact HTTP(S)
+origins or dsh-app://app only, and changes CSP only on this document. Cross-site
+GET exceptions cover public frame/static resources; API origin and Fetch Metadata
+checks remain enforced. Embedded Web sessions use a separate HttpOnly Secure
+SameSite=None Partitioned cookie selected by X-DSH-Embedded, with independent
+logout from ordinary Web sessions and no device credential changes.
+
+Validation: Server check/build and all 64 tests, Plugin source/test typecheck,
+production build, bundle verification and 44 relevant runtime/API tests passed.
+Core tests cover exact CSP, default denial, cross-site API refusal, independent
+cookies/sessions/logout and wildcard refusal. No pure UI tests added. The earlier
+full Plugin suite's platform/environment failures remain recorded below; this
+does not claim a new full-suite pass.
+
+Deployed dsh-remote-server:embed-20261109 to remote.gaolin.ink with
+DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://dsh.gaolin.ink. Isolated container
+health, embedded document/CSP, login and 3-device API checks passed before switch.
+Updated server and local Harness Plugin bundles, preserving state/credentials and
+backing up the previous container/image and installed bundles. Actual Windows
+Harness acceptance confirmed the sidebar position, embedded signed-in dark page,
+3 rows (company/server Host + Client online; Android Client offline), and no
+duplicate website navigation. Screenshot is ignored under artifacts/embedded-devices/.
+Installation follow-up verified identical Host/Client bundle SHA-256 hashes in
+the repository, local Desktop profile and server Web profile. The cloud Harness
+service is active, the Remote container is healthy, and both public Harness and
+embedded-device GET requests return 200. User requested a local source commit
+after installation; no push performed.
+
+## Self-hosted device role grouping (2026-11-09)
+
+The account device page groups a Plugin installation's independent Host/Client
+identities into one row with both role tags. Only explicit owned-role registration
+or proof of both existing access credentials establishes a persistent symmetric
+link; names and IP addresses never do. Presence is any-role online, last seen is
+the maximum, and rename updates both descriptors. Discovery, connection, tokens
+and revocation remain scoped to each identity. Link and registration persistence
+failures roll back memory. Existing Plugins sync the optional link on startup and
+Client sign-in, without registering missing/expired Host credentials or changing
+Host-only policy; unsupported Servers return 404 without disrupting login.
+
+Validation: Server check/build and 63 tests, Protocol build and 94 tests, Plugin
+source/test typecheck, production build, bundle verification and 44 relevant tests
+passed. Plugin full suite: 578/584 passed; failures involved Windows paths, LAN/P2P
+classification, a directory rename EPERM and a control settings timeout. The
+15-test control suite passed separately. Browser preview was blocked by an origin
+rejection, so no visual acceptance is claimed.
+
+At the user's explicit request, deployed to remote.gaolin.ink, updated only the
+Host bundle in the server/local Harness installation and restarted both. Isolated
+container health/login/device API checks passed before switch. Production HTTPS
+health and account API confirmed 3 device rows (company and server each Host +
+Client online; Android Client offline), with all 5 original active identities
+preserved and 4 linked. Previous container/image, state and installed Host bundles
+were backed up for rollback. No commit or push performed.
+
 ## Interrupted trust-file migration recovery (2026-11-09)
 
 迁移归属检查接受 atomic writer 生成的 `trusted-peers.json.<pid>.<UUIDv7>.tmp`，覆盖旧根目录及 Server Host/Client 目录；仍执行普通文件、链接数、大小与身份/凭据一致性校验。迁移只读保留残留，身份成功加载后清理，不用残留覆盖正式信任记录。未知或格式错误的临时文件仍拒绝迁移。

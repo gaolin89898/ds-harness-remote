@@ -413,6 +413,34 @@ describe('HostServerApi', () => {
     )
   }, 15000)
 
+  it('links existing roles without registration or token replacement and tolerates older Servers', async () => {
+    await runScenarios(['linked', 'unsupported', 'missing', 'expired', 'host-only', 'conflict'].map(kind => ({ name: kind, run: async () => {
+      const directory = await mkdtemp(join(tmpdir(), 'dsh-role-link-'))
+      directories.push(directory)
+      const identity = hostIdentity(), store = new ServerCredentialStore(directory)
+      const initial = { serverUrl: 'https://example.invalid', deviceId: identity.deviceId, authorizationMethod: 'account' as const,
+        ...tokens(), ...(kind === 'expired' ? { refreshTokenExpiresAt: Date.now() - 1 } : {}),
+        ...(kind === 'host-only' ? { pairingRestricted: true as const } : {}) }
+      if (kind !== 'missing') await store.save(initial)
+      const before = await store.load(initial.serverUrl, identity.deviceId)
+      const fetchMock = vi.fn<typeof fetch>(async (_input, init) => {
+        expect(init?.method).toBe('POST')
+        expect(init?.headers).toMatchObject({ Authorization: `Bearer ${initial.accessToken}` })
+        expect(JSON.parse(String(init?.body))).toEqual({ v: 1, counterpartAccessToken: 'other-role-access-token' })
+        return kind === 'unsupported' ? errorJson('METHOD_NOT_FOUND', 'unsupported', 404)
+          : kind === 'conflict' ? errorJson('DEVICE_GROUP_CONFLICT', 'conflict', 409) : json({ status: 'ok' })
+      })
+      const api = new HostServerApi(initial.serverUrl, store, fetchMock); api.bindIdentity(identity)
+      try {
+        if (kind === 'conflict') await expect(api.linkOwnedRole('other-role-access-token')).rejects.toMatchObject({ code: 'DEVICE_GROUP_CONFLICT', status: 409 })
+        else await api.linkOwnedRole('other-role-access-token')
+        expect(fetchMock).toHaveBeenCalledTimes(['missing', 'expired', 'host-only'].includes(kind) ? 0 : 1)
+        if (fetchMock.mock.calls.length) expect(String(fetchMock.mock.calls[0]![0])).toBe('https://example.invalid/api/v1/devices/link-owned-roles')
+        expect(await store.load(initial.serverUrl, identity.deviceId)).toEqual(before)
+      } finally { api.close() }
+    } })), cleanupContract1)
+  })
+
   it('revokes the current Server device before clearing local credentials', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'dsh-server-sign-out-'))
     directories.push(directory)

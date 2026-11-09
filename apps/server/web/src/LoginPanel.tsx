@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { api, type Account } from './api'
 import { ThemeToggle } from './ThemeToggle'
 import { SiteFooter } from './SiteFooter'
-export function LoginPanel({ onAuthSuccess, initialError }: { onAuthSuccess: (account: Account) => void; initialError?: string }) {
+export function LoginPanel({ onAuthSuccess, initialError, embedded = false }: { onAuthSuccess: (account: Account) => void; initialError?: string; embedded?: boolean }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(initialError ?? '')
   const [form] = Form.useForm<{ email: string; password: string }>()
@@ -18,7 +18,7 @@ export function LoginPanel({ onAuthSuccess, initialError }: { onAuthSuccess: (ac
     finally { setLoading(false) }
   }
   return <><main className="auth-page">
-    <div className="auth-language-menu"><a className="auth-github-link" href="https://github.com/liguobao/dsh-harness-remote" target="_blank" rel="noreferrer"><GithubOutlined /> GitHub</a><ThemeToggle className="auth-theme-toggle" /></div>
+    <div className="auth-language-menu">{!embedded && <a className="auth-github-link" href="https://github.com/liguobao/dsh-harness-remote" target="_blank" rel="noreferrer"><GithubOutlined /> GitHub</a>}<ThemeToggle className="auth-theme-toggle" /></div>
     <section className="auth-content">
       <div className="auth-logo-stack"><a className="auth-home-link" href="/" aria-label="返回首页"><img className="auth-brand-icon" src="/brand-whale.webp" alt="" width="48" height="48" /><Typography.Title>DeepSeek Harness Remote</Typography.Title></a></div>
       <Card className="auth-panel">
@@ -31,5 +31,5 @@ export function LoginPanel({ onAuthSuccess, initialError }: { onAuthSuccess: (ac
         </Form>
       </Card>
     </section>
-  </main><SiteFooter /></>
+  </main>{!embedded && <SiteFooter />}</>
 }

@@ -954,6 +954,17 @@ export const registerOwnedRoleRequestSchema: z.ZodType<RegisterOwnedRoleRequest>
   device: accountDeviceDescriptorSchema,
 }).strict()
 
+/** Link existing local roles for display without reissuing either credential. */
+export interface LinkOwnedRolesRequest {
+  v: typeof PROTOCOL_VERSION
+  counterpartAccessToken: string
+}
+
+export const linkOwnedRolesRequestSchema: z.ZodType<LinkOwnedRolesRequest> = z.object({
+  v: z.literal(PROTOCOL_VERSION),
+  counterpartAccessToken: authTokenSchema,
+}).strict()
+
 export const deviceRefreshRequestSchema: z.ZodType<DeviceRefreshRequest> = z.object({
   deviceId: deviceIdSchema,
   refreshToken: authTokenSchema,

@@ -97,6 +97,27 @@ it('does not consume a refresh token on failed persistence or exhausted storage'
   expect(store.refresh(d.deviceId, pair.refreshToken).refreshToken).not.toBe(pair.refreshToken)
 })
 
+it('rolls back role links, renames and owned registration when persistence fails', () => {
+  const c = descriptor(), h = { ...descriptor(), role: 'host' as const }
+  const client = store.register(c), host = store.register(h), before = readFileSync(file, 'utf8')
+  const invalidated = vi.fn(); store.onInvalidate = invalidated
+  mkdirSync(file + '.tmp')
+  expect(() => store.linkRoles(h.deviceId, c.deviceId)).toThrow()
+  expect(store.deviceGroup(h.deviceId)).toHaveLength(1)
+  expect(() => store.register(h, c.deviceId)).toThrow()
+  expect(invalidated).not.toHaveBeenCalled()
+  expect(store.authenticate(host.accessToken).descriptor.deviceId).toBe(h.deviceId)
+  expect(store.authenticate(client.accessToken).descriptor.deviceId).toBe(c.deviceId)
+  expect(readFileSync(file, 'utf8')).toBe(before)
+  rmSync(file + '.tmp', { recursive: true })
+  store.linkRoles(h.deviceId, c.deviceId)
+  const linked = readFileSync(file, 'utf8')
+  mkdirSync(file + '.tmp')
+  expect(() => store.rename(h.deviceId, 'changed')).toThrow()
+  expect(store.deviceGroup(h.deviceId).every(device => device.descriptor.name === 'test')).toBe(true)
+  expect(readFileSync(file, 'utf8')).toBe(linked)
+})
+
 it('fails closed on damaged recovery metadata without revoking valid credentials', async () => {
   await runScenarios(['nonce', 'missing-successor', 'wrong-device', 'missing-access'].map(kind => ({
     name: kind, run: () => {

@@ -1631,8 +1631,53 @@ Minimum version required to store current data is: ` + bestVersion + `.
     }
   }
 
+  // packages/plugin/src/client/devices-panel.ts
+  var DEVICES_PANEL_ID = "ds-harness-remote-devices";
+  function createDevicesPanel(React) {
+    function DevicesIcon() {
+      return React.createElement(
+        "svg",
+        { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, "aria-hidden": !0 },
+        React.createElement("rect", { x: 2, y: 3, width: 15, height: 12, rx: 2 }),
+        React.createElement("path", { d: "M6 21h7M9.5 15v6" }),
+        React.createElement("rect", { x: 17, y: 9, width: 5, height: 12, rx: 1.3 })
+      );
+    }
+    function DevicesPanel(props) {
+      let [status, setStatus] = React.useState(void 0), [failed, setFailed] = React.useState(!1);
+      React.useEffect(() => {
+        let active = !0, dispose = props.statusFeed.subscribe((next) => {
+          active && (setStatus(next), setFailed(!1));
+        });
+        return props.control("status").then((next) => {
+          active && setStatus(next);
+        }).catch(() => {
+          active && setFailed(!0);
+        }), () => {
+          active = !1, dispose();
+        };
+      }, [props.control, props.statusFeed]);
+      let source;
+      if (status?.serverUrl)
+        try {
+          let url = new URL(status.serverUrl);
+          ["http:", "https:"].includes(url.protocol) && !url.username && !url.password && (source = new URL("/app/embedded/devices", url).href);
+        } catch {
+        }
+      return React.createElement(
+        "section",
+        { className: "dshRemoteDevicesPanel", "aria-label": props.t("myDevices") },
+        source ? React.createElement("iframe", { key: source, src: source, title: props.t("myDevices"), sandbox: "allow-scripts allow-forms allow-same-origin", referrerPolicy: "no-referrer" }) : React.createElement("p", { role: failed ? "alert" : "status" }, props.t(failed ? "devicesPanelUnavailable" : status ? "devicesPanelConfigure" : "loadingSettings"))
+      );
+    }
+    return { DevicesIcon, DevicesPanel };
+  }
+
   // packages/plugin/src/client-locale.ts
   var localeNamespace = "ds-harness-remote", en = {
+    myDevices: "My devices",
+    devicesPanelConfigure: "Save a Server URL in the Remote plugin settings to view your devices.",
+    devicesPanelUnavailable: "Could not load Remote settings. Check that the plugin is running and reopen this page.",
     serverSavedLive: "Server address saved and applied.",
     saveServerBeforeLogin: "Save the Server address before continuing sign-in or pairing.",
     pairingLoginTab: "DSH Go pairing",
@@ -1981,6 +2026,9 @@ If a code was sent, recover the original submission without changing it.`,
     hermesVirtualWorkspace: "Hermes virtual workspace",
     codexVirtualSessions: "Sessions"
   }, zh = {
+    myDevices: "\u6211\u7684\u8BBE\u5907",
+    devicesPanelConfigure: "\u8BF7\u5148\u5728 Remote \u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u4FDD\u5B58\u670D\u52A1\u5730\u5740\u3002",
+    devicesPanelUnavailable: "\u65E0\u6CD5\u52A0\u8F7D Remote \u8BBE\u7F6E\uFF0C\u8BF7\u68C0\u67E5\u63D2\u4EF6\u662F\u5426\u8FD0\u884C\u540E\u91CD\u65B0\u6253\u5F00\u6B64\u9875\u9762\u3002",
     serverSavedLive: "\u670D\u52A1\u5668\u5730\u5740\u5DF2\u4FDD\u5B58\u5E76\u751F\u6548\u3002",
     saveServerBeforeLogin: "\u8BF7\u5148\u4FDD\u5B58\u670D\u52A1\u5668\u5730\u5740\uFF0C\u518D\u7EE7\u7EED\u767B\u5F55\u6216\u914D\u5BF9\u3002",
     pairingLoginTab: "DSH Go \u626B\u7801",
@@ -3814,6 +3862,7 @@ If a code was sent, recover the original submission without changing it.`,
   function installStyle(clientModuleId2) {
     let style = document.createElement("style");
     return style.dataset.plugin = clientModuleId2, style.dataset.pluginCss = "dsh-remote", style.textContent = [
+      ".dshRemoteDevicesPanel{display:flex;flex:1 1 auto;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}.dshRemoteDevicesPanel>iframe{flex:1 1 auto;width:100%;height:100%;border:0;background:var(--dsw-alias-bg-base)}.dshRemoteDevicesPanel>p{margin:auto;padding:24px;color:var(--dsw-alias-label-secondary);text-align:center}",
       ".dshRemoteConnectedPanelHeader{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;margin-bottom:6px}.dshRemoteConnectedPanelHeader .dshRemoteConnectedPanelTitle{margin-bottom:0}",
       ".dshRemoteHostNameLine{display:flex;align-items:center;flex-wrap:wrap;gap:8px}",
       ".dshRemoteServerNotice{font-size:12px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}.dshRemoteServerNotice.isWarning{color:var(--dsw-alias-state-warning-primary,#946200)}.dshRemoteServerNotice.isError{color:var(--dsw-alias-state-error-primary)}.dshRemoteServerNotice.isRestored{color:var(--dsw-alias-state-success-primary)}",
@@ -3838,17 +3887,15 @@ If a code was sent, recover the original submission without changing it.`,
       // The official sidebar.footer.action slot owns the surrounding layout.
       // Style only our entry so other footer actions, usage and Settings keep
       // their host-defined geometry, including third-party sidebar variants.
-      // Match native workspace rows: 8px inset, 16px icon slot and 6px label gap.
-      ".dshRemoteSidebarEntry{box-sizing:border-box;flex:none;width:36px;min-width:36px;display:block}.dshRemoteSidebarEntry .dshRemoteModeButton{box-sizing:border-box;width:36px;height:36px;min-height:36px;justify-content:center;gap:0;padding:0;border-radius:50%}.dshRemoteSidebarEntry.isWide{flex:0 1 auto;width:fit-content;min-width:36px;max-width:100%;height:36px;margin:0}.dshRemoteSidebarEntry.isWide .dshRemoteModeButton{width:auto;max-width:100%;min-width:0;justify-content:flex-start;gap:6px;padding:0 8px;border-radius:8px;font:inherit;font-size:14px;line-height:20px;text-align:start}.dshRemoteSidebarLabel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteSidebarEntry.isRail{height:36px}.dshRemoteSidebarEntry.isActive .dshRemoteComputerIcon{color:var(--dsw-alias-brand-primary)}.dshRemoteSidebarEntry .dshRemoteModeButton:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}.dshRemoteSidebarEntry .dshRemoteModeButton:disabled{opacity:.45;cursor:default}",
-      ".dshRemoteComputerIcon{box-sizing:border-box;width:18px;height:18px;flex:0 0 18px;color:var(--dsw-alias-label-secondary)}.dshRemoteSidebarEntry.isWide .dshRemoteComputerIcon{width:16px;height:16px;flex-basis:16px}",
+      // Match native workspace rows: 8px inset and 6px label gap, with the
+      // 18px computer icon button at the row's trailing edge.
+      ".dshRemoteSidebarEntry{box-sizing:border-box;flex:none;width:100%;min-width:0;display:block}.dshRemoteSidebarEntry .dshRemoteModeButton{box-sizing:border-box;width:36px;height:36px;min-height:36px;justify-content:center;gap:0;padding:0;border-radius:50%}.dshRemoteSidebarEntry.isWide{display:flex;align-items:center;gap:6px;width:100%;min-width:0;max-width:100%;height:36px;margin:0;padding:0 8px;border-radius:8px}.dshRemoteSidebarEntry.isWide .dshRemoteModeButton{width:28px;min-width:28px;height:28px;min-height:28px;justify-content:center;gap:0;padding:0;border-radius:6px}.dshRemoteSidebarLabel{min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:inherit;font-size:14px;line-height:20px;text-align:start}.dshRemoteSidebarEntry.isRail{width:36px;min-width:36px;height:36px}.dshRemoteSidebarEntry.isActive .dshRemoteComputerIcon{color:var(--dsw-alias-brand-primary)}.dshRemoteSidebarEntry .dshRemoteModeButton:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}.dshRemoteSidebarEntry .dshRemoteModeButton:disabled{opacity:.45;cursor:default}",
+      ".dshRemoteComputerIcon{box-sizing:border-box;width:18px;height:18px;flex:0 0 18px;color:var(--dsw-alias-label-secondary)}",
       // Compact entry: the same button portalled to the end of the host account row.
       ".dshRemoteAccountEntry{display:inline-flex;align-items:center;flex:none}.dshRemoteAccountEntry .dshRemoteAccountEntryButton{box-sizing:border-box;width:26px;height:26px;min-width:26px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}.dshRemoteAccountEntry .dshRemoteAccountEntryButton:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}.dshRemoteAccountEntry .dshRemoteAccountEntryButton:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:0}.dshRemoteAccountEntry .dshRemoteAccountEntryButton:disabled{opacity:.45;cursor:default}.dshRemoteAccountEntry.isActive .dshRemoteComputerIcon{color:var(--dsw-alias-brand-primary)}",
       // Segmented control for the entry style; scoped through the group because the
       // page body rule for bare buttons outranks a single class.
       ".dshRemoteEntryStyleChoices{flex:0 0 auto;display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:8px;border:.5px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-3)}.dshRemoteEntryStyleChoices>button{box-sizing:border-box;border:0;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:12px;line-height:18px;padding:3px 10px;border-radius:6px;white-space:nowrap;cursor:pointer}.dshRemoteEntryStyleChoices>button:hover:not(:disabled):not(.isSelected){color:var(--dsw-alias-label-primary)}.dshRemoteEntryStyleChoices>button.isSelected{background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary)}.dshRemoteEntryStyleChoices>button:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}.dshRemoteEntryStyleChoices>button:disabled{opacity:.45;cursor:default}",
-      // Keep Exit in flow: an absolute action and reserved padding can overlap
-      // the icon or adjacent plugins when the host shrinks this flex item.
-      ".dshRemoteSidebarEntry.isWide.isActive{display:flex;align-items:center}.dshRemoteSidebarEntry.isWide.isActive .dshRemoteModeButton{flex:1 1 auto;width:auto;overflow:hidden;padding:0}.dshRemoteSidebarEntry.isWide.isActive .dshRemoteComputerIcon{margin-inline-start:8px}.dshRemoteExitLink{margin-inline-start:auto;flex:0 0 36px;min-width:36px;height:36px;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary);padding:0;font:inherit;font-size:12px;line-height:20px;white-space:nowrap;cursor:pointer}.dshRemoteExitLink:hover:not(:disabled){color:var(--dsw-alias-label-primary);text-decoration:underline}.dshRemoteExitLink:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}.dshRemoteExitLink:disabled{opacity:.45;cursor:default}",
       // The strip sits inside the 40px Windows caption row, which the shell declares as the
       // window drag region. Without an explicit opt-out every press starts a window drag and
       // never reaches these buttons; the shell's own caption controls (sidebar toggle, new
@@ -4475,22 +4522,16 @@ If a code was sent, recover the original submission without changing it.`,
       }, t("updateShort", { version: updateInfo?.latestVersion ?? "" })) : null, updateDot = localUpdateAvailable ? React.createElement("span", { className: "dshRemoteUpdateDot", title: t("updateBadge"), "aria-hidden": !0 }) : null, entry = React.createElement(
         "div",
         { className: `dshRemoteSidebarEntry${remoteActive ? " isActive" : ""}${props.wide ? " isWide" : " isRail"}${localUpdateAvailable ? " hasUpdate" : ""}` },
-        React.createElement(remoteActive && props.wide && !reauth ? "div" : "button", {
-          ...remoteActive && props.wide && !reauth ? {} : {
-            type: "button",
-            disabled: remoteActive && busy,
-            onClick: () => void (remoteActive && !reauth ? openLocalWorkspaces() : show())
-          },
-          className: "dshRemoteModeButton",
-          title: props.wide ? remoteLabel : remoteActionLabel,
-          "aria-label": props.wide ? remoteLabel : remoteActionLabel
-        }, computerIcon, props.wide ? React.createElement("span", { className: "dshRemoteSidebarLabel" }, remoteLabel) : null, props.wide ? updateSuffix : updateDot),
-        remoteActive && props.wide ? React.createElement("button", {
+        props.wide ? React.createElement("span", { className: "dshRemoteSidebarLabel", title: remoteActionLabel }, remoteLabel) : null,
+        props.wide ? updateSuffix : null,
+        React.createElement("button", {
           type: "button",
-          className: "dshRemoteExitLink",
-          disabled: busy,
-          onClick: () => void openLocalWorkspaces()
-        }, t("exitRemote")) : null
+          className: "dshRemoteModeButton",
+          disabled: remoteActive && busy,
+          title: remoteActionLabel,
+          "aria-label": props.wide ? remoteLabel : remoteActionLabel,
+          onClick: () => void (remoteActive && !reauth ? openLocalWorkspaces() : show())
+        }, computerIcon, props.wide ? null : updateDot)
       ), accountEntry = React.createElement(
         "div",
         { className: `dshRemoteAccountEntry${remoteActive ? " isActive" : ""}` },
@@ -5757,7 +5798,7 @@ If a code was sent, recover the original submission without changing it.`,
           }
         }, label);
       }
-      let RemoteWorkspaceAction = createRemoteWorkspaceAction(React, portal), RemoteProgressView = createRemoteProgressView(React), RemoteSessionHeaderAction = createRemoteSessionHeaderAction(React, portal), openHarnessSettings;
+      let RemoteWorkspaceAction = createRemoteWorkspaceAction(React, portal), { DevicesIcon, DevicesPanel } = createDevicesPanel(React), RemoteProgressView = createRemoteProgressView(React), RemoteSessionHeaderAction = createRemoteSessionHeaderAction(React, portal), openHarnessSettings;
       function RemoteSettingsLauncher(props) {
         return openHarnessSettings = props.openSettings, null;
       }
@@ -6074,7 +6115,18 @@ If a code was sent, recover the original submission without changing it.`,
               document.removeEventListener("click", stopHostFileOpen, !0), unregister();
             };
           }, "ds-harness-remote: host mention source");
-        }), ctx.effect(() => ctx.locale.register(localeNamespace, { zh, en }), "ds-harness-remote: dictionaries"), ctx.effect(() => installStyle(clientModuleId), "ds-harness-remote: client styles"), ctx.effect(() => installTerminalAvailabilityNotice(statusFeed, t), "ds-harness-remote: terminal availability notice"), ctx.slots.inject("shell.overlay", () => ctx.slots.register({
+        }), ctx.effect(() => ctx.locale.register(localeNamespace, { zh, en }), "ds-harness-remote: dictionaries"), ctx.effect(() => installStyle(clientModuleId), "ds-harness-remote: client styles"), ctx.effect(() => installTerminalAvailabilityNotice(statusFeed, t), "ds-harness-remote: terminal availability notice"), ctx.slots.inject("main", () => ctx.slots.register({
+          name: "main",
+          key: DEVICES_PANEL_ID,
+          locale: localeNamespace,
+          inject: () => ({ control, statusFeed })
+        }, DevicesPanel)), ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({
+          name: "sidebar.panellist",
+          id: DEVICES_PANEL_ID,
+          order: 80,
+          label: () => t("myDevices"),
+          locale: localeNamespace
+        }, DevicesIcon)), ctx.slots.inject("shell.overlay", () => ctx.slots.register({
           name: "shell.overlay",
           id: "ds-harness-remote-global-context",
           order: 20,

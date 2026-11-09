@@ -351,6 +351,20 @@ export class HostServerApi {
     return this.credentials
   }
 
+  async linkOwnedRole(counterpartAccessToken: string): Promise<void> {
+    // A display migration must never create a missing or expired authorization.
+    const stored = await this.store.load(this.baseUrl, this.requireIdentity().deviceId)
+    if (this.hostOnly || !stored || stored.pairingRestricted || stored.refreshTokenExpiresAt <= Date.now() + 30_000) return
+    try {
+      await this.request('/api/v1/devices/link-owned-roles', {
+        method: 'POST', body: JSON.stringify({ v: 1, counterpartAccessToken }),
+      })
+    } catch (error) {
+      // Other/older Servers may not support presentation groups yet.
+      if (!(error instanceof ServerApiError) || error.status !== 404) throw error
+    }
+  }
+
   async refreshCredentials(rejectedAccessToken = this.credentials?.accessToken): Promise<ServerCredentials> {
     const identity = this.requireIdentity()
     this.credentials = await this.withRefreshLock(async () => {

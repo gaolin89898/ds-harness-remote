@@ -201,9 +201,9 @@ export class ClientModeRuntime {
       && this.host !== undefined
       && this.server.hasStoredAuthorization !== undefined) {
       try {
-        if (await this.server.hasStoredAuthorization()
-          && (this.host.hasStoredAuthorization === undefined || !await this.host.hasStoredAuthorization())) {
-          await this.authorizeHostByDefault()
+        if (await this.server.hasStoredAuthorization()) {
+          if (this.host.hasStoredAuthorization === undefined || !await this.host.hasStoredAuthorization()) await this.authorizeHostByDefault()
+          else await this.linkDeviceRoles()
         }
       } catch (error) {
         this.logger.warn('automatic Host authorization failed', { code: safeErrorCode(error) })
@@ -225,13 +225,25 @@ export class ClientModeRuntime {
       // stays unusable until the process restarts.
       const status = this.host.hostStatus()
       if (!status.accountRequired) {
-        if (status.authorized) return
-        if (this.host.hasStoredAuthorization !== undefined && await this.host.hasStoredAuthorization()) return
+        if (status.authorized || (this.host.hasStoredAuthorization !== undefined && await this.host.hasStoredAuthorization())) {
+          await this.linkDeviceRoles()
+          return
+        }
       }
       const credentials = await this.server.authenticate(this.requireIdentity())
       await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account)
     } catch (error) {
       this.logger.warn('automatic Host authorization failed', { code: safeErrorCode(error) })
+    }
+  }
+
+  private async linkDeviceRoles(): Promise<void> {
+    if (!this.host?.linkOwnedRole || this.host.hostStatus().pairingHostOnly) return
+    try {
+      const credentials = await this.server.authenticate(this.requireIdentity())
+      await this.host.linkOwnedRole(credentials.accessToken)
+    } catch (error) {
+      this.logger.warn('device role association failed', { code: safeErrorCode(error) })
     }
   }
 

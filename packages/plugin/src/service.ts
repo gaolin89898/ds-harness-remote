@@ -272,6 +272,10 @@ export class HostPluginRuntime {
     return this.serverApi?.hasStoredAuthorization() ?? false
   }
 
+  async linkOwnedRole(accessToken: string): Promise<void> {
+    await this.serverApi?.linkOwnedRole(accessToken)
+  }
+
   private listConnectedClients(): HostConnectedClient[] {
     return this.connections.connectedPeers().map(peer => {
       const trusted = this.identities.trustedPeer(peer.deviceId)

@@ -1350,6 +1350,7 @@ describe('ClientModeRuntime Host account control', () => {
         accountRequired: false,
       })),
       hasStoredAuthorization: vi.fn(async () => true),
+      linkOwnedRole: vi.fn(async () => {}),
       reconnectHost: vi.fn(),
       clearHostAuthorization: vi.fn(),
       authorizeHostAsOwned: vi.fn(),
@@ -1374,7 +1375,9 @@ describe('ClientModeRuntime Host account control', () => {
 
     await runtime.pollClientOAuthQrLogin('qr-session-identifier-0002')
 
-    expect(authenticate).not.toHaveBeenCalled()
+    expect(authenticate).toHaveBeenCalledTimes(2)
+    expect(host.linkOwnedRole).toHaveBeenCalledTimes(2)
+    expect(host.linkOwnedRole).toHaveBeenLastCalledWith('fresh-access-token')
     expect(host.authorizeHostAsOwned).not.toHaveBeenCalled()
     await runtime.close()
   })

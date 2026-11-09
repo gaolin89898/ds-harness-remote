@@ -1,6 +1,7 @@
 export interface Account { account: string }
 export interface Device {
   deviceId: string; name: string; role: 'host' | 'client'; platform: string;
+  roles?: ('host' | 'client')[];
   clientVersion: string; harnessVersion?: string; online: boolean; lastSeenAt?: number;
 }
 export interface DeviceList { items: Device[]; serverUrl: string; transport: string }
@@ -12,7 +13,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
   try {
     response = await fetch(`/api/v1${path}`, {
       method: body === undefined ? 'GET' : 'POST',
-      credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(window.location.pathname === '/app/embedded/devices' ? { 'X-DSH-Embedded': '1' } : {}) },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(10000),
     })

@@ -14,7 +14,10 @@ const tokenSchema = z.object({
   kind: z.enum(['access', 'refresh']), deviceId: z.string(), expires: z.number(), used: z.boolean(),
   recovery: z.object({ nonce: z.string().regex(/^[A-Za-z0-9_-]{43}$/), accessExpires: z.number().int().positive() }).optional(),
 })
-const savedDeviceSchema = z.object({ descriptor: accountDeviceDescriptorSchema, revoked: z.boolean(), lastSeenAt: z.number() })
+const savedDeviceSchema = z.object({
+  descriptor: accountDeviceDescriptorSchema, revoked: z.boolean(), lastSeenAt: z.number(),
+  pairedDeviceId: z.string().optional(),
+})
 const stateSchema = z.object({ version: z.literal(1), account: z.string(), salt: z.string(), verifier: z.string(), devices: z.record(z.string(), savedDeviceSchema), tokens: z.record(z.string(), tokenSchema) })
 type SavedDevice = z.infer<typeof savedDeviceSchema>
 type SavedToken = z.infer<typeof tokenSchema>
@@ -54,14 +57,63 @@ export class Store {
     return d
   }
   list(): SavedDevice[] { return Object.values(this.state.devices).filter(d => !d.revoked) }
-  register(descriptor: AccountDeviceDescriptor): ReturnType<Store['issue']> {
+  /** Presentation groups never replace either role's identity or authorization. */
+  deviceGroup(id: string): SavedDevice[] {
+    const device = this.get(id)
+    const paired = device.pairedDeviceId === undefined ? undefined : this.state.devices[device.pairedDeviceId]
+    if (!paired || paired.revoked || paired.pairedDeviceId !== id
+      || paired.descriptor.role === device.descriptor.role || paired.descriptor.platform !== device.descriptor.platform) return [device]
+    return device.descriptor.role === 'host' ? [device, paired] : [paired, device]
+  }
+  private checkPair(source: SavedDevice, target: AccountDeviceDescriptor, old?: SavedDevice): void {
+    if (source.descriptor.deviceId === target.deviceId || source.descriptor.role === target.role
+      || source.descriptor.platform !== target.platform) throw new ApiError('INVALID_MESSAGE', 409)
+    for (const [device, counterpart] of [[source, target.deviceId], [old, source.descriptor.deviceId]] as const) {
+      if (device?.pairedDeviceId && device.pairedDeviceId !== counterpart
+        && this.state.devices[device.pairedDeviceId] && !this.state.devices[device.pairedDeviceId]!.revoked) throw new ApiError('DEVICE_GROUP_CONFLICT', 409)
+    }
+  }
+  linkRoles(sourceId: string, targetId: string): void {
+    const source = this.get(sourceId), target = this.get(targetId)
+    this.checkPair(source, target.descriptor, target)
+    if (source.pairedDeviceId === targetId && target.pairedDeviceId === sourceId) return
+    const previous = this.state.devices
+    this.state.devices = {
+      ...previous,
+      [sourceId]: { ...source, pairedDeviceId: targetId },
+      [targetId]: { ...target, pairedDeviceId: sourceId },
+    }
+    try { this.save() } catch (error) { this.state.devices = previous; throw error }
+  }
+  register(descriptor: AccountDeviceDescriptor, sourceDeviceId?: string): ReturnType<Store['issue']> {
     const old = this.state.devices[descriptor.deviceId]
     if (old?.revoked) throw new ApiError('DEVICE_REVOKED', 403)
     if (old && (old.descriptor.identityKey !== descriptor.identityKey || old.descriptor.role !== descriptor.role)) throw new ApiError('PEER_IDENTITY_MISMATCH', 409)
     if (!old && Object.keys(this.state.devices).length >= 256) throw new ApiError('RATE_LIMITED', 429)
-    this.state.devices[descriptor.deviceId] = { descriptor, revoked: false, lastSeenAt: old?.lastSeenAt ?? 0 }
-    this.invalidate(descriptor.deviceId)
-    return this.issue(descriptor.deviceId)
+    const source = sourceDeviceId === undefined ? undefined : this.get(sourceDeviceId)
+    if (source && (sourceDeviceId === descriptor.deviceId || source.descriptor.role === descriptor.role)) throw new ApiError('INVALID_MESSAGE', 409)
+    // register-owned-role is explicitly for the opposite role on this installation.
+    // Keep cross-platform enrollments separate, and never infer a link from a name/IP.
+    const paired = source?.descriptor.platform === descriptor.platform ? source : undefined
+    if (paired) this.checkPair(paired, descriptor, old)
+    const registered: SavedDevice = {
+      descriptor, revoked: false, lastSeenAt: old?.lastSeenAt ?? 0,
+      ...(old?.pairedDeviceId === undefined ? {} : { pairedDeviceId: old.pairedDeviceId }),
+      ...(paired === undefined ? {} : { pairedDeviceId: sourceDeviceId }),
+    }
+    const previousDevices = this.state.devices, previousTokens = this.state.tokens
+    this.state.devices = { ...previousDevices, [descriptor.deviceId]: registered }
+    if (paired) this.state.devices[sourceDeviceId!] = { ...paired, pairedDeviceId: descriptor.deviceId }
+    this.state.tokens = { ...previousTokens }
+    for (const [key, value] of Object.entries(this.state.tokens)) if (value.deviceId === descriptor.deviceId) delete this.state.tokens[key]
+    let tokens: ReturnType<Store['issue']>
+    try { tokens = this.issue(descriptor.deviceId) } catch (error) {
+      this.state.devices = previousDevices
+      this.state.tokens = previousTokens
+      throw error
+    }
+    this.onInvalidate(descriptor.deviceId)
+    return tokens
   }
   private issue(deviceId: string, refreshTokenExpiresAt = Date.now() + 30 * 86400_000, previous?: { token: string; record: SavedToken }) {
     const tokens = { ...this.state.tokens }
@@ -119,8 +171,13 @@ export class Store {
   }
   revoke(id: string): void { this.get(id).revoked = true; this.invalidate(id) }
   rename(id: string, name: string): void {
-    this.get(id).descriptor.name = name
-    this.save()
+    const devices = this.deviceGroup(id)
+    const previous = devices.map(device => device.descriptor.name)
+    for (const device of devices) device.descriptor.name = name
+    try { this.save() } catch (error) {
+      devices.forEach((device, index) => { device.descriptor.name = previous[index]! })
+      throw error
+    }
   }
   touch(id: string, clientVersion?: string, harnessVersion?: string): void {
     const d = this.get(id)

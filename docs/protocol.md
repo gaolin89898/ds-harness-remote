@@ -284,6 +284,27 @@ Authorization: Bearer <currentDeviceAccessToken>
 deviceId 或相同 role，并为新角色签发独立 token pair、同步同账号 membership。
 角色切换只复用账号归属，不得复用 Host/Client 私钥或 device token。
 
+开源自部署 Server 将本次注册的同平台两个角色保存为一台设备的展示关联。
+`GET /api/v1/account/devices` 按关联返回一行，`roles` 列出 `host`、`client`；
+主字段取 Host，`online` 为任一角色在线，`lastSeenAt` 取两者最大值。改名同步两个角色。
+发现、身份校验、连接、刷新及撤销仍按独立 deviceId 执行，不按名称或 IP 合并。
+
+已有两份凭据的安装可以补关联，无需重新注册：
+
+```http
+POST /api/v1/devices/link-owned-roles
+Authorization: Bearer <currentDeviceAccessToken>
+Content-Type: application/json
+
+{ "v": 1, "counterpartAccessToken": "<otherLocalRoleAccessToken>" }
+```
+
+此可选接口只修改展示关联，不签发或轮换 token。两份 access token 必须均有效、归属
+当前账号、deviceId 不同、角色相反且平台一致。任一角色已关联其他未撤销身份时返回
+`DEVICE_GROUP_CONFLICT`（409）；相同关联可重复提交，返回 `{ "status": "ok" }`。
+写入失败不得改变内存关联。撤销其中一个身份后，另一个仍独立有效并单独显示。
+旧 Server 可返回 404；Plugin 跳过该可选功能，不影响登录和连接。
+
 ### 8.2 Refresh
 
 `POST /api/v1/auth/refresh`

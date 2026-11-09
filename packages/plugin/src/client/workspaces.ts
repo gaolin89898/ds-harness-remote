@@ -1184,9 +1184,13 @@ export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalR
       React.createElement('rect', { x: 3, y: 4, width: 18, height: 13, rx: 2 }),
       React.createElement('path', { d: 'M8 21h8M12 17v4' }))
     const remoteActive = status?.mode === 'remote'
-    // Wide entry: the button stretches full width and carries the update suffix
-    // in the host's own update-indicator look. Rail/Compact entries are
-    // icon-only, so they get the official 6px brand dot instead.
+    // Wide entry: the label keeps the host name on the left and the computer
+    // icon button sits at the right end of the row, matching the Compact entry
+    // that hangs off the account row. The icon button carries the action (exit
+    // when Remote mode is active, open the Remote panel otherwise) and its
+    // tooltip keeps the host name plus the exit hint. The update suffix keeps
+    // the host's own update-indicator look; the icon-only rail/compact entries
+    // get the official 6px brand dot instead.
     const updateSuffix = localUpdateAvailable && props.wide
       ? React.createElement('span', {
         className: 'dshRemoteUpdateSuffix',
@@ -1197,24 +1201,18 @@ export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalR
       ? React.createElement('span', { className: 'dshRemoteUpdateDot', title: t('updateBadge'), 'aria-hidden': true })
       : null
     const entry = React.createElement('div', { className: `dshRemoteSidebarEntry${remoteActive ? ' isActive' : ''}${props.wide ? ' isWide' : ' isRail'}${localUpdateAvailable ? ' hasUpdate' : ''}` },
-      React.createElement(remoteActive && props.wide && !reauth ? 'div' : 'button', {
-        ...(remoteActive && props.wide && !reauth ? {} : {
-          type: 'button',
-          disabled: remoteActive && busy,
-          onClick: () => void (remoteActive && !reauth ? openLocalWorkspaces() : show()),
-        }),
-        className: 'dshRemoteModeButton',
-        title: props.wide ? remoteLabel : remoteActionLabel,
-        'aria-label': props.wide ? remoteLabel : remoteActionLabel,
-      }, computerIcon, props.wide
-        ? React.createElement('span', { className: 'dshRemoteSidebarLabel' }, remoteLabel)
-        : null, props.wide ? updateSuffix : updateDot),
-      remoteActive && props.wide ? React.createElement('button', {
+      props.wide
+        ? React.createElement('span', { className: 'dshRemoteSidebarLabel', title: remoteActionLabel }, remoteLabel)
+        : null,
+      props.wide ? updateSuffix : null,
+      React.createElement('button', {
         type: 'button',
-        className: 'dshRemoteExitLink',
-        disabled: busy,
-        onClick: () => void openLocalWorkspaces(),
-      }, t('exitRemote')) : null)
+        className: 'dshRemoteModeButton',
+        disabled: remoteActive && busy,
+        title: remoteActionLabel,
+        'aria-label': props.wide ? remoteLabel : remoteActionLabel,
+        onClick: () => void (remoteActive && !reauth ? openLocalWorkspaces() : show()),
+      }, computerIcon, props.wide ? null : updateDot))
     // The Compact style drops the label and lives in the account row, so it is
     // always a plain icon button regardless of the current Remote mode.
     const accountEntry = React.createElement('div', { className: `dshRemoteAccountEntry${remoteActive ? ' isActive' : ''}` },

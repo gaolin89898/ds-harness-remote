@@ -10,6 +10,24 @@ This remains a small self-hosted Server that we intend to maintain. The product 
 
 The `/` landing page links to `/app/login`; a successful sign-in continues to `/app/remote`. Point both Host and Client at the same Server URL and use the same account and password. Device credentials are persisted by the Server, while Web sessions use an HttpOnly cookie.
 
+The Host and Client roles of one Plugin installation share a row with both role tags. Online counts use devices, either role can make the device online, and renaming updates both roles. Credentials and revocation remain independent. Matching names alone never merge separate devices.
+
+For existing duplicate rows, update both the Server and Plugin. On restart or Client sign-in, the Plugin links its two existing valid credentials. Devices with only one valid role continue to appear separately.
+
+## Embed devices in Harness
+
+The Plugin adds **My devices** below SSH in the Harness sidebar and opens the saved Server's `/app/embedded/devices` page inside the main area. The embedded page keeps the device table without the website navigation or footer.
+
+To enable it on a self-hosted Server, use HTTPS and set the exact Harness origins allowed to frame this page:
+
+```dotenv
+DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://harness.example.com
+```
+
+`dsh-app://app` allows the Desktop app; replace the HTTPS example with your Harness Web origin. Empty (default) disables embedding. Wildcards and page paths are rejected. Recreate the Server container after changing the setting. Other website pages remain protected from framing.
+
+Sign in once inside the embedded page. Its HttpOnly, Secure, Partitioned cookie is separate from the ordinary website session and device credentials; signing out here does not disconnect Host or Client roles.
+
 ## Refresh response recovery
 
 If a refresh succeeds but its response is lost, retrying the previous refresh token returns the same successor pair, including after a Server restart. Recovery remains available until that successor is rotated again, revoked, or expired; it does not extend either token's lifetime. An expired recovered access token can be replaced by rotating the recovered refresh token. Older tokens are rejected without revoking current credentials.
@@ -76,6 +94,7 @@ Open <http://localhost:8080>. Set the same Server URL on your Host and Client, t
 | `DSH_SERVER_ACCOUNT` | Required login account |
 | `DSH_SERVER_PASSWORD` | Required; at least 12 characters |
 | `DSH_SERVER_PUBLIC_URL` | Browser-facing URL; default `http://localhost:8080` |
+| `DSH_SERVER_FRAME_ANCESTORS` | Exact origins allowed to embed `/app/embedded/devices`, comma-separated; empty (default) disables embedding |
 | `DSH_SERVER_HOST` | Listen / port-binding address; default `127.0.0.1`, use `0.0.0.0` for LAN access |
 | `DSH_SERVER_PORT` | Default `8080` |
 | `DSH_SERVER_DATA_FILE` | Default `data/state.json`, relative to the working directory |

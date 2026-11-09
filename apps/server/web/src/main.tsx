@@ -17,6 +17,7 @@ export function navigate(path: string) {
 }
 
 function App() {
+  const embedded = window.location.pathname === '/app/embedded/devices'
   const { colorTheme } = useColorTheme()
   const dark = colorTheme === 'dark'
   const [account, setAccount] = useState<Account | null>()
@@ -30,7 +31,7 @@ function App() {
     if (window.location.pathname !== next) window.history.pushState({}, '', next)
     setPath(next)
   }, [])
-  const signedOut = useCallback(() => { setAccount(null); go('/') }, [go])
+  const signedOut = useCallback(() => { setAccount(null); go(embedded ? '/app/embedded/devices' : '/') }, [go, embedded])
   useEffect(() => {
     const onPopState = () => setPath(window.location.pathname)
     window.addEventListener('popstate', onPopState)
@@ -47,13 +48,13 @@ function App() {
     if (justLoggedIn.current) { justLoggedIn.current = false; return }
     if (account === null && path === '/app/remote') go('/app/login')
   }, [account, path, go])
-  const login = useCallback((next: Account) => { justLoggedIn.current = true; setAccount(next); go('/app/remote') }, [go])
+  const login = useCallback((next: Account) => { justLoggedIn.current = true; setAccount(next); go(embedded ? '/app/embedded/devices' : '/app/remote') }, [go, embedded])
   const content = account === undefined
     ? <div className="route-loading auth-route-loading" role="status">正在检查登录状态…</div>
-    : path === '/app/remote' && account
-      ? <DevicesPage account={account.account} onSignedOut={signedOut} />
-      : path === '/app/login'
-        ? <LoginPanel onAuthSuccess={login} initialError={error} />
+    : (path === '/app/remote' || embedded) && account
+      ? <DevicesPage account={account.account} onSignedOut={signedOut} embedded={embedded} />
+      : path === '/app/login' || embedded
+        ? <LoginPanel onAuthSuccess={login} initialError={error} embedded={embedded} />
         : <HomePage />
   return <ConfigProvider locale={zhCN} theme={{
     algorithm: dark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
@@ -61,7 +62,7 @@ function App() {
       colorPrimary: '#1677ff', colorInfo: '#1677ff', colorSuccess: dark ? '#49aa68' : '#16a34a', colorWarning: dark ? '#d89614' : '#d97706', colorError: dark ? '#ff7875' : '#cf222e',
       colorBgLayout: dark ? '#111318' : '#f5f5f7', colorBgContainer: dark ? '#181b22' : '#ffffff', colorBgElevated: dark ? '#20242c' : '#ffffff', colorText: dark ? '#f2f3f5' : '#1d1d1f', colorTextSecondary: dark ? '#b7bcc7' : '#6e6e73', colorTextPlaceholder: dark ? '#8d94a3' : '#6e6e73', colorBorder: dark ? '#3a404c' : '#d9e2ec', colorBorderSecondary: dark ? '#2d323c' : '#e8e8ed', borderRadius: 6, borderRadiusLG: 8, controlHeight: 40, fontSize: 15, wireframe: false,
     }, components: { Button: { primaryShadow: 'none' }, Table: { headerBg: dark ? '#20242c' : '#f7f7f8', headerColor: dark ? '#c8cdd6' : '#4b5563' } },
-  }}><Layout className={account && path === '/app/remote' ? 'app-shell product-shell' : 'app-shell auth-shell'}>
+  }}><Layout className={`${account && (path === '/app/remote' || embedded) ? 'app-shell product-shell' : 'app-shell auth-shell'}${embedded ? ' embedded-shell' : ''}`}>
     {content}
   </Layout></ConfigProvider>
 }

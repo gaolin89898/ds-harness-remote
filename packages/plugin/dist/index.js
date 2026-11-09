@@ -64764,6 +64764,10 @@ var registerOwnedRoleRequestSchema = external_exports.object({
   v: external_exports.literal(PROTOCOL_VERSION),
   device: accountDeviceDescriptorSchema
 }).strict();
+var linkOwnedRolesRequestSchema = external_exports.object({
+  v: external_exports.literal(PROTOCOL_VERSION),
+  counterpartAccessToken: authTokenSchema
+}).strict();
 var deviceRefreshRequestSchema = external_exports.object({
   deviceId: deviceIdSchema,
   refreshToken: authTokenSchema
@@ -84350,6 +84354,18 @@ var HostServerApi = class {
     this.credentials = await this.credentialsPromise;
     return this.credentials;
   }
+  async linkOwnedRole(counterpartAccessToken) {
+    const stored = await this.store.load(this.baseUrl, this.requireIdentity().deviceId);
+    if (this.hostOnly || !stored || stored.pairingRestricted || stored.refreshTokenExpiresAt <= Date.now() + 3e4) return;
+    try {
+      await this.request("/api/v1/devices/link-owned-roles", {
+        method: "POST",
+        body: JSON.stringify({ v: 1, counterpartAccessToken })
+      });
+    } catch (error62) {
+      if (!(error62 instanceof ServerApiError) || error62.status !== 404) throw error62;
+    }
+  }
   async refreshCredentials(rejectedAccessToken = this.credentials?.accessToken) {
     const identity3 = this.requireIdentity();
     this.credentials = await this.withRefreshLock(async () => {
@@ -86411,8 +86427,9 @@ var ClientModeRuntime = class {
     });
     if (this.config.hostControl?.enabled !== false && this.host !== void 0 && this.server.hasStoredAuthorization !== void 0) {
       try {
-        if (await this.server.hasStoredAuthorization() && (this.host.hasStoredAuthorization === void 0 || !await this.host.hasStoredAuthorization())) {
-          await this.authorizeHostByDefault();
+        if (await this.server.hasStoredAuthorization()) {
+          if (this.host.hasStoredAuthorization === void 0 || !await this.host.hasStoredAuthorization()) await this.authorizeHostByDefault();
+          else await this.linkDeviceRoles();
         }
       } catch (error62) {
         this.logger.warn("automatic Host authorization failed", { code: safeErrorCode(error62) });
@@ -86425,13 +86442,24 @@ var ClientModeRuntime = class {
       if (this.config.hostControl?.enabled === false) return;
       const status2 = this.host.hostStatus();
       if (!status2.accountRequired) {
-        if (status2.authorized) return;
-        if (this.host.hasStoredAuthorization !== void 0 && await this.host.hasStoredAuthorization()) return;
+        if (status2.authorized || this.host.hasStoredAuthorization !== void 0 && await this.host.hasStoredAuthorization()) {
+          await this.linkDeviceRoles();
+          return;
+        }
       }
       const credentials = await this.server.authenticate(this.requireIdentity());
       await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account);
     } catch (error62) {
       this.logger.warn("automatic Host authorization failed", { code: safeErrorCode(error62) });
+    }
+  }
+  async linkDeviceRoles() {
+    if (!this.host?.linkOwnedRole || this.host.hostStatus().pairingHostOnly) return;
+    try {
+      const credentials = await this.server.authenticate(this.requireIdentity());
+      await this.host.linkOwnedRole(credentials.accessToken);
+    } catch (error62) {
+      this.logger.warn("device role association failed", { code: safeErrorCode(error62) });
     }
   }
   registerControl(connection, webServer) {
@@ -100362,6 +100390,9 @@ var HostPluginRuntime = class {
   }
   async hasStoredAuthorization() {
     return this.serverApi?.hasStoredAuthorization() ?? false;
+  }
+  async linkOwnedRole(accessToken) {
+    await this.serverApi?.linkOwnedRole(accessToken);
   }
   listConnectedClients() {
     return this.connections.connectedPeers().map((peer) => {

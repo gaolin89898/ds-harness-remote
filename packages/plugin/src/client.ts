@@ -1,4 +1,5 @@
 import { renderBodyPortal } from './client/portal.js'
+import { createDevicesPanel, DEVICES_PANEL_ID } from './client/devices-panel.js'
 import type { Translate } from './client-locale.js'
 import { en, localeNamespace, zh } from './client-locale.js'
 import { createRemoteSessionHeaderAction } from './client/header.js'
@@ -119,6 +120,7 @@ window.__ModuleLoader__.load({
       }, label)
     }
     const RemoteWorkspaceAction = createRemoteWorkspaceAction(React, portal)
+    const { DevicesIcon, DevicesPanel } = createDevicesPanel(React)
     const RemoteProgressView = createRemoteProgressView(React)
     const RemoteSessionHeaderAction = createRemoteSessionHeaderAction(React, portal)
     let openHarnessSettings: ((page?: string) => void) | undefined
@@ -601,6 +603,14 @@ window.__ModuleLoader__.load({
       ctx.effect(() => ctx.locale.register(localeNamespace, { zh, en }), 'ds-harness-remote: dictionaries')
       ctx.effect(() => installStyle(clientModuleId), 'ds-harness-remote: client styles')
       ctx.effect(() => installTerminalAvailabilityNotice(statusFeed, t), 'ds-harness-remote: terminal availability notice')
+      ctx.slots.inject('main', () => ctx.slots.register({
+        name: 'main', key: DEVICES_PANEL_ID, locale: localeNamespace,
+        inject: () => ({ control, statusFeed }),
+      }, DevicesPanel))
+      ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+        name: 'sidebar.panellist', id: DEVICES_PANEL_ID, order: 80,
+        label: () => t('myDevices'), locale: localeNamespace,
+      }, DevicesIcon))
       ctx.slots.inject('shell.overlay', () => ctx.slots.register({
         name: 'shell.overlay',
         id: 'ds-harness-remote-global-context',

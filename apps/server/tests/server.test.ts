@@ -12,7 +12,7 @@ import { MAX_CONTROL_FRAME_BYTES, createControlFrame } from '@dsh-remote/protoco
 import { NoiseIkSession, createNoisePrologue, generateKeyPair, toBase64Url, fromBase64Url } from '../../../packages/crypto/src/index.js'
 import { RelayTransport } from '../../../packages/webrtc/src/index.js'
 import { ClientSecureTransport } from '../../../packages/plugin/src/client-secure-transport.js'
-import { ClientServerApi } from '../../../packages/plugin/src/server-api.js'
+import { ClientServerApi, HostServerApi } from '../../../packages/plugin/src/server-api.js'
 import { IdentityStore } from '../../../packages/plugin/src/identity-store.js'
 import { ServerCredentialStore } from '../../../packages/plugin/src/server-credentials.js'
 import {
@@ -181,6 +181,31 @@ const cleanupScenario2 = async () => {
 afterEach(cleanupScenario2)
 
 describe('account and device authorization', () => {
+  it('restricts embedding to configured ancestors and keeps embedded sessions separate', async () => {
+    const embedHeaders = { 'X-DSH-Embedded': '1' }
+    const crossSite = { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'iframe' }
+    expect((await fetch(base + '/app/embedded/devices', { headers: crossSite })).status).toBe(403)
+    await app.close(); await start(password, [], { frameAncestors: ['dsh-app://app', 'https://harness.example.com'] })
+    const embedded = await fetch(base + '/app/embedded/devices', { headers: crossSite })
+    expect(embedded.status).toBe(200)
+    expect(embedded.headers.get('content-security-policy')).toContain('frame-ancestors dsh-app://app https://harness.example.com;')
+    expect((await fetch(base + '/app/remote')).headers.get('content-security-policy')).toContain("frame-ancestors 'none'")
+    expect((await request('/auth/login', 'POST', { email: account, password }, undefined, crossSite)).status).toBe(403)
+    expect((await request('/auth/login', 'POST', { email: account, password }, undefined, { ...embedHeaders, Origin: 'https://attacker.example' })).status).toBe(403)
+    const normalLogin = await request('/auth/login', 'POST', { email: account, password })
+    const embedLogin = await request('/auth/login', 'POST', { email: account, password }, undefined, embedHeaders)
+    const embedCookie = embedLogin.headers.get('set-cookie')!
+    expect(embedCookie).toContain('dsh_embed_session=')
+    for (const attribute of ['HttpOnly', 'Secure', 'SameSite=None', 'Partitioned']) expect(embedCookie).toContain(attribute)
+    expect(normalLogin.headers.get('set-cookie')).toContain('SameSite=Strict')
+    const headers = { ...embedHeaders, Cookie: embedCookie.split(';')[0]! }
+    expect((await request('/account/devices', 'GET', undefined, undefined, headers)).status).toBe(200)
+    expect((await request('/account/devices', 'GET', undefined, undefined, { Cookie: headers.Cookie })).status).toBe(401)
+    await request('/auth/logout', 'POST', {}, undefined, headers)
+    expect((await request('/account/devices', 'GET', undefined, undefined, headers)).status).toBe(401)
+    expect((await request('/auth/me', 'GET', undefined, normalLogin.data.token)).status).toBe(200)
+    expect(() => createRemoteServer({ account, password, dataFile: join(dir, 'invalid.json'), publicUrl: 'http://localhost:8080', frameAncestors: ['https://*.example.com'] })).toThrow()
+  })
   it('separates account, cookie and device credentials; rejects cross-origin requests', async () => {
     expect((await request('/auth/login', 'POST', { email: account, password: 'wrong' })).status).toBe(401)
     expect((await request('/auth/login', 'POST', { email: account, password }, undefined, { Origin: 'https://attacker.example' })).status).toBe(403)
@@ -204,6 +229,67 @@ describe('account and device authorization', () => {
     const descriptor = { ...changed, deviceId: randomUUID() }
     expect((await request('/devices/register-owned-role', 'POST', { v: 1, device: descriptor }, h.accessToken)).status).toBe(409)
     expect((await request('/devices/register-owned-role', 'POST', { v: 1, device: descriptor }, c.accessToken)).status).toBe(200)
+    const rows = (await request('/account/devices', 'GET', undefined, accountToken)).data.items
+    expect(rows).toHaveLength(2)
+    expect(rows.find((row: any) => row.deviceId === descriptor.deviceId).roles).toEqual(['host', 'client'])
+  })
+  it('links existing local roles without rotating credentials and keeps the group across restart', async () => {
+    const h = await device('host'), c = await device(), other = await device('host')
+    // Matching names/platforms do not prove that two identities share an installation.
+    expect((await request('/account/devices', 'GET', undefined, accountToken)).data.items).toHaveLength(3)
+    const credentials = new ServerCredentialStore(join(dir, 'link-api'))
+    await credentials.save({ serverUrl: base, deviceId: h.deviceId, authorizationMethod: 'account', account,
+      accessToken: h.accessToken, refreshToken: h.refreshToken,
+      accessTokenExpiresAt: h.accessTokenExpiresAt, refreshTokenExpiresAt: h.refreshTokenExpiresAt })
+    const api = new HostServerApi(base, credentials)
+    api.bindIdentity({ schemaVersion: 1, deviceId: h.deviceId, name: h.name, ...h.keys, fingerprint: 'local-host' })
+    try { await api.linkOwnedRole(c.accessToken) } finally { api.close() }
+    expect((await request('/devices/link-owned-roles', 'POST', { v: 1, counterpartAccessToken: h.accessToken }, c.accessToken)).status).toBe(200)
+    const client = await socket(c); await client.next('hello.ack')
+    const rows = (await request('/account/devices', 'GET', undefined, accountToken)).data.items
+    expect(rows).toHaveLength(2)
+    expect(rows.find((row: any) => row.deviceId === h.deviceId)).toMatchObject({ roles: ['host', 'client'], online: true, lastSeenAt: app.store.get(c.deviceId).lastSeenAt })
+    expect(rows.find((row: any) => row.deviceId === other.deviceId).roles).toEqual(['host'])
+    expect((await request('/me', 'GET', undefined, h.accessToken)).data.role).toBe('host')
+    expect((await request('/me', 'GET', undefined, c.accessToken)).data.role).toBe('client')
+    expect((await request('/devices', 'GET', undefined, c.accessToken)).data.items).toHaveLength(2)
+    expect((await request(`/devices/${h.deviceId}/name`, 'POST', { name: '公司电脑' }, accountToken)).status).toBe(200)
+    expect(app.store.get(c.deviceId).descriptor.name).toBe('公司电脑')
+    await app.close(); await start()
+    accountToken = (await request('/auth/login', 'POST', { email: account, password })).data.token
+    const restored = (await request('/account/devices', 'GET', undefined, accountToken)).data.items
+    expect(restored).toHaveLength(2)
+    expect(restored.find((row: any) => row.deviceId === h.deviceId)).toMatchObject({ name: '公司电脑', roles: ['host', 'client'], online: false })
+    expect((await request('/devices/self', 'DELETE', undefined, h.accessToken)).status).toBe(200)
+    expect((await request('/me', 'GET', undefined, c.accessToken)).status).toBe(200)
+    expect((await request('/auth/refresh', 'POST', { deviceId: c.deviceId, refreshToken: c.refreshToken })).status).toBe(200)
+    const remaining = (await request('/account/devices', 'GET', undefined, accountToken)).data.items
+    expect(remaining.find((row: any) => row.deviceId === c.deviceId).roles).toEqual(['client'])
+  })
+  it('requires both valid opposite-role credentials and refuses conflicting device groups', async () => {
+    await runScenarios(['missing-source', 'account-source', 'invalid-target', 'expired-target', 'revoked-target', 'same-device', 'same-role', 'different-platform', 'source-conflict', 'target-conflict'].map(kind => ({
+      name: kind, run: async () => {
+        const h = await device('host'), c = await device(), extra = await device('host')
+        let source: string | undefined = h.accessToken, target = c.accessToken, status = 409
+        if (kind === 'missing-source') { source = undefined; status = 401 }
+        if (kind === 'account-source') { source = accountToken; status = 401 }
+        if (kind === 'invalid-target') { target = 'invalid-target-access-token'; status = 401 }
+        if (kind === 'expired-target') { vi.spyOn(Date, 'now').mockReturnValue(c.accessTokenExpiresAt); status = 401 }
+        if (kind === 'revoked-target') { app.store.revoke(c.deviceId); status = 401 }
+        if (kind === 'same-device') target = h.accessToken
+        if (kind === 'same-role') target = extra.accessToken
+        if (kind === 'different-platform') app.store.get(c.deviceId).descriptor.platform = 'android'
+        if (kind === 'source-conflict') {
+          const other = await device(); app.store.linkRoles(h.deviceId, other.deviceId)
+        }
+        if (kind === 'target-conflict') app.store.linkRoles(extra.deviceId, c.deviceId)
+        const before = readFileSync(join(dir, 'state.json'), 'utf8')
+        expect((await request('/devices/link-owned-roles', 'POST', { v: 1, counterpartAccessToken: target }, source)).status).toBe(status)
+        expect(readFileSync(join(dir, 'state.json'), 'utf8')).toBe(before)
+        vi.restoreAllMocks()
+        expect((await request('/me', 'GET', undefined, h.accessToken)).status).toBe(200)
+      },
+    })), async () => { vi.restoreAllMocks(); await cleanupScenario2(); await prepareScenario1() })
   })
   it('recovers a lost refresh response across restart without invalidating the successor', async () => {
     const d = await device()

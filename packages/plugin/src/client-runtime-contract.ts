@@ -141,6 +141,7 @@ export interface HostAuthorizationControl {
     }>
   }
   hasStoredAuthorization?(): Promise<boolean>
+  linkOwnedRole?(accessToken: string): Promise<void>
   reconnectHost(): void
   clearHostAuthorization(): Promise<void>
   localHarnessVersion?(): string | undefined

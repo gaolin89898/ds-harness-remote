@@ -10,6 +10,24 @@
 
 首页地址是 `/`，点击“开始使用”进入登录页；登录成功后进入 `/app/remote` 设备列表。Host 和客户端都填写同一个 Server 地址，并使用相同的账号密码登录。设备凭据由 Server 保存，Web 登录会话使用 HttpOnly Cookie。
 
+同一 Plugin 安装的 Host 和客户端合并为一行，角色列同时显示两个角色；在线数量按设备统计，任一角色在线即显示在线，改名同步两个角色。两个角色的凭据及撤销仍保持独立。同名的不同设备不会合并。
+
+已有的重复记录需要同时更新 Server 和 Plugin；插件重启或 Client 再次登录时会用本机两份有效凭据补齐关联。只有一份有效凭据的设备继续单独显示。
+
+## 在 Harness 内嵌设备页
+
+Plugin 在 Harness 左侧 SSH 下方增加“我的设备”，在主区域打开已保存 Server 的 `/app/embedded/devices` 页面。内嵌页保留设备表格，省去网站导航和页脚。
+
+自部署 Server 需要使用 HTTPS，并配置允许嵌入的 Harness 精确 origin：
+
+```dotenv
+DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://harness.example.com
+```
+
+`dsh-app://app` 用于 Desktop；将 HTTPS 示例替换为自己的 Harness Web origin。留空（默认）时禁止嵌入，不接受通配符和页面路径。修改后重新创建 Server 容器；网站其他页面仍禁止嵌入。
+
+首次在内嵌页中登录一次。该页使用独立的 HttpOnly、Secure、Partitioned Cookie，与普通网页登录和设备凭据分开；在此退出登录不会断开 Host 或客户端。
+
 ## 刷新响应丢失恢复
 
 刷新成功但响应丢失时，重试旧 refresh token 会返回同一组后继凭据，Server 重启后也可恢复。恢复持续到后继再次轮换、撤销或过期，不延长任何 token 的生命周期。若恢复的 access token 已过期，可用恢复的 refresh token 再次轮换。更早的旧 token 会被拒绝，但不撤销当前有效凭据。
@@ -76,6 +94,7 @@ node --env-file=.env dist/main.js
 | `DSH_SERVER_ACCOUNT` | 必填，登录账号 |
 | `DSH_SERVER_PASSWORD` | 必填，至少 12 字符 |
 | `DSH_SERVER_PUBLIC_URL` | 浏览器访问地址，默认 `http://localhost:8080` |
+| `DSH_SERVER_FRAME_ANCESTORS` | 允许嵌入 `/app/embedded/devices` 的精确 origin，逗号分隔；留空（默认）时禁止嵌入 |
 | `DSH_SERVER_HOST` | 监听/端口映射地址，默认 `127.0.0.1`；局域网设为 `0.0.0.0` |
 | `DSH_SERVER_PORT` | 默认 `8080` |
 | `DSH_SERVER_DATA_FILE` | 默认 `data/state.json`，相对启动目录 |

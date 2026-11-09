@@ -43,6 +43,12 @@ WebSocket: wss://{serverHost}/ws/v1/connect
 
 切换 Server 时，不得把旧 Server 的账号 token、设备 token、deviceId 或账号授权状态发送给新 Server。建议按规范化后的 `serverUrl` 隔离本地凭证和设备身份。
 
+“我的设备”入口通过官方 `sidebar.panellist` 与 `main` 插槽打开已保存 Server 的
+`/app/embedded/devices`，仅接受无用户名密码的 HTTP(S) 地址，不向 iframe 传递设备凭据。
+自部署 Server 须配置 `DSH_SERVER_FRAME_ANCESTORS` 放行精确 Harness origin，见
+[Server 配置](../apps/server/README.zh.md#在-harness-内嵌设备页)。首次内嵌网页登录独立于
+Plugin 的设备授权；退出内嵌页不撤销设备凭据，也不影响普通网页的登录会话。
+
 ## 3. 账号登录
 
 ### 3.1 邮箱密码
@@ -280,6 +286,13 @@ owner 的设备或其他 Server 签发的 token。
 
 Host 与 Remote 必须使用不同 deviceId 和 identity key。Remote 主机列表应排除本机 Host
 deviceId，避免用户把当前 Harness 连接回自身。
+
+自部署 Server 的“我的设备”按本机角色关联显示一行，角色列同时显示 Host 和客户端。
+新角色通过 `register-owned-role` 注册时保存关联。已持有两份凭据的 Plugin 在启动及
+Client 登录完成时，以 Host bearer 和本机 Client bearer 调用可选的
+`POST /api/v1/devices/link-owned-roles`（见协议 §8.1.2），补齐旧记录的展示关联。
+不重新注册或替换有效凭据，不按名称/IP 推断同机；缺失、已过期或 Host-only 配对凭据
+不触发 Host 注册。旧 Server 不支持时跳过，其他失败仅记录安全错误码，不阻断登录。
 
 ## 6. 凭证保存和刷新
 

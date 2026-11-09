@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { randomUUID } from 'node:crypto'
 import { isIP } from 'node:net'
 import { z } from 'zod'
-import { deviceRegistrationRequestSchema, deviceRefreshRequestSchema } from '@dsh-remote/protocol'
+import { deviceRegistrationRequestSchema, deviceRefreshRequestSchema, linkOwnedRolesRequestSchema } from '@dsh-remote/protocol'
 import { ApiError, Store, equal, hash, secret } from './store.js'
 import { Gateway } from './gateway.js'
 import { buildIceServers, parseIceConfig, type IceConfig } from './ice.js'
@@ -30,6 +30,7 @@ export interface Config {
   dataFile: string
   publicUrl: string
   trustedProxyIps?: readonly string[]
+  frameAncestors?: readonly string[]
   helloTimeoutMs?: number
   heartbeatIntervalMs?: number
   heartbeatDisconnectMs?: number
@@ -165,6 +166,13 @@ export function createRemoteServer(config: Config) {
   const url = new URL(config.publicUrl)
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) throw new Error('DSH_SERVER_PUBLIC_URL must be an HTTP(S) origin.')
   const trustedProxyIps = normalizeTrustedProxyIps(config.trustedProxyIps)
+  const frameAncestors = (config.frameAncestors ?? []).map(value => {
+    if (value === 'dsh-app://app') return value
+    const origin = new URL(value)
+    if (!['http:', 'https:'].includes(origin.protocol) || origin.username || origin.password || origin.pathname !== '/'
+      || origin.search || origin.hash || origin.hostname.includes('*')) throw new Error('Frame ancestors must be exact HTTP(S) origins or dsh-app://app.')
+    return origin.origin
+  })
   const ice = config.ice ?? parseIceConfig({})
   const store = new Store(config.dataFile, config.account.trim(), config.password)
   const assets = readAssets()
@@ -179,7 +187,8 @@ export function createRemoteServer(config: Config) {
   function token(req: IncomingMessage): string {
     const authorization = req.headers.authorization
     if (authorization) return authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
-    return /(?:^|;\s*)dsh_session=([A-Za-z0-9_-]+)/.exec(req.headers.cookie ?? '')?.[1] ?? ''
+    const cookieName = embeddedRequest(req) ? 'dsh_embed_session' : 'dsh_session'
+    return new RegExp(`(?:^|;\\s*)${cookieName}=([A-Za-z0-9_-]+)`).exec(req.headers.cookie ?? '')?.[1] ?? ''
   }
   function accountAuth(req: IncomingMessage) {
     const key = hash(token(req))
@@ -189,13 +198,20 @@ export function createRemoteServer(config: Config) {
     if (!req.headers.authorization?.startsWith('Bearer ')) throw new ApiError('AUTH_REQUIRED', 401)
     return store.authenticate(req.headers.authorization.slice(7))
   }
-  function cookie(value: string, age: number): string { return `dsh_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${url.protocol === 'https:' ? '; Secure' : ''}` }
+  function embeddedRequest(req: IncomingMessage): boolean { return frameAncestors.length > 0 && req.headers['x-dsh-embedded'] === '1' }
+  function cookie(value: string, age: number, embedded = false): string {
+    return embedded
+      ? `dsh_embed_session=${value}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${age}`
+      : `dsh_session=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${url.protocol === 'https:' ? '; Secure' : ''}`
+  }
   const profile = () => ({ account: store.account, profile: { displayName: store.account }, isAdmin: false })
   const server = createServer({ requestTimeout: 15000, headersTimeout: 10000 }, (req, res) => {
     res.setHeader('Cache-Control', 'no-store')
     res.setHeader('X-Content-Type-Options', 'nosniff')
     res.setHeader('Referrer-Policy', 'no-referrer')
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+    const embedPage = req.url?.split('?')[0] === '/app/embedded/devices'
+    const ancestors = embedPage && frameAncestors.length ? frameAncestors.join(' ') : "'none'"
+    res.setHeader('Content-Security-Policy', `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors ${ancestors}; form-action 'self'`)
     void route(req, res).catch(error => {
       if (res.headersSent || res.destroyed) return
       const e = error instanceof ApiError ? error : error instanceof z.ZodError ? new ApiError('INVALID_MESSAGE') : new ApiError('INTERNAL_ERROR', 500)
@@ -222,13 +238,29 @@ export function createRemoteServer(config: Config) {
   function descriptor(d: ReturnType<Store['get']>) {
     return { ...d.descriptor, membershipId: `account:${hash(store.account).slice(0, 16)}`, online: gateway.peers.has(d.descriptor.deviceId), lastSeenAt: d.lastSeenAt }
   }
+  function accountDevices() {
+    const seen = new Set<string>()
+    return store.list().flatMap(device => {
+      if (seen.has(device.descriptor.deviceId)) return []
+      const members = store.deviceGroup(device.descriptor.deviceId).map(descriptor)
+      for (const member of members) seen.add(member.deviceId)
+      const primary = members[0]!
+      return [{
+        ...primary,
+        roles: members.map(member => member.role),
+        online: members.some(member => member.online),
+        lastSeenAt: Math.max(...members.map(member => member.lastSeenAt)),
+      }]
+    })
+  }
   async function route(req: IncomingMessage, res: ServerResponse) {
     const requestUrl = new URL(req.url ?? '/', url)
     const path = requestUrl.pathname
     const method = req.method
     if (req.headers.origin && req.headers.origin !== url.origin) throw new ApiError('AUTH_INVALID', 403)
-    if (req.headers['sec-fetch-site'] === 'cross-site') throw new ApiError('AUTH_INVALID', 403)
     const staticAsset = path.startsWith('/assets/') || ['/icon.png', '/brand-whale.webp', '/landing-atmosphere.webp'].includes(path)
+    const publicEmbedResource = method === 'GET' && (staticAsset || (path === '/app/embedded/devices' && frameAncestors.length > 0))
+    if (req.headers['sec-fetch-site'] === 'cross-site' && !publicEmbedResource) throw new ApiError('AUTH_INVALID', 403)
     // SPA fallback: any GET that is not API / WebSocket / health-check returns index.html.
     // Without this, refreshing a client route such as /app/remote hits the unknown-method branch and yields METHOD_NOT_FOUND.
     const spaRoute = method === 'GET' && !staticAsset && !path.startsWith('/api/') && !path.startsWith('/ws/') && !['/health', '/healthz', '/ready'].includes(path)
@@ -252,22 +284,29 @@ export function createRemoteServer(config: Config) {
       if (sessions.size >= 256) throw new ApiError('RATE_LIMITED', 429)
       const value = secret(), expiresAt = Date.now() + 8 * 3600_000
       sessions.set(hash(value), expiresAt)
-      res.setHeader('Set-Cookie', cookie(value, 8 * 3600))
+      res.setHeader('Set-Cookie', cookie(value, 8 * 3600, embeddedRequest(req)))
       json(res, 200, { ...profile(), token: value, expiresAt }); return
     }
     if (method === 'GET' && path === '/api/v1/auth/me') { accountAuth(req); json(res, 200, profile()); return }
     if (method === 'POST' && path === '/api/v1/auth/logout') {
-      sessions.delete(hash(token(req))); res.setHeader('Set-Cookie', cookie('', 0)); json(res, 200, { status: 'ok' }); return
+      sessions.delete(hash(token(req))); res.setHeader('Set-Cookie', cookie('', 0, embeddedRequest(req))); json(res, 200, { status: 'ok' }); return
     }
     if (method === 'GET' && path === '/api/v1/account/devices') {
-      accountAuth(req); json(res, 200, { items: store.list().map(descriptor), serverUrl: url.origin, transport: 'webrtc' }); return
+      accountAuth(req); json(res, 200, { items: accountDevices(), serverUrl: url.origin, transport: 'webrtc' }); return
+    }
+    if (method === 'POST' && path === '/api/v1/devices/link-owned-roles') {
+      const source = deviceAuth(req)
+      const { counterpartAccessToken } = linkOwnedRolesRequestSchema.parse(await body(req))
+      const target = store.authenticate(counterpartAccessToken)
+      store.linkRoles(source.descriptor.deviceId, target.descriptor.deviceId)
+      json(res, 200, { status: 'ok' }); return
     }
     if (method === 'POST' && (path === '/api/v1/devices/register' || path === '/api/v1/devices/register-owned-role')) {
       const source = path.endsWith('register-owned-role') ? deviceAuth(req) : undefined
       if (!source) accountAuth(req)
       const { device } = deviceRegistrationRequestSchema.parse(await body(req))
       if (source && (source.descriptor.deviceId === device.deviceId || source.descriptor.role === device.role)) throw new ApiError('INVALID_MESSAGE', 409)
-      json(res, 200, store.register(device)); return
+      json(res, 200, store.register(device, source?.descriptor.deviceId)); return
     }
     if (method === 'POST' && path === '/api/v1/auth/refresh') {
       const data = deviceRefreshRequestSchema.parse(await body(req))
