@@ -1786,7 +1786,16 @@ If a code was sent, recover the original submission without changing it.`,
     useRegistrationCode: "Use connection code",
     registering: "Registering\u2026",
     remoteEntry: "Remote",
-    remoteTitle: "DS Harness Remote - Remote Workspace",
+    remoteTitle: "Remote workbench",
+    chooseWorkspace: "Choose workspace",
+    platform: "System",
+    searchWorkspaces: "Search workspaces or paths",
+    noWorkspaceMatches: "No matching workspaces.",
+    allHosts: "All Hosts",
+    onlineHosts: "Online Hosts",
+    offlineHosts: "Offline Hosts",
+    onlineHostCount: "{count} online",
+    noHostMatches: "No Hosts match this filter.",
     remoteDescription: "Choose one of your Hosts, then select a working directory. The Harness interface stays on this device.",
     starProject: "Open source project, stars welcome~",
     chooseHost: "Host",
@@ -2135,7 +2144,16 @@ If a code was sent, recover the original submission without changing it.`,
     useRegistrationCode: "\u4F7F\u7528\u8FDE\u63A5\u7801",
     registering: "\u6B63\u5728\u6CE8\u518C\u2026",
     remoteEntry: "Remote",
-    remoteTitle: "DS Harness Remote - \u8FDC\u7A0B\u5DE5\u4F5C\u53F0",
+    remoteTitle: "\u8FDC\u7A0B\u5DE5\u4F5C\u53F0",
+    chooseWorkspace: "\u9009\u62E9\u5DE5\u4F5C\u533A",
+    platform: "\u7CFB\u7EDF",
+    searchWorkspaces: "\u641C\u7D22\u5DE5\u4F5C\u533A\u6216\u8DEF\u5F84",
+    noWorkspaceMatches: "\u6CA1\u6709\u5339\u914D\u7684\u5DE5\u4F5C\u533A\u3002",
+    allHosts: "\u5168\u90E8\u4E3B\u673A",
+    onlineHosts: "\u5728\u7EBF\u4E3B\u673A",
+    offlineHosts: "\u79BB\u7EBF\u4E3B\u673A",
+    onlineHostCount: "{count} \u53F0\u5728\u7EBF",
+    noHostMatches: "\u6CA1\u6709\u7B26\u5408\u7B5B\u9009\u6761\u4EF6\u7684\u4E3B\u673A\u3002",
     remoteDescription: "\u9009\u62E9\u60F3\u8981\u8FDE\u63A5\u4E3B\u673A\u548C\u5DE5\u4F5C\u76EE\u5F55\u3002",
     starProject: "\u5F00\u6E90\u9879\u76EE\uFF0C\u6B22\u8FCEStar~",
     chooseHost: "\u4E3B\u673A",
@@ -3810,6 +3828,157 @@ If a code was sent, recover the original submission without changing it.`,
     return RemotePluginOptions;
   }
 
+  // packages/plugin/src/client/workbench-styles.ts
+  var workbenchStyles = `
+.dshRemotePage { box-sizing:border-box; letter-spacing:0; }
+.dshRemotePage:focus { outline:0; }
+.dshRemotePageHeader { box-sizing:border-box; min-height:88px; padding:20px 28px; flex-shrink:0; }
+.dshRemotePageHeader strong,.dshRemotePageTitles>strong { font-size:22px; line-height:1.35; letter-spacing:0; white-space:normal; overflow-wrap:anywhere; }
+.dshRemotePageTitles { gap:5px; }
+.dshRemotePageEyebrow { color:var(--dsw-alias-label-tertiary); font-size:11px; }
+.dshRemotePageEyebrowLabel { letter-spacing:0; text-transform:none; }
+.dshRemotePageEyebrow>svg { width:12px; height:12px; flex:none; }
+.dshRemoteBreadcrumbHost { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dshRemoteBrandMark { width:40px; height:40px; border-radius:8px; color:var(--dsw-alias-brand-primary); background:color-mix(in srgb,var(--dsw-alias-brand-primary) 8%,transparent); }
+.dshRemotePageEyebrow .dshRemoteStarLink { font-size:10px; padding:2px 7px; border-radius:4px; }
+.dshRemotePageActions { gap:8px; }
+.dshRemotePageActions>button { box-sizing:border-box; width:34px; height:34px; min-width:34px; padding:0; border-radius:6px; }
+.dshRemotePageActions>.dshRemotePageBack { width:auto; gap:7px; padding:0 10px; font-size:12px; }
+.dshRemotePageActions>button>svg { width:15px; height:15px; flex:none; }
+.dshRemotePage.isWorkbench { width:min(1000px,100%); height:min(620px,calc(100dvh - 40px)); max-height:calc(100dvh - 40px); border-radius:12px; }
+.dshRemotePage.isWorkbench>.dshRemotePageBody { min-height:0; flex:1; padding:22px 28px 0; gap:18px; }
+.isWorkbench .dshRemoteHosts { min-height:0; display:flex; flex-direction:column; gap:14px; flex:1; }
+.isWorkbench .dshRemotePermissionRow { min-height:60px; box-sizing:border-box; display:flex; align-items:center; gap:12px; flex:none; padding:12px 14px; border:1px solid var(--dsw-alias-border-l2); border-radius:8px; background:var(--dsw-alias-bg-layer-2); }
+.dshRemotePermissionIcon { display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:6px; color:var(--dsw-alias-brand-primary); background:color-mix(in srgb,var(--dsw-alias-brand-primary) 8%,transparent); }
+.dshRemotePermissionRow>.dshRemoteHostControlToggle { gap:12px; color:var(--dsw-alias-label-primary); font-size:13px; font-weight:500; white-space:normal; }
+.dshRemotePermissionRow>.dshRemoteConnectedMenu { margin-left:auto; }
+.dshRemotePage .dshRemoteHostControlToggle>input:checked { background:var(--dsw-alias-brand-primary); border-color:var(--dsw-alias-brand-primary); box-shadow:none; }
+.dshRemotePage .dshRemoteConnectedCount { padding:5px 8px; font-size:11px; border-radius:6px; text-decoration:none; background:var(--dsw-alias-bg-layer-3); box-shadow:none; }
+.isWorkbench .dshRemoteSectionHeading { margin:0; flex:none; min-height:28px; }
+.dshRemoteOnlineCount { display:inline-flex; padding:3px 7px; border-radius:4px; color:var(--dsw-alias-state-success-primary); background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 9%,transparent); font-size:11px; line-height:1.4; }
+.dshRemoteHostFilter { box-sizing:border-box; max-width:45%; min-height:30px; border:1px solid var(--dsw-alias-border-l2); border-radius:6px; padding:3px 7px; background:var(--dsw-alias-bg-layer-2); color:var(--dsw-alias-label-secondary); font:inherit; font-size:11px; cursor:pointer; }
+.dshRemoteHostFilter:focus-visible,.dshRemoteWorkspaceSearch:focus-within { outline:2px solid var(--dsw-alias-brand-primary); outline-offset:2px; }
+.isWorkbench .dshRemoteHostList { min-height:0; max-height:none; flex:1; gap:10px; padding:0 2px 4px; margin:0 -2px; }
+.isWorkbench .dshRemoteHostList>button { box-sizing:border-box; min-height:72px; border-radius:8px; padding:12px 16px; gap:12px; box-shadow:none; transition:background .15s,border-color .15s; }
+.isWorkbench .dshRemoteHostItemIcon { width:36px; height:36px; border-radius:8px; background:color-mix(in srgb,var(--dsw-alias-brand-primary) 7%,var(--dsw-alias-bg-layer-2)); }
+.isWorkbench .dshRemoteHostItemText strong { font-size:14px; }
+.isWorkbench .dshRemoteHostItemText small { font-size:11px; }
+.isWorkbench .dshRemoteHostStatus { padding:4px 8px; font-size:10px; border:0; }
+.isWorkbench .dshRemoteHostStatus::before { width:5px; height:5px; box-shadow:none; }
+.isWorkbench .dshRemoteHostItemChevron { display:flex; margin:0; }
+.dshRemotePageBody>.dshRemoteAccountFooter { flex:none; margin:0 -28px; padding:16px 28px; min-height:64px; box-sizing:border-box; }
+.dshRemotePage .dshRemoteAccountAvatar { width:30px; height:30px; background:var(--dsw-alias-brand-primary); color:#fff; }
+.dshRemotePage .dshRemoteAccountSettings,.dshRemotePage .dshRemoteAccountExit { min-height:30px; display:inline-flex; justify-content:center; align-items:center; gap:7px; padding:5px 8px; border-radius:6px; }
+.dshRemotePage .dshRemoteAccountSettings { width:30px; padding:0; }
+.dshRemotePage .dshRemoteAccountExit { border:1px solid var(--dsw-alias-border-l2); }
+.dshRemoteAccountFooter button>svg { width:14px; height:14px; flex:none; }
+.dshRemotePage.hasSelectedHost { width:min(1080px,100%); }
+.dshRemotePage.hasSelectedHost>.dshRemotePageBody { padding:0; gap:0; overflow:hidden; }
+.hasSelectedHost .dshRemoteLocalLink { margin:8px 28px; font-size:12px; }
+.dshRemotePickerLayout { display:grid; grid-template-columns:260px minmax(0,1fr); min-height:0; flex:1; }
+.dshRemoteHostRail { box-sizing:border-box; min-width:0; min-height:0; display:flex; flex-direction:column; gap:22px; padding:24px 22px 16px; border-right:1px solid var(--dsw-alias-border-l2); background:color-mix(in srgb,var(--dsw-alias-bg-base) 55%,var(--dsw-alias-bg-layer-1)); overflow:auto; }
+.dshRemoteRailHost { display:flex; align-items:center; gap:11px; flex:none; min-width:0; }
+.dshRemoteRailHost>div { min-width:0; display:flex; flex-direction:column; gap:4px; }
+.dshRemoteRailHost strong { font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dshRemoteRailStatus { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--dsw-alias-label-secondary); }
+.dshRemoteRailStatus::before { content:''; width:5px; height:5px; flex:none; border-radius:50%; background:currentColor; }
+.dshRemoteRailStatus.isOnline { color:var(--dsw-alias-state-success-primary); }
+.dshRemoteHostSpecs { flex:none; margin:0; padding:0 0 18px; border-bottom:1px solid var(--dsw-alias-border-l2); display:flex; flex-direction:column; gap:10px; font-size:11px; }
+.dshRemoteHostSpecs>div { display:flex; align-items:baseline; justify-content:space-between; gap:10px; min-width:0; }
+.dshRemoteHostSpecs dt { color:var(--dsw-alias-label-tertiary); }
+.dshRemoteHostSpecs dd { margin:0; color:var(--dsw-alias-label-secondary); text-align:right; overflow-wrap:anywhere; }
+.dshRemoteHostSpecs dd>small { display:block; color:var(--dsw-alias-brand-primary); }
+.dshRemoteSelectedDirectory { min-width:0; flex:none; display:flex; flex-direction:column; gap:10px; }
+.dshRemoteSelectedDirectory>span { display:flex; align-items:center; gap:7px; color:var(--dsw-alias-label-secondary); font-size:11px; }
+.dshRemoteSelectedDirectory>span>svg { width:14px; height:14px; }
+.dshRemoteSelectedDirectory>strong { padding:10px 12px; font:12px/1.6 var(--dsw-font-mono,ui-monospace,Consolas,monospace); overflow-wrap:anywhere; border-left:2px solid var(--dsw-alias-border-l2); }
+.dshRemoteSelectedDirectory.hasSelection>strong { color:var(--dsw-alias-brand-primary); border-color:var(--dsw-alias-brand-primary); background:color-mix(in srgb,var(--dsw-alias-brand-primary) 7%,transparent); }
+.dshRemoteHostRail>.dshRemoteAccountFooter { margin-top:auto; padding-top:14px; gap:5px; flex-wrap:wrap; flex:none; }
+.dshRemoteHostRail .dshRemoteAccountIdentity { flex:1; }
+.dshRemoteHostRail .dshRemoteAccountUpdate { order:4; width:100%; padding-left:40px; white-space:normal; box-sizing:border-box; }
+.dshRemoteHostRail .dshRemoteAccountExit { width:30px; padding:0; }
+.dshRemotePickerLayout>.dshRemoteBrowser { min-width:0; min-height:0; padding:22px 24px 0; gap:16px; }
+.dshRemoteWorkspaceSearch { display:flex; align-items:center; gap:9px; flex:none; min-height:40px; padding:0 12px; border:1px solid var(--dsw-alias-border-l2); border-radius:8px; background:var(--dsw-alias-bg-base); color:var(--dsw-alias-label-tertiary); }
+.dshRemoteWorkspaceSearch>svg { width:15px; height:15px; flex:none; }
+.dshRemoteWorkspaceSearch>input { min-width:0; width:100%; height:38px; padding:0; border:0; outline:0; background:transparent; color:var(--dsw-alias-label-primary); font:inherit; font-size:12px; }
+.dshRemoteWorkspaceSearch>input::placeholder { color:var(--dsw-alias-label-tertiary); opacity:1; }
+.dshRemoteWorkspaceLists { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 18px; align-content:start; padding:0 2px 4px; margin:0 -2px; }
+.dshRemoteWorkspaceLists>.dshRemoteCodexWorkspaceGroup { min-width:0; margin:0; border-top:1px solid var(--dsw-alias-border-l2); }
+.dshRemoteWorkspaceLists>.dshRemoteCodexWorkspaceGroup:only-child { grid-column:1/-1; }
+.dshRemoteWorkspaceSourceHeading { box-sizing:border-box; min-height:44px; padding:6px 2px; gap:8px; }
+.dshRemoteWorkspaceSourceHeading>strong,.dshRemoteWorkspaceSourceText>strong { font-size:12px; line-height:1.4; overflow-wrap:anywhere; }
+.dshRemoteWorkspaceSourceHeading>.dshRemoteAddWorkspace { width:26px; height:26px; border:1px solid var(--dsw-alias-border-l2); border-radius:6px; }
+.dshRemoteWorkspaceSourceHeading>.dshRemoteAddWorkspace svg { width:14px; height:14px; }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList { min-height:0; border:0; gap:3px; }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>button:not(.dshRemoteWorkspaceMore) { position:relative; min-height:68px; flex:none; grid-template-columns:28px minmax(0,1fr); grid-template-rows:auto auto; column-gap:10px; row-gap:4px; align-content:center; padding:12px 24px 12px 10px; border:1px solid transparent; border-radius:8px; }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>button.isSelected { border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 28%,transparent); background:color-mix(in srgb,var(--dsw-alias-brand-primary) 9%,transparent); }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>button.isSelected::after { content:''; position:absolute; top:28px; right:10px; width:5px; height:9px; border-right:1.5px solid var(--dsw-alias-brand-primary); border-bottom:1.5px solid var(--dsw-alias-brand-primary); transform:rotate(45deg); }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>button>span { font-size:13px; line-height:1.4; }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>button>small { font-size:10px; line-height:1.5; font-family:var(--dsw-font-mono,ui-monospace,Consolas,monospace); }
+.dshRemoteWorkspaceLists .dshRemoteWorkspaceIcon { width:24px; height:24px; color:var(--dsw-alias-label-secondary); }
+.dshRemoteWorkspaceLists .isSelected>.dshRemoteWorkspaceIcon { color:var(--dsw-alias-brand-primary); }
+.dshRemoteWorkspaceLists .dshRemoteDirectoryList>p { padding:12px 4px; margin:0; font-size:12px; line-height:1.6; }
+.dshRemoteWorkspaceLists .dshRemoteWorkspaceMore { min-height:30px; font-size:16px; border:0; }
+.dshRemotePickerLayout .dshRemoteOpenBar { box-sizing:border-box; margin:0 -24px; padding:14px 24px; gap:12px; min-height:66px; }
+.dshRemoteOpenBar>.dshRemoteOpenActions { margin-left:auto; display:flex; flex-direction:row; gap:8px; align-items:center; flex:none; }
+.dshRemoteOpenActions>button { min-height:36px; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:8px 14px; border:0; border-radius:6px; background:var(--dsw-alias-brand-primary); color:#fff; font-size:12px; line-height:1.4; cursor:pointer; }
+.dshRemoteOpenActions>button>svg { width:15px; height:15px; flex:none; }
+.dshRemoteOpenActions>.dshRemotePickerCancel { color:var(--dsw-alias-label-secondary); background:transparent; }
+.dshRemoteOpenActions>button:hover:not(:disabled) { filter:brightness(1.08); }
+.dshRemoteOpenActions>button:disabled { opacity:.4; cursor:default; }
+.dshRemoteOpenBar .dshRemoteConnectedPanel { top:auto; bottom:calc(100% + 8px); left:0; right:auto; }
+.dshRemotePage.hasSelectedHost .dshRemotePageBody>p { padding:8px 24px; margin:0; }
+.dshRemotePickerLayout .dshRemoteFolderBrowser { margin:0; }
+@media(max-width:920px) {
+  .dshRemotePickerLayout { grid-template-columns:220px minmax(0,1fr); }
+  .dshRemoteHostRail { padding:20px 16px 16px; }
+  .dshRemoteWorkspaceLists { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:700px) {
+  .dshRemoteBackdrop { padding:12px; }
+  .dshRemotePage.isWorkbench { height:min(780px,calc(100dvh - 24px)); max-height:calc(100dvh - 24px); }
+  .dshRemotePageHeader { padding:16px; gap:12px; }
+  .dshRemotePageHeader strong,.dshRemotePageTitles>strong { font-size:19px; }
+  .dshRemotePageTitleRow { gap:10px; }
+  .dshRemotePageEyebrow { flex-wrap:wrap; gap:4px; }
+  .dshRemotePageEyebrow .dshRemoteStarLink { display:none; }
+  .dshRemotePage.hasSelectedHost .dshRemotePageBack { width:34px; padding:0; }
+  .dshRemotePageBack>span { display:none; }
+  .dshRemotePage.isWorkbench>.dshRemotePageBody { padding:16px 16px 0; gap:14px; }
+  .isWorkbench .dshRemoteSectionHeading { flex-direction:row; align-items:center; }
+  .isWorkbench .dshRemotePermissionRow { padding:10px; gap:9px; }
+  .dshRemotePermissionRow>.dshRemoteHostControlToggle { gap:8px; font-size:12px; }
+  .dshRemotePermissionIcon { display:none; }
+  .isWorkbench .dshRemoteHostList>button { padding:12px; gap:8px; }
+  .isWorkbench .dshRemoteHostItemLeft { gap:10px; }
+  .dshRemotePageBody>.dshRemoteAccountFooter { margin:0 -16px; padding:14px 16px; gap:8px; flex-wrap:wrap; }
+  .dshRemoteAccountFooter>.dshRemoteAccountUpdate { white-space:normal; }
+  .dshRemotePage.hasSelectedHost>.dshRemotePageBody { padding:0; gap:0; }
+  .dshRemotePickerLayout { display:flex; flex-direction:column; }
+  .dshRemoteHostRail { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px 16px; padding:14px 16px; border-right:0; border-bottom:1px solid var(--dsw-alias-border-l2); max-height:42%; flex:none; }
+  .dshRemoteHostSpecs { padding:0; border:0; gap:4px; font-size:10px; }
+  .dshRemoteHostSpecs>div { gap:5px; }
+  .dshRemoteSelectedDirectory { grid-column:1/-1; gap:5px; }
+  .dshRemoteSelectedDirectory>strong { padding:5px 8px; max-height:52px; overflow:auto; }
+  .dshRemoteHostRail>.dshRemoteAccountFooter { grid-column:1/-1; padding:8px 0 0; }
+  .dshRemoteHostRail .dshRemoteAccountAvatar { width:24px; height:24px; }
+  .dshRemoteHostRail .dshRemoteAccountCopy>.dshRemoteServerNotice { display:none; }
+  .dshRemotePickerLayout>.dshRemoteBrowser { padding:16px 16px 0; gap:12px; }
+  .dshRemotePickerLayout .dshRemoteOpenBar { margin:0 -16px; padding:12px 16px; min-height:60px; align-items:center; }
+  .dshRemoteOpenBar .dshRemoteConnectedCount { padding:0; background:transparent; font-size:10px; }
+}
+@media(max-width:380px) {
+  .dshRemoteBrandMark { width:32px; height:32px; }
+  .dshRemotePageActions { gap:4px; }
+  .dshRemotePermissionRow>.dshRemoteConnectedMenu .dshRemoteConnectedCount { font-size:10px; padding:4px; }
+  .isWorkbench .dshRemoteHostItemIcon { width:30px; height:30px; }
+  .isWorkbench .dshRemoteHostItemText small { font-size:10px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .isWorkbench .dshRemoteHostList>button { transition:none; }
+}
+`;
+
   // packages/plugin/src/client/shell.ts
   function installStyle(clientModuleId2) {
     let style = document.createElement("style");
@@ -3940,7 +4109,8 @@ If a code was sent, recover the original submission without changing it.`,
       ".dshRemoteAssociation{min-width:0;flex:1;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);align-items:baseline;column-gap:12px;row-gap:4px}.dshRemoteAssociation>span{grid-column:1/-1;color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:1.5}.dshRemoteAssociation strong{grid-column:1;min-width:0;color:var(--dsw-alias-label-primary);font-size:14px;font-weight:500;line-height:1.5;overflow-wrap:anywhere}.dshRemoteAssociation p{grid-column:2;color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:1.5}",
       ".dshRemoteConnection{border-top:1px solid var(--dsw-alias-border-l2);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}.dshRemoteConnectionSummary{min-width:0;display:flex;flex-direction:column;gap:4px}.dshRemoteConnectionSummary>span{color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:1.5}.dshRemoteConnectionSummary strong{display:flex;align-items:center;gap:7px;color:var(--dsw-alias-label-primary);font-size:14px;font-weight:500;line-height:1.5}.dshRemoteConnectionSummary p,.dshRemoteConnectionIssue{color:var(--dsw-alias-label-tertiary);margin:0;font-size:12px;line-height:1.5}.dshRemoteConnectionDot{width:8px;height:8px;flex:0 0 auto;border-radius:999px;background:var(--dsw-alias-label-tertiary)}.dshRemoteConnectionDot.isOnline{background:var(--dsw-alias-state-success-primary)}.dshRemoteConnectionDot.isReconnecting{background:var(--dsw-alias-state-warn-primary)}.dshRemoteConnectionDot.isOffline{background:var(--dsw-alias-state-error-primary)}.dshRemoteConnectionIssue{color:var(--dsw-alias-state-error-primary);padding:0 0 12px}.dshRemoteReconnect{appearance:none;flex:0 0 auto;font:inherit;cursor:pointer;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary);min-height:34px;padding:5px 14px;font-size:13px;line-height:1.5}.dshRemoteReconnect:hover:not(:disabled){color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-dimmed);background:var(--dsw-alias-interactive-bg-hover)}.dshRemoteReconnect:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}.dshRemoteReconnect:disabled{opacity:.4;cursor:default}",
       ".dshRemoteSettingsFooter{border-top:1px solid var(--dsw-alias-border-l2);display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 0 4px}.dshRemoteSettingsFooter .dshRemoteError,.dshRemoteNotice{min-width:0;flex:1;margin:0;font-size:12px;line-height:1.5}.dshRemoteNotice{color:var(--dsw-alias-label-tertiary)}.dshRemoteDiscard,.dshRemoteSave{appearance:none;font:inherit;cursor:pointer;border:1px solid transparent;border-radius:8px;padding:5px 14px;font-size:13px;line-height:1.5}.dshRemoteDiscard{border-color:var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);background:transparent}.dshRemoteDiscard:hover:not(:disabled){color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-dimmed)}.dshRemoteSave{background:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-layer-3)}.dshRemoteDiscard:disabled,.dshRemoteSave:disabled{opacity:.4;cursor:default}.dshRemoteDiscard:focus-visible,.dshRemoteSave:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}",
-      "@media(max-width:620px){.dshRemotePluginCardStatus{display:none}.dshRemoteSettingsTop{gap:10px}.dshRemoteConnection{align-items:flex-start}.dshRemoteReconnect{min-height:40px}.dshRemotePortsRow{flex-direction:column}.dshRemoteAcpAddForm{grid-template-columns:1fr}.dshRemoteAcpAddForm button{min-height:40px}}"
+      "@media(max-width:620px){.dshRemotePluginCardStatus{display:none}.dshRemoteSettingsTop{gap:10px}.dshRemoteConnection{align-items:flex-start}.dshRemoteReconnect{min-height:40px}.dshRemotePortsRow{flex-direction:column}.dshRemoteAcpAddForm{grid-template-columns:1fr}.dshRemoteAcpAddForm button{min-height:40px}}",
+      workbenchStyles
     ].join(""), document.head.append(style), () => style.remove();
   }
   function installTerminalAvailabilityNotice(feed, t) {
@@ -3961,6 +4131,149 @@ If a code was sent, recover the original submission without changing it.`,
 
   // packages/plugin/src/client/workspaces.ts
   var import_qrcode3 = __toESM(require_browser(), 1);
+
+  // node_modules/lucide/dist/esm/defaultAttributes.js
+  var defaultAttributes = {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    "stroke-width": 2,
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round"
+  };
+
+  // node_modules/lucide/dist/esm/icons/arrow-left-right.js
+  var ArrowLeftRight = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M8 3 4 7l4 4" }],
+      ["path", { d: "M4 7h16" }],
+      ["path", { d: "m16 21 4-4-4-4" }],
+      ["path", { d: "M20 17H4" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/chevron-right.js
+  var ChevronRight = ["svg", defaultAttributes, [["path", { d: "m9 18 6-6-6-6" }]]];
+
+  // node_modules/lucide/dist/esm/icons/folder-open.js
+  var FolderOpen = [
+    "svg",
+    defaultAttributes,
+    [
+      [
+        "path",
+        {
+          d: "m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"
+        }
+      ]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/log-out.js
+  var LogOut = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }],
+      ["polyline", { points: "16 17 21 12 16 7" }],
+      ["line", { x1: "21", x2: "9", y1: "12", y2: "12" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/monitor.js
+  var Monitor = [
+    "svg",
+    defaultAttributes,
+    [
+      ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2" }],
+      ["line", { x1: "8", x2: "16", y1: "21", y2: "21" }],
+      ["line", { x1: "12", x2: "12", y1: "17", y2: "21" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/plus.js
+  var Plus = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M5 12h14" }],
+      ["path", { d: "M12 5v14" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/refresh-cw.js
+  var RefreshCw = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" }],
+      ["path", { d: "M21 3v5h-5" }],
+      ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" }],
+      ["path", { d: "M8 16H3v5" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/search.js
+  var Search = [
+    "svg",
+    defaultAttributes,
+    [
+      ["circle", { cx: "11", cy: "11", r: "8" }],
+      ["path", { d: "m21 21-4.3-4.3" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/settings-2.js
+  var Settings2 = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M20 7h-9" }],
+      ["path", { d: "M14 17H5" }],
+      ["circle", { cx: "17", cy: "17", r: "3" }],
+      ["circle", { cx: "7", cy: "7", r: "3" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/shield-check.js
+  var ShieldCheck = [
+    "svg",
+    defaultAttributes,
+    [
+      [
+        "path",
+        {
+          d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        }
+      ],
+      ["path", { d: "m9 12 2 2 4-4" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/smartphone.js
+  var Smartphone = [
+    "svg",
+    defaultAttributes,
+    [
+      ["rect", { width: "14", height: "20", x: "5", y: "2", rx: "2", ry: "2" }],
+      ["path", { d: "M12 18h.01" }]
+    ]
+  ];
+
+  // node_modules/lucide/dist/esm/icons/x.js
+  var X = [
+    "svg",
+    defaultAttributes,
+    [
+      ["path", { d: "M18 6 6 18" }],
+      ["path", { d: "m6 6 12 12" }]
+    ]
+  ];
 
   // packages/plugin/src/version-compare.ts
   var VERSION_PATTERN = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/;
@@ -3999,11 +4312,10 @@ If a code was sent, recover the original submission without changing it.`,
   var whaleMarkViewBox = "0 0 23.5 17.2", whaleMarkPath = "M22.9168 1.43018c-0.2455-0.12-0.351 0.109-0.4945 0.22501-0.049 0.0375-0.0905 0.0865-0.132 0.1315-0.3586 0.38301-0.7776 0.63452-1.3246 0.60452-0.8-0.045-1.483 0.2065-2.087 0.81852-0.1285-0.75452-0.5551-1.20503-1.2041-1.49404-0.3395-0.15001-0.683-0.30051-0.921-0.62702-0.166-0.23251-0.2115-0.49152-0.2945-0.74702-0.053-0.154-0.1055-0.31151-0.283-0.33801-0.1925-0.03-0.268 0.1315-0.3435 0.26651-0.302 0.55202-0.419 1.16003-0.4075 1.77605 0.0265 1.38554 0.6115 2.48907 1.774 3.2741 0.132 0.09 0.166 0.18 0.1245 0.31151-0.0795 0.2705-0.1735 0.53301-0.2565 0.80352-0.053 0.17251-0.132 0.21051-0.317 0.135-0.638-0.2665-1.189-0.66102-1.6761-1.13753-0.8265-0.79952-1.574-1.68205-2.506-2.37307-0.219-0.16151-0.438-0.31151-0.6646-0.45451-0.951-0.92353 0.1246-1.68206 0.3736-1.77206 0.2605-0.094 0.0905-0.41701-0.7511-0.41301-0.8415 0.0035-1.61151 0.28551-2.59304 0.66102-0.14351 0.0565-0.29451 0.0975-0.44902 0.1315-0.89052-0.169-1.81555-0.2065-2.78158-0.0975-1.81905 0.20251-3.2721 1.06253-4.34013 2.53058-1.28304 1.76455-1.58505 3.76961-1.21553 5.86067 0.38851 2.20408 1.51354 4.02858 3.24209 5.45518 1.79256 1.479 3.85712 2.2041 6.21269 2.065 1.43052-0.0825 3.02312-0.274 4.81962-1.7945 0.453 0.2255 0.9286 0.3155 1.7171 0.383 0.6075 0.0565 1.1925-0.03 1.6455-0.124 0.7095-0.15 0.6605-0.807 0.404-0.9275-2.0795-0.9686-1.623-0.5745-2.038-0.8936 1.0565-1.25 2.6706-3.4721 3.1686-6.49765 0.049-0.33401 0.1115-0.80452 0.104-1.07503-0.004-0.16501 0.034-0.22901 0.2225-0.24801 0.521-0.06 1.0265-0.2025 1.491-0.45801 1.3476-0.73602 1.8911-1.94506 2.0191-3.3941 0.019-0.22151-0.004-0.45052-0.238-0.56702z m-11.7419 13.04342c-2.01554-1.5846-2.99306-2.1061-3.39658-2.0836-0.37751 0.0225-0.30951 0.4545-0.2265 0.736 0.087 0.278 0.2 0.4695 0.35851 0.7136 0.1095 0.1615 0.185 0.4015-0.1095 0.582-0.64902 0.4015-1.77756-0.135-1.83056-0.1615-1.31354-0.7736-2.41157-1.7946-3.1856-3.1911-0.74752-1.34407-1.18153-2.78611-1.25303-4.32516-0.019-0.37151 0.0905-0.50302 0.46051-0.57052 0.48701-0.09 0.98903-0.109 1.47554-0.0375 2.05707 0.30051 3.80812 1.22004 5.27616 2.67708 0.83803 0.82953 1.47205 1.8211 2.12505 2.7896 0.6945 1.0285 1.4416 2.0085 2.3931 2.8121 0.336 0.2815 0.604 0.4955 0.8605 0.6535-0.7735 0.0865-2.0645 0.105-2.9476-0.5935l0-0.001z m0.9661-6.21372c0-0.165 0.132-0.2965 0.298-0.2965 0.0375 0 0.0715 0.0075 0.102 0.0185 0.0415 0.015 0.0795 0.0375 0.1095 0.0715 0.053 0.0525 0.083 0.1275 0.083 0.2065 0 0.16501-0.132 0.29651-0.298 0.29651-0.166 0-0.2945-0.1315-0.2945-0.29651z m3.0005 1.53905c-0.1925 0.079-0.385 0.14651-0.57 0.15401-0.287 0.015-0.6-0.10151-0.77-0.24401-0.264-0.22151-0.453-0.34551-0.532-0.73202-0.034-0.16501-0.015-0.42052 0.015-0.56702 0.068-0.31551-0.0075-0.51802-0.23-0.70202-0.181-0.15001-0.4115-0.19151-0.6645-0.19151-0.0945 0-0.181-0.0415-0.2455-0.075-0.1055-0.0525-0.1926-0.18401-0.1095-0.34551 0.0265-0.0525 0.155-0.18001 0.185-0.20251 0.3435-0.1955 0.7395-0.1315 1.106 0.015 0.3395 0.13901 0.5965 0.39402 0.966 0.75453 0.3775 0.43551 0.4455 0.55551 0.6605 0.88252 0.17 0.25551 0.3245 0.51802 0.4306 0.81853 0.064 0.1875-0.019 0.34101-0.2416 0.43501z";
 
   // packages/plugin/src/client/icons.ts
-  var deepSeekWorkspaceIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAACVBMVEUAAADy8vXx8fUsA3vyAAAAAXRSTlMAQObYZgAAAOxJREFUWMPtlsEOwyAMQxP+/6OnTZMGxHGcot3wDYgfhkJbs6urprzveGtu9d1NgEdto8w93GuA7zPS2RFg7ynsCOAokbtAmLr2YaeKgJ6fxpT8jCAC0qSqPyNoO5DXdvyouj4ClFAdYaDxK09uiBDCIYBf6CxLesnR0uF2pG+JmhCqrUb0AOvjjoQaYDTCEAAgMg5grhAeAQIB+/M15IcKlnUIp4CkTCd0AKb4zVsRSJVGYEVzT0agK107IMGMEurvromEpaX4wzk/IKw378kq4LafED6Oowxfk7AP2q8W16EdM3p29Eyvrv6vF0WIBfBziKyCAAAAAElFTkSuQmCC", gptWorkspaceIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAclBMVEX////v7+++wMf////s7O3k5OTExcrX2Ny6vMTv8PPW19yXmqRqboJmaHd3eoaqrLPs7fGMjpfb3eKlpq1eYXOxs7pWWWd+gY5HSVdRVGVub3k+QU74+Pg4OkcvMT1ISlUoKjUiIy4fICueoKkaGyUSFB21Bp+qAAAAAXRSTlMAQObYZgAABChJREFUWMPtl916qjoQhlsdEwIECEgMYCBxx/u/xT1DrFUL1LO1DtY8LSLJvPnmB4gfH//sr7TPDfvdebf/xXZbkE/4zZ0MVhGHd9zJDsv+7F3//Z69tT5wljAu3tXw+TIlzXKJlhflYmJ+5uF5WpWhb54X+C/zZCmT2wJA4dJZwus0UYjIGqWyMhVbEp4yKNRRqlv0opW5PJLJ4rFJXvP4JKDRMqturBZjkMVJFYjR6iHQDQDI4+k2k51wZbWrqwp4mR/1CVYATyko9TFGxBUqL5IvMbXSWt0T8bkGgFLqgqZBI/Uxbx5UAxLaNcCNLBpttM7wbCc1pmJOpWAsDtey68UaQMyrFgb9uxLPjqg3+nGluyKN0XUdWw0BJ0NvTFFqgzpr9J+Dh4w0Ga1qkqBNswagxdRgFPAbgHRQG5jumGWyMxrTIaRRa4AzFs0YrNMXgI4MJWnsKYFhGNMnIh/mBOPsV8CZBFjN9w8ArowxnZzDr5IcvxTaKpxJCVsoI3SWysz1UM4AqQdzlCgho1IKrK+x1mKFzisANtgEU8E7GwHDgOqxe4w9tnM166wbaA2xBMBLrTWcAGYGdCiYVUJUrMCF+7l6gklrW1RwPi8ByjuActANqhKzVWoYrFGcCFzbDgNaBrTWpncFQMcI2DfWoAiDqRCiHcYM/ZdCEKkZqfR8spj4F0CiJjv2gHL6URNoCQDaYacL6O1oFDO2eQDUFP7AKdCRdC4CRDZaNifbjA41l/uYb/SZMAFNTBGzY7sG4J2jTsJgToOzIzXF3HZqBpSOAGduXbkGEKV1OqVGqRJpRxtvwbSw5IqAiUJItwBCOT9R32FCGo3nCkAN3t0UTBRC6zDONcBeOee9pr4T+ASbnDOdc5OmtREwEEB5w8Wqgt4bOV5c7Lt9iiK8zdP/IsBbutUGX4gNwEVCqd3FUt/xYnRWt7BvPBYQjwjAGXa3ASguHVAZ/WXKlA3eZDX1wRegFsr7E2wAlB9xFbx/7MV70kFT8aqNgLL3F8nFBmA3hrn/IJHjKJOK2oj1WI4Z4FzwN/81AOhgYD6v2xbIvaZIurLC9AfvB1WLTYAoXejF1xeBL5cpBIyEbmxkZymIXwDQh1BAfOrhI1lfwtgz8tozF5T4ttf3+32AyxC6klwAgw/YVTHpoK82xYt3wLP/Bw4AAI4D7/01TLKXBj9NEz2wEuGiKpoy68S/FwCLMQAZ3gXhihaCa25vQo6RyToOz9PE6wYjJgGi1YnqZX8qMIK+TDlnargGzSv4NvFjlwXf/nfLLMrAB4O/Xl3BH0d+RIASFgDA8IYMIXgr2+cBsbDdPSwAAHjSZFmb3txETCKIxc0uWwI8rxsLJcTiVndNwyMgKljbbNN2/zcEAja2+4RgIDYN2Bu/WtAOaEodnu2dnzz/7I/Y/w/LaEcX/MdfAAAAAElFTkSuQmCC";
+  var gptWorkspaceIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAclBMVEX////v7+++wMf////s7O3k5OTExcrX2Ny6vMTv8PPW19yXmqRqboJmaHd3eoaqrLPs7fGMjpfb3eKlpq1eYXOxs7pWWWd+gY5HSVdRVGVub3k+QU74+Pg4OkcvMT1ISlUoKjUiIy4fICueoKkaGyUSFB21Bp+qAAAAAXRSTlMAQObYZgAABChJREFUWMPtl916qjoQhlsdEwIECEgMYCBxx/u/xT1DrFUL1LO1DtY8LSLJvPnmB4gfH//sr7TPDfvdebf/xXZbkE/4zZ0MVhGHd9zJDsv+7F3//Z69tT5wljAu3tXw+TIlzXKJlhflYmJ+5uF5WpWhb54X+C/zZCmT2wJA4dJZwus0UYjIGqWyMhVbEp4yKNRRqlv0opW5PJLJ4rFJXvP4JKDRMqturBZjkMVJFYjR6iHQDQDI4+k2k51wZbWrqwp4mR/1CVYATyko9TFGxBUqL5IvMbXSWt0T8bkGgFLqgqZBI/Uxbx5UAxLaNcCNLBpttM7wbCc1pmJOpWAsDtey68UaQMyrFgb9uxLPjqg3+nGluyKN0XUdWw0BJ0NvTFFqgzpr9J+Dh4w0Ga1qkqBNswagxdRgFPAbgHRQG5jumGWyMxrTIaRRa4AzFs0YrNMXgI4MJWnsKYFhGNMnIh/mBOPsV8CZBFjN9w8ArowxnZzDr5IcvxTaKpxJCVsoI3SWysz1UM4AqQdzlCgho1IKrK+x1mKFzisANtgEU8E7GwHDgOqxe4w9tnM166wbaA2xBMBLrTWcAGYGdCiYVUJUrMCF+7l6gklrW1RwPi8ByjuActANqhKzVWoYrFGcCFzbDgNaBrTWpncFQMcI2DfWoAiDqRCiHcYM/ZdCEKkZqfR8spj4F0CiJjv2gHL6URNoCQDaYacL6O1oFDO2eQDUFP7AKdCRdC4CRDZaNifbjA41l/uYb/SZMAFNTBGzY7sG4J2jTsJgToOzIzXF3HZqBpSOAGduXbkGEKV1OqVGqRJpRxtvwbSw5IqAiUJItwBCOT9R32FCGo3nCkAN3t0UTBRC6zDONcBeOee9pr4T+ASbnDOdc5OmtREwEEB5w8Wqgt4bOV5c7Lt9iiK8zdP/IsBbutUGX4gNwEVCqd3FUt/xYnRWt7BvPBYQjwjAGXa3ASguHVAZ/WXKlA3eZDX1wRegFsr7E2wAlB9xFbx/7MV70kFT8aqNgLL3F8nFBmA3hrn/IJHjKJOK2oj1WI4Z4FzwN/81AOhgYD6v2xbIvaZIurLC9AfvB1WLTYAoXejF1xeBL5cpBIyEbmxkZymIXwDQh1BAfOrhI1lfwtgz8tozF5T4ttf3+32AyxC6klwAgw/YVTHpoK82xYt3wLP/Bw4AAI4D7/01TLKXBj9NEz2wEuGiKpoy68S/FwCLMQAZ3gXhihaCa25vQo6RyToOz9PE6wYjJgGi1YnqZX8qMIK+TDlnargGzSv4NvFjlwXf/nfLLMrAB4O/Xl3BH0d+RIASFgDA8IYMIXgr2+cBsbDdPSwAAHjSZFmb3txETCKIxc0uWwI8rxsLJcTiVndNwyMgKljbbNN2/zcEAja2+4RgIDYN2Bu/WtAOaEodnu2dnzz/7I/Y/w/LaEcX/MdfAAAAAElFTkSuQmCC";
 
   // packages/plugin/src/client/workspaces.ts
-  function hostDeviceGlyph(React, platform) {
-    let mobile = /android|ios|iphone|ipad/i.test(platform);
+  function glyph(React, icon) {
     return React.createElement("svg", {
       viewBox: "0 0 24 24",
       width: 18,
@@ -4015,10 +4327,13 @@ If a code was sent, recover the original submission without changing it.`,
       strokeLinejoin: "round",
       "aria-hidden": !0,
       focusable: !1
-    }, mobile ? React.createElement("path", { d: "M9.5 3h5A1.5 1.5 0 0 1 16 4.5v15A1.5 1.5 0 0 1 14.5 21h-5A1.5 1.5 0 0 1 8 19.5v-15A1.5 1.5 0 0 1 9.5 3Zm1.5 15h2" }) : React.createElement("path", { d: "M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5v-9Zm4 12h8" }));
+    }, ...(icon[2] ?? []).map(([tag, attributes], key) => React.createElement(tag, { ...attributes, key })));
+  }
+  function hostDeviceGlyph(React, platform) {
+    return glyph(React, /android|ios|iphone|ipad/i.test(platform) ? Smartphone : Monitor);
   }
   function footerAccountName(status, t) {
-    return status?.target?.name ?? status?.deviceName ?? (status?.host?.account === void 0 ? t("account") : displayRemoteAccount(status.host.account));
+    return status?.host?.account === void 0 ? status?.deviceName ?? t("account") : displayRemoteAccount(status.host.account);
   }
   function accountInitial(label) {
     let trimmed = label.trim();
@@ -4057,7 +4372,7 @@ If a code was sent, recover the original submission without changing it.`,
           if (typeof code == "string") return connectionErrorMessage(code, translate);
         }
         return messageOf(reason, translate);
-      }, [open, setOpen] = React.useState(!1), [status, setStatus] = React.useState(void 0), [devices, setDevices] = React.useState([]), [discoveryUnavailable, setDiscoveryUnavailable] = React.useState(!1), [selectedHost, setSelectedHost] = React.useState(void 0), [connectingHost, setConnectingHost] = React.useState(void 0), [workspaces, setWorkspaces] = React.useState([]), [codexWorkspaces, setCodexWorkspaces] = React.useState([]), [cursorWorkspaces, setCursorWorkspaces] = React.useState([]), [antigravityWorkspaces, setAntigravityWorkspaces] = React.useState([]), [piWorkspaces, setPiWorkspaces] = React.useState([]), [opencodeWorkspaces, setOpencodeWorkspaces] = React.useState([]), [claudeWorkspaces, setClaudeWorkspaces] = React.useState([]), [hermesWorkspaces, setHermesWorkspaces] = React.useState([]), [workspaceBackend, setWorkspaceBackend] = React.useState("harness"), [codexWorkspaceId, setCodexWorkspaceId] = React.useState(void 0), [cursorWorkspaceId, setCursorWorkspaceId] = React.useState(void 0), [antigravityWorkspaceId, setAntigravityWorkspaceId] = React.useState(void 0), [piWorkspaceId, setPiWorkspaceId] = React.useState(void 0), [opencodeWorkspaceId, setOpencodeWorkspaceId] = React.useState(void 0), [claudeWorkspaceId, setClaudeWorkspaceId] = React.useState(void 0), [hermesWorkspaceId, setHermesWorkspaceId] = React.useState(void 0), [directory, setDirectory] = React.useState(void 0), [path, setPath] = React.useState(""), [addingWorkspace, setAddingWorkspace] = React.useState(!1), [showAllWorkspaces, setShowAllWorkspaces] = React.useState(!1), [showAllCodexWorkspaces, setShowAllCodexWorkspaces] = React.useState(!1), [devicesOpen, setDevicesOpen] = React.useState(!1), [showAllCursorWorkspaces, setShowAllCursorWorkspaces] = React.useState(!1), [showAllAntigravityWorkspaces, setShowAllAntigravityWorkspaces] = React.useState(!1), [showAllPiWorkspaces, setShowAllPiWorkspaces] = React.useState(!1), [showAllOpencodeWorkspaces, setShowAllOpencodeWorkspaces] = React.useState(!1), [showAllClaudeWorkspaces, setShowAllClaudeWorkspaces] = React.useState(!1), [showAllHermesWorkspaces, setShowAllHermesWorkspaces] = React.useState(!1), workspaceListId = "dsh-remote-workspace-list", codexWorkspaceHeadingId = "dsh-remote-codex-workspace-heading", codexWorkspaceListId = "dsh-remote-codex-workspace-list", cursorWorkspaceHeadingId = "dsh-remote-cursor-workspace-heading", cursorWorkspaceListId = "dsh-remote-cursor-workspace-list", antigravityWorkspaceHeadingId = "dsh-remote-antigravity-workspace-heading", piWorkspaceHeadingId = "dsh-remote-pi-workspace-heading", opencodeWorkspaceHeadingId = "dsh-remote-opencode-workspace-heading", claudeWorkspaceHeadingId = "dsh-remote-claude-workspace-heading", hermesWorkspaceHeadingId = "dsh-remote-hermes-workspace-heading", antigravityWorkspaceListId = "dsh-remote-antigravity-workspace-list", piWorkspaceListId = "dsh-remote-pi-workspace-list", opencodeWorkspaceListId = "dsh-remote-opencode-workspace-list", claudeWorkspaceListId = "dsh-remote-claude-workspace-list", hermesWorkspaceListId = "dsh-remote-hermes-workspace-list", [busy, setBusy] = React.useState(!1), [needsAuthorization, setNeedsAuthorization] = React.useState(void 0), [email, setEmail] = React.useState(""), [password, setPassword] = React.useState(""), [loginServerUrl, setLoginServerUrl] = React.useState("https://dsh.r2049.cn"), [editingServer, setEditingServer] = React.useState(!1), [savingServer, setSavingServer] = React.useState(!1), serverDirty = loginServerUrl.trim() !== (status?.serverUrl ?? ""), [loginMethod, setLoginMethod] = React.useState("password"), loginMethodManuallySelected = React.useRef(!1), [oauthProviders, setOAuthProviders] = React.useState([]), [providersLoading, setProvidersLoading] = React.useState(!1), [providersFailed, setProvidersFailed] = React.useState(!1), [pairingAvailable, setPairingAvailable] = React.useState(!1), [providerReload, setProviderReload] = React.useState(0), providerRequestRun = React.useRef(0), [qrSession, setQrSession] = React.useState(void 0), [qrImage, setQrImage] = React.useState(void 0), [qrExpired, setQrExpired] = React.useState(!1), [hostEmail, setHostEmail] = React.useState(""), [hostPassword, setHostPassword] = React.useState(""), [hostRegistrationCode, setHostRegistrationCode] = React.useState(""), [progress, setProgress] = React.useState(void 0), progressRun = React.useRef(0), qrFlowRun = React.useRef(0), pageRef = React.useRef(null), [notice, setNotice] = React.useState(void 0), [error, setError] = React.useState(void 0), [sidebarEntry, setSidebarEntry] = React.useState(() => props.sidebarEntry.read());
+      }, [open, setOpen] = React.useState(!1), [status, setStatus] = React.useState(void 0), [devices, setDevices] = React.useState([]), [hostFilter, setHostFilter] = React.useState("all"), [workspaceSearch, setWorkspaceSearch] = React.useState(""), [discoveryUnavailable, setDiscoveryUnavailable] = React.useState(!1), [selectedHost, setSelectedHost] = React.useState(void 0), [connectingHost, setConnectingHost] = React.useState(void 0), [workspaces, setWorkspaces] = React.useState([]), [codexWorkspaces, setCodexWorkspaces] = React.useState([]), [cursorWorkspaces, setCursorWorkspaces] = React.useState([]), [antigravityWorkspaces, setAntigravityWorkspaces] = React.useState([]), [piWorkspaces, setPiWorkspaces] = React.useState([]), [opencodeWorkspaces, setOpencodeWorkspaces] = React.useState([]), [claudeWorkspaces, setClaudeWorkspaces] = React.useState([]), [hermesWorkspaces, setHermesWorkspaces] = React.useState([]), [workspaceBackend, setWorkspaceBackend] = React.useState("harness"), [codexWorkspaceId, setCodexWorkspaceId] = React.useState(void 0), [cursorWorkspaceId, setCursorWorkspaceId] = React.useState(void 0), [antigravityWorkspaceId, setAntigravityWorkspaceId] = React.useState(void 0), [piWorkspaceId, setPiWorkspaceId] = React.useState(void 0), [opencodeWorkspaceId, setOpencodeWorkspaceId] = React.useState(void 0), [claudeWorkspaceId, setClaudeWorkspaceId] = React.useState(void 0), [hermesWorkspaceId, setHermesWorkspaceId] = React.useState(void 0), [directory, setDirectory] = React.useState(void 0), [path, setPath] = React.useState(""), [addingWorkspace, setAddingWorkspace] = React.useState(!1), [showAllWorkspaces, setShowAllWorkspaces] = React.useState(!1), [showAllCodexWorkspaces, setShowAllCodexWorkspaces] = React.useState(!1), [devicesOpen, setDevicesOpen] = React.useState(!1), [showAllCursorWorkspaces, setShowAllCursorWorkspaces] = React.useState(!1), [showAllAntigravityWorkspaces, setShowAllAntigravityWorkspaces] = React.useState(!1), [showAllPiWorkspaces, setShowAllPiWorkspaces] = React.useState(!1), [showAllOpencodeWorkspaces, setShowAllOpencodeWorkspaces] = React.useState(!1), [showAllClaudeWorkspaces, setShowAllClaudeWorkspaces] = React.useState(!1), [showAllHermesWorkspaces, setShowAllHermesWorkspaces] = React.useState(!1), workspaceListId = "dsh-remote-workspace-list", codexWorkspaceHeadingId = "dsh-remote-codex-workspace-heading", codexWorkspaceListId = "dsh-remote-codex-workspace-list", cursorWorkspaceHeadingId = "dsh-remote-cursor-workspace-heading", cursorWorkspaceListId = "dsh-remote-cursor-workspace-list", antigravityWorkspaceHeadingId = "dsh-remote-antigravity-workspace-heading", piWorkspaceHeadingId = "dsh-remote-pi-workspace-heading", opencodeWorkspaceHeadingId = "dsh-remote-opencode-workspace-heading", claudeWorkspaceHeadingId = "dsh-remote-claude-workspace-heading", hermesWorkspaceHeadingId = "dsh-remote-hermes-workspace-heading", antigravityWorkspaceListId = "dsh-remote-antigravity-workspace-list", piWorkspaceListId = "dsh-remote-pi-workspace-list", opencodeWorkspaceListId = "dsh-remote-opencode-workspace-list", claudeWorkspaceListId = "dsh-remote-claude-workspace-list", hermesWorkspaceListId = "dsh-remote-hermes-workspace-list", [busy, setBusy] = React.useState(!1), [needsAuthorization, setNeedsAuthorization] = React.useState(void 0), [email, setEmail] = React.useState(""), [password, setPassword] = React.useState(""), [loginServerUrl, setLoginServerUrl] = React.useState("https://dsh.r2049.cn"), [editingServer, setEditingServer] = React.useState(!1), [savingServer, setSavingServer] = React.useState(!1), serverDirty = loginServerUrl.trim() !== (status?.serverUrl ?? ""), [loginMethod, setLoginMethod] = React.useState("password"), loginMethodManuallySelected = React.useRef(!1), [oauthProviders, setOAuthProviders] = React.useState([]), [providersLoading, setProvidersLoading] = React.useState(!1), [providersFailed, setProvidersFailed] = React.useState(!1), [pairingAvailable, setPairingAvailable] = React.useState(!1), [providerReload, setProviderReload] = React.useState(0), providerRequestRun = React.useRef(0), [qrSession, setQrSession] = React.useState(void 0), [qrImage, setQrImage] = React.useState(void 0), [qrExpired, setQrExpired] = React.useState(!1), [hostEmail, setHostEmail] = React.useState(""), [hostPassword, setHostPassword] = React.useState(""), [hostRegistrationCode, setHostRegistrationCode] = React.useState(""), [progress, setProgress] = React.useState(void 0), progressRun = React.useRef(0), qrFlowRun = React.useRef(0), pageRef = React.useRef(null), [notice, setNotice] = React.useState(void 0), [error, setError] = React.useState(void 0), [sidebarEntry, setSidebarEntry] = React.useState(() => props.sidebarEntry.read());
       React.useEffect(
         () => props.sidebarEntry.subscribe(() => setSidebarEntry(props.sidebarEntry.read())),
         [props.sidebarEntry]
@@ -4183,7 +4498,7 @@ If a code was sent, recover the original submission without changing it.`,
         disabled: busy,
         onClick: () => selectLoginMethod(`oauth:${provider.id}`)
       }, t("providerLogin", { provider: provider.displayName })), selectHost = async (host) => {
-        setBusy(!0), setError(void 0), setConnectingHost(host), setCodexWorkspaces([]), setCursorWorkspaces([]), setAntigravityWorkspaces([]), setPiWorkspaces([]), setOpencodeWorkspaces([]), setClaudeWorkspaces([]), setHermesWorkspaces([]), setShowAllWorkspaces(!1), setShowAllCodexWorkspaces(!1), setShowAllCursorWorkspaces(!1), setShowAllAntigravityWorkspaces(!1), setShowAllPiWorkspaces(!1), setShowAllOpencodeWorkspaces(!1), setShowAllClaudeWorkspaces(!1), setShowAllHermesWorkspaces(!1);
+        setWorkspaceSearch(""), setBusy(!0), setError(void 0), setConnectingHost(host), setCodexWorkspaces([]), setCursorWorkspaces([]), setAntigravityWorkspaces([]), setPiWorkspaces([]), setOpencodeWorkspaces([]), setClaudeWorkspaces([]), setHermesWorkspaces([]), setShowAllWorkspaces(!1), setShowAllCodexWorkspaces(!1), setShowAllCursorWorkspaces(!1), setShowAllAntigravityWorkspaces(!1), setShowAllPiWorkspaces(!1), setShowAllOpencodeWorkspaces(!1), setShowAllClaudeWorkspaces(!1), setShowAllHermesWorkspaces(!1);
         try {
           let result = await runConnectHostProgress(
             status?.preferredTransports,
@@ -4311,7 +4626,7 @@ If a code was sent, recover the original submission without changing it.`,
         setStatus(next), next.host?.pairingHostOnly && (setNeedsAuthorization(!next.host.authorized || next.host.accountRequired), setDevices([]), setSelectedHost(void 0), setConnectingHost(void 0)), next.host?.online && setDiscoveryUnavailable(!1);
       }), [props.statusFeed]);
       let chooseAnotherHost = () => {
-        setSelectedHost(void 0), setWorkspaces([]), setCodexWorkspaces([]), setCursorWorkspaces([]), setAntigravityWorkspaces([]), setPiWorkspaces([]), setOpencodeWorkspaces([]), setClaudeWorkspaces([]), setHermesWorkspaces([]), setShowAllWorkspaces(!1), setShowAllCodexWorkspaces(!1), setShowAllCursorWorkspaces(!1), setShowAllAntigravityWorkspaces(!1), setShowAllPiWorkspaces(!1), setShowAllOpencodeWorkspaces(!1), setShowAllClaudeWorkspaces(!1), setShowAllHermesWorkspaces(!1), setWorkspaceBackend("harness"), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setDirectory(void 0), setPath(""), setAddingWorkspace(!1), setError(void 0);
+        setWorkspaceSearch(""), setSelectedHost(void 0), setWorkspaces([]), setCodexWorkspaces([]), setCursorWorkspaces([]), setAntigravityWorkspaces([]), setPiWorkspaces([]), setOpencodeWorkspaces([]), setClaudeWorkspaces([]), setHermesWorkspaces([]), setShowAllWorkspaces(!1), setShowAllCodexWorkspaces(!1), setShowAllCursorWorkspaces(!1), setShowAllAntigravityWorkspaces(!1), setShowAllPiWorkspaces(!1), setShowAllOpencodeWorkspaces(!1), setShowAllClaudeWorkspaces(!1), setShowAllHermesWorkspaces(!1), setWorkspaceBackend("harness"), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setDirectory(void 0), setPath(""), setAddingWorkspace(!1), setError(void 0);
       }, resetLoginFlow = () => {
         providerRequestRun.current += 1, qrFlowRun.current += 1, setQrSession(void 0), setQrImage(void 0), setQrExpired(!1), setOAuthProviders([]), setProvidersFailed(!1), setProvidersLoading(!1), setLoginMethod("password"), loginMethodManuallySelected.current = !1, setPassword(""), setError(void 0), setNotice(void 0);
       }, saveLoginServer = async (serverUrlOverride) => {
@@ -4413,12 +4728,8 @@ If a code was sent, recover the original submission without changing it.`,
             setError(messageOf(reason, t)), setBusy(!1);
           }
         }
-      }, reauth = status?.clientAuthRequired === !0, remoteLabel = reauth ? t("clientSignInAgain") : status?.mode === "remote" ? t("activeRemote", { name: status.target?.name ?? t("host") }) : t("remoteEntry"), remoteActionLabel = !reauth && status?.mode === "remote" ? `${remoteLabel} \xB7 ${t("exitRemote")}` : remoteLabel, visibleWorkspaces = showAllWorkspaces ? workspaces : workspaces.slice(0, 3), visibleCodexWorkspaces = showAllCodexWorkspaces ? codexWorkspaces : codexWorkspaces.slice(0, 3), visibleCursorWorkspaces = showAllCursorWorkspaces ? cursorWorkspaces : cursorWorkspaces.slice(0, 3), visibleAntigravityWorkspaces = showAllAntigravityWorkspaces ? antigravityWorkspaces : antigravityWorkspaces.slice(0, 3), visiblePiWorkspaces = showAllPiWorkspaces ? piWorkspaces : piWorkspaces.slice(0, 3), visibleOpencodeWorkspaces = showAllOpencodeWorkspaces ? opencodeWorkspaces : opencodeWorkspaces.slice(0, 3), visibleClaudeWorkspaces = showAllClaudeWorkspaces ? claudeWorkspaces : claudeWorkspaces.slice(0, 3), visibleHermesWorkspaces = showAllHermesWorkspaces ? hermesWorkspaces : hermesWorkspaces.slice(0, 3), codexAvailable = status?.remoteFeatures?.codex === !0, cursorAvailable = status?.remoteFeatures?.cursor === !0, antigravityAvailable = status?.remoteFeatures?.antigravity === !0, piAvailable = status?.remoteFeatures?.pi === !0, opencodeAvailable = status?.remoteFeatures?.opencode === !0, claudeAvailable = status?.remoteFeatures?.claude === !0, hermesAvailable = status?.remoteFeatures?.hermes === !0, rawUpdate = status?.update, updateInfo = rawUpdate !== void 0 && typeof rawUpdate.currentVersion == "string" && typeof rawUpdate.latestVersion == "string" ? rawUpdate : void 0, localUpdateAvailable = updateInfo !== void 0 && compareVersions(updateInfo.currentVersion, updateInfo.latestVersion) < 0, updateNotice = updateInfo !== void 0 && localUpdateAvailable ? t("updateAvailable", { latest: updateInfo.latestVersion, current: updateInfo.currentVersion }) : void 0, deviceUpdateAvailable = (device) => updateInfo !== void 0 && device.clientVersion !== void 0 && compareVersions(device.clientVersion, updateInfo.latestVersion) < 0, selectedHostDetails = selectedHost === void 0 ? void 0 : [
-        formatPlatform(selectedHost.platform),
-        selectedHost.harnessVersion === void 0 ? void 0 : t("harnessVersion", { version: selectedHost.harnessVersion }),
-        selectedHost.clientVersion === void 0 ? void 0 : t("pluginVersion", { version: selectedHost.clientVersion }),
-        deviceUpdateAvailable(selectedHost) ? t("updateAvailableTag") : void 0
-      ].filter(Boolean).join(" \xB7 "), connectedClients = status?.host?.connectedClients ?? [], connectedCount = connectedClients.length, connectedCountLabel = t("connectedClientCount", { count: connectedCount }), connectedMenu = !needsAuthorization && status?.hostAuthorizationAvailable === !0 ? React.createElement(
+      }, reauth = status?.clientAuthRequired === !0, remoteLabel = reauth ? t("clientSignInAgain") : status?.mode === "remote" ? t("activeRemote", { name: status.target?.name ?? t("host") }) : t("remoteEntry"), remoteActionLabel = !reauth && status?.mode === "remote" ? `${remoteLabel} \xB7 ${t("exitRemote")}` : remoteLabel, query = workspaceSearch.trim().toLocaleLowerCase(), matchingWorkspaces = (rows, expanded) => query !== "" ? rows.filter((row) => `${row.title}
+${row.path}`.toLocaleLowerCase().includes(query)) : expanded ? rows : rows.slice(0, 3), visibleWorkspaces = matchingWorkspaces(workspaces, showAllWorkspaces), visibleCodexWorkspaces = matchingWorkspaces(codexWorkspaces, showAllCodexWorkspaces), visibleCursorWorkspaces = matchingWorkspaces(cursorWorkspaces, showAllCursorWorkspaces), visibleAntigravityWorkspaces = matchingWorkspaces(antigravityWorkspaces, showAllAntigravityWorkspaces), visiblePiWorkspaces = matchingWorkspaces(piWorkspaces, showAllPiWorkspaces), visibleOpencodeWorkspaces = matchingWorkspaces(opencodeWorkspaces, showAllOpencodeWorkspaces), visibleClaudeWorkspaces = matchingWorkspaces(claudeWorkspaces, showAllClaudeWorkspaces), visibleHermesWorkspaces = matchingWorkspaces(hermesWorkspaces, showAllHermesWorkspaces), codexAvailable = status?.remoteFeatures?.codex === !0, cursorAvailable = status?.remoteFeatures?.cursor === !0, antigravityAvailable = status?.remoteFeatures?.antigravity === !0, piAvailable = status?.remoteFeatures?.pi === !0, opencodeAvailable = status?.remoteFeatures?.opencode === !0, claudeAvailable = status?.remoteFeatures?.claude === !0, hermesAvailable = status?.remoteFeatures?.hermes === !0, rawUpdate = status?.update, updateInfo = rawUpdate !== void 0 && typeof rawUpdate.currentVersion == "string" && typeof rawUpdate.latestVersion == "string" ? rawUpdate : void 0, localUpdateAvailable = updateInfo !== void 0 && compareVersions(updateInfo.currentVersion, updateInfo.latestVersion) < 0, updateNotice = updateInfo !== void 0 && localUpdateAvailable ? t("updateAvailable", { latest: updateInfo.latestVersion, current: updateInfo.currentVersion }) : void 0, deviceUpdateAvailable = (device) => updateInfo !== void 0 && device.clientVersion !== void 0 && compareVersions(device.clientVersion, updateInfo.latestVersion) < 0, connectedClients = status?.host?.connectedClients ?? [], connectedCount = connectedClients.length, connectedCountLabel = t("connectedClientCount", { count: connectedCount }), connectedMenu = !needsAuthorization && status?.hostAuthorizationAvailable === !0 ? React.createElement(
         "div",
         {
           className: `dshRemoteConnectedMenu${devicesOpen ? " isOpen" : ""}`
@@ -4481,7 +4792,66 @@ If a code was sent, recover the original submission without changing it.`,
             ))
           )
         ) : null
-      ) : null, serverUnavailable = discoveryUnavailable || status?.host?.online === !1 && status.host.reconnecting && (status.host.lastActiveAt !== void 0 || status.host.error === "CONNECTION_FAILED"), listedHosts = status?.host?.pairingHostOnly ? [] : connectingHost === void 0 ? devices : [connectingHost], computerIcon = React.createElement(
+      ) : null, serverUnavailable = discoveryUnavailable || status?.host?.online === !1 && status.host.reconnecting && (status.host.lastActiveAt !== void 0 || status.host.error === "CONNECTION_FAILED"), listedHosts = status?.host?.pairingHostOnly ? [] : connectingHost === void 0 ? devices.filter((device) => hostFilter === "all" || (hostFilter === "online" ? device.online && !serverUnavailable : !device.online || serverUnavailable)) : [connectingHost], renderAccount = () => React.createElement(
+        "footer",
+        { className: "dshRemoteAccountFooter" },
+        React.createElement(
+          "div",
+          { className: "dshRemoteAccountIdentity" },
+          React.createElement("span", { className: "dshRemoteAccountAvatar", "aria-hidden": !0 }, accountInitial(footerAccountName(status, t))),
+          React.createElement(
+            "div",
+            { className: "dshRemoteAccountCopy" },
+            React.createElement("strong", null, footerAccountName(status, t)),
+            React.createElement(ServerNotice, {
+              offline: serverUnavailable,
+              linked: connectedCount > 0 || status?.connected === !0,
+              expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt,
+              t
+            })
+          )
+        ),
+        updateNotice === void 0 ? null : React.createElement("a", {
+          className: "dshRemoteAccountUpdate",
+          href: "https://github.com/gaolin89898/ds-harness-remote/releases",
+          target: "_blank",
+          rel: "noreferrer",
+          title: updateNotice
+        }, t("updateAvailableShort", { version: updateInfo?.latestVersion ?? "" })),
+        props.openSettings === void 0 ? null : React.createElement("button", {
+          type: "button",
+          className: "dshRemoteAccountSettings",
+          onClick: props.openSettings,
+          "aria-label": t("settings"),
+          title: t("settings")
+        }, glyph(React, Settings2)),
+        React.createElement("button", {
+          type: "button",
+          className: "dshRemoteAccountExit",
+          disabled: busy,
+          onClick: () => void logoutRemote(),
+          "aria-label": t("exitRemoteAccount"),
+          title: t("exitRemoteAccount")
+        }, glyph(React, LogOut), selectedHost === void 0 ? t("exitRemoteAccount") : null)
+      ), workspaceHeading = React.createElement(
+        "div",
+        { className: "dshRemoteWorkspaceSourceHeading" },
+        React.createElement("strong", null, t("existingWorkspaces")),
+        React.createElement("button", {
+          type: "button",
+          className: "dshRemoteAddWorkspace",
+          disabled: busy,
+          title: t("addRemoteWorkspace"),
+          "aria-label": t("addRemoteWorkspace"),
+          onClick: () => startAddingWorkspace("harness")
+        }, glyph(React, Plus))
+      ), workspaceIcon = React.createElement("svg", {
+        className: "dshRemoteWorkspaceIcon",
+        viewBox: whaleMarkViewBox,
+        fill: "currentColor",
+        "aria-hidden": !0,
+        focusable: !1
+      }, React.createElement("path", { d: whaleMarkPath })), computerIcon = React.createElement(
         "svg",
         {
           className: "dshRemoteComputerIcon",
@@ -4537,10 +4907,10 @@ If a code was sent, recover the original submission without changing it.`,
         }, React.createElement(
           "section",
           {
-            className: `dshRemotePage${selectedHost === void 0 ? "" : " hasSelectedHost"}`,
+            className: `dshRemotePage${needsAuthorization === !1 ? " isWorkbench" : ""}${selectedHost === void 0 ? "" : " hasSelectedHost"}`,
             role: "dialog",
             "aria-modal": !0,
-            "aria-label": selectedHost?.name ?? t("remoteTitle"),
+            "aria-label": t(selectedHost === void 0 ? "remoteTitle" : "chooseWorkspace"),
             tabIndex: -1,
             ref: pageRef
           },
@@ -4570,6 +4940,12 @@ If a code was sent, recover the original submission without changing it.`,
                     "div",
                     { className: "dshRemotePageEyebrow" },
                     React.createElement("span", { className: "dshRemotePageEyebrowLabel" }, "DSH Remote"),
+                    selectedHost === void 0 ? null : React.createElement(
+                      React.Fragment,
+                      null,
+                      glyph(React, ChevronRight),
+                      React.createElement("span", { className: "dshRemoteBreadcrumbHost", title: selectedHost.name }, selectedHost.name)
+                    ),
                     selectedHost === void 0 ? React.createElement("a", {
                       className: "dshRemoteStarLink",
                       href: "https://github.com/gaolin89898/ds-harness-remote",
@@ -4577,10 +4953,9 @@ If a code was sent, recover the original submission without changing it.`,
                       rel: "noreferrer"
                     }, t("starProject")) : null
                   ),
-                  React.createElement("strong", null, selectedHost?.name ?? t("remoteTitle"))
+                  React.createElement("strong", null, t(selectedHost === void 0 ? "remoteTitle" : "chooseWorkspace"))
                 )
-              ),
-              React.createElement("p", null, selectedHostDetails ?? t(status?.host?.pairingHostOnly ? "pairingHostOnly" : "remoteDescription"))
+              )
             ),
             React.createElement(
               "div",
@@ -4590,8 +4965,9 @@ If a code was sent, recover the original submission without changing it.`,
                 className: "dshRemotePageBack",
                 disabled: busy,
                 title: t("backToHosts"),
+                "aria-label": t("backToHosts"),
                 onClick: chooseAnotherHost
-              }, t("backToHosts")),
+              }, glyph(React, ArrowLeftRight), React.createElement("span", null, t("backToHosts"))),
               React.createElement("button", {
                 type: "button",
                 className: "dshRemotePageRefresh",
@@ -4599,8 +4975,8 @@ If a code was sent, recover the original submission without changing it.`,
                 title: t("refreshRemote"),
                 "aria-label": t("refreshRemote"),
                 onClick: () => void refreshRemote()
-              }, t("refreshRemoteShort")),
-              React.createElement("button", { type: "button", className: "dshRemotePageClose", onClick: () => setOpen(!1), "aria-label": t("close") }, "\xD7")
+              }, glyph(React, RefreshCw)),
+              React.createElement("button", { type: "button", className: "dshRemotePageClose", onClick: () => setOpen(!1), "aria-label": t("close"), title: t("close") }, glyph(React, X))
             )
           ),
           React.createElement(
@@ -4835,6 +5211,25 @@ If a code was sent, recover the original submission without changing it.`,
                       React.createElement("button", { type: "button", disabled: busy || hostRegistrationCode.trim() === "", onClick: () => void authorizeHost("code") }, t(busy ? "registering" : "useRegistrationCode"))
                     )
                   ) : null,
+                  status?.hostAuthorizationAvailable ? React.createElement(
+                    "div",
+                    { className: "dshRemotePermissionRow" },
+                    React.createElement("span", { className: "dshRemotePermissionIcon", "aria-hidden": !0 }, glyph(React, ShieldCheck)),
+                    React.createElement(
+                      "label",
+                      { className: "dshRemoteHostControlToggle" },
+                      React.createElement("span", null, t("allowControlDevice")),
+                      React.createElement("input", {
+                        type: "checkbox",
+                        role: "switch",
+                        disabled: busy,
+                        "aria-label": t("allowControlDevice"),
+                        checked: status.host?.authorized === !0,
+                        onChange: (event) => void setCurrentDeviceControl(event.target.checked)
+                      })
+                    ),
+                    connectedMenu
+                  ) : null,
                   React.createElement(
                     "div",
                     { className: "dshRemoteSectionHeading" },
@@ -4842,26 +5237,30 @@ If a code was sent, recover the original submission without changing it.`,
                       "div",
                       { className: "dshRemoteSectionTitle" },
                       React.createElement("strong", null, t(status?.host?.pairingHostOnly ? "thisMachineHost" : "chooseHost")),
-                      status?.hostAuthorizationAvailable ? React.createElement(
-                        "div",
-                        { className: "dshRemoteHostControlToggle" },
-                        React.createElement("span", null, t("allowControlDevice")),
-                        React.createElement("input", {
-                          type: "checkbox",
-                          role: "switch",
-                          disabled: busy,
-                          "aria-label": t("allowControlDevice"),
-                          checked: status.host?.authorized === !0,
-                          onChange: (event) => void setCurrentDeviceControl(event.target.checked)
-                        })
-                      ) : null,
-                      connectedMenu
+                      status?.host?.pairingHostOnly ? null : React.createElement(
+                        "span",
+                        { className: "dshRemoteOnlineCount" },
+                        t("onlineHostCount", { count: serverUnavailable ? 0 : devices.filter((device) => device.online).length })
+                      )
+                    ),
+                    status?.host?.pairingHostOnly ? null : React.createElement(
+                      "select",
+                      {
+                        className: "dshRemoteHostFilter",
+                        value: hostFilter,
+                        disabled: busy,
+                        "aria-label": t("allHosts"),
+                        onChange: (event) => setHostFilter(event.target.value)
+                      },
+                      React.createElement("option", { value: "all" }, t("allHosts")),
+                      React.createElement("option", { value: "online" }, t("onlineHosts")),
+                      React.createElement("option", { value: "offline" }, t("offlineHosts"))
                     )
                   ),
                   React.createElement("div", {
                     className: `dshRemoteHostList${connectingHost === void 0 ? "" : " isCollapsed"}`,
                     "aria-busy": connectingHost === void 0 ? void 0 : !0
-                  }, listedHosts.length === 0 ? error !== void 0 ? null : React.createElement("p", null, t(busy ? "checkingConnection" : status?.host?.pairingHostOnly ? "pairingHostOnly" : "noRemoteHosts")) : listedHosts.map((device) => React.createElement(
+                  }, listedHosts.length === 0 ? error !== void 0 ? null : React.createElement("p", null, t(busy ? "checkingConnection" : status?.host?.pairingHostOnly ? "pairingHostOnly" : devices.length > 0 ? "noHostMatches" : "noRemoteHosts")) : listedHosts.map((device) => React.createElement(
                     "button",
                     {
                       type: "button",
@@ -4896,577 +5295,548 @@ If a code was sent, recover the original submission without changing it.`,
                       React.createElement("small", {
                         className: `dshRemoteHostStatus${serverUnavailable || !device.online ? " isOffline" : " isOnline"}`
                       }, t(serverUnavailable ? "unavailable" : device.online ? "online" : "offline")),
-                      React.createElement("span", { className: "dshRemoteHostItemChevron", "aria-hidden": !0 }, "\u203A")
+                      React.createElement("span", { className: "dshRemoteHostItemChevron", "aria-hidden": !0 }, glyph(React, ChevronRight))
                     )
                   )))
                 ) : null,
                 React.createElement(RemoteProgressView, { progress, t }),
-                selectedHost === void 0 ? connectingHost === void 0 ? React.createElement(
-                  React.Fragment,
-                  null,
-                  status?.host?.pairingHostOnly ? null : React.createElement("p", { className: "dshRemoteHint" }, t("selectHostHint")),
+                selectedHost === void 0 ? connectingHost === void 0 ? renderAccount() : null : React.createElement(
+                  "div",
+                  { className: "dshRemotePickerLayout" },
                   React.createElement(
-                    "footer",
-                    { className: "dshRemoteAccountFooter" },
+                    "aside",
+                    { className: "dshRemoteHostRail", "aria-label": selectedHost.name },
                     React.createElement(
                       "div",
-                      { className: "dshRemoteAccountIdentity" },
-                      React.createElement(
-                        "span",
-                        { className: "dshRemoteAccountAvatar", "aria-hidden": !0 },
-                        accountInitial(footerAccountName(status, t))
-                      ),
+                      { className: "dshRemoteRailHost" },
+                      React.createElement("span", { className: "dshRemoteHostItemIcon", "aria-hidden": !0 }, hostDeviceGlyph(React, selectedHost.platform)),
                       React.createElement(
                         "div",
-                        { className: "dshRemoteAccountCopy" },
-                        React.createElement("strong", null, footerAccountName(status, t)),
-                        React.createElement(ServerNotice, {
-                          offline: discoveryUnavailable || status?.host?.online === !1 && status.host.reconnecting,
-                          linked: connectedCount > 0 || status?.connected === !0,
-                          expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt,
-                          t
-                        })
+                        null,
+                        React.createElement("strong", { title: selectedHost.name }, selectedHost.name),
+                        React.createElement("small", { className: `dshRemoteRailStatus${status?.connected ? " isOnline" : ""}` }, t(status?.connected ? "connected" : "offline"))
                       )
                     ),
-                    updateNotice === void 0 ? null : React.createElement("a", {
-                      className: "dshRemoteAccountUpdate",
-                      href: "https://github.com/gaolin89898/ds-harness-remote/releases",
-                      target: "_blank",
-                      rel: "noreferrer",
-                      title: updateNotice
-                    }, t("updateAvailableShort", { version: updateInfo?.latestVersion ?? "" })),
-                    props.openSettings === void 0 ? null : React.createElement("button", {
-                      type: "button",
-                      className: "dshRemoteAccountSettings",
-                      onClick: props.openSettings,
-                      "aria-label": t("settings"),
-                      title: t("settings")
-                    }, t("settings")),
-                    React.createElement("button", {
-                      type: "button",
-                      className: "dshRemoteAccountExit",
-                      disabled: busy,
-                      onClick: () => void logoutRemote()
-                    }, t("exitRemoteAccount"))
-                  )
-                ) : null : React.createElement(
-                  "section",
-                  { className: "dshRemoteBrowser", "aria-label": t("chooseDirectory") },
-                  React.createElement(
-                    "div",
-                    { className: "dshRemoteSectionHeading dshRemoteWorkspaceHeading" },
-                    React.createElement("strong", null, t(addingWorkspace ? workspaceBackend === "codex" ? "addCodexWorkspace" : workspaceBackend === "cursor" ? "addCursorWorkspace" : workspaceBackend === "antigravity" ? "addAntigravityWorkspace" : workspaceBackend === "pi" ? "addPiWorkspace" : workspaceBackend === "claude" ? "addClaudeWorkspace" : workspaceBackend === "hermes" ? "addHermesWorkspace" : workspaceBackend === "opencode" ? "addOpencodeWorkspace" : "addRemoteWorkspace" : "existingWorkspaces")),
-                    addingWorkspace ? React.createElement("button", {
-                      type: "button",
-                      className: "dshRemoteCancelWorkspace",
-                      disabled: busy,
-                      onClick: cancelAddingWorkspace
-                    }, t("cancelAddWorkspace")) : React.createElement("button", {
-                      type: "button",
-                      className: "dshRemoteAddWorkspace",
-                      disabled: busy,
-                      title: t("addRemoteWorkspace"),
-                      "aria-label": t("addRemoteWorkspace"),
-                      onClick: () => startAddingWorkspace("harness")
-                    }, React.createElement("svg", {
-                      className: "dshRemoteAddWorkspaceIcon",
-                      viewBox: "0 0 16 16",
-                      "aria-hidden": !0,
-                      focusable: !1
-                    }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" })))
-                  ),
-                  addingWorkspace ? React.createElement(
-                    "div",
-                    { className: "dshRemoteFolderBrowser" },
-                    directory === void 0 ? React.createElement("p", null, t("loadingDirectory")) : React.createElement(
-                      React.Fragment,
-                      null,
-                      React.createElement(
-                        "nav",
-                        { className: "dshRemoteCrumbs", "aria-label": t("currentDirectory") },
-                        directory.crumbs.map((crumb) => React.createElement("button", {
-                          type: "button",
-                          key: crumb.path,
-                          disabled: busy || crumb.path === directory.path,
-                          onClick: () => void browseDirectory(crumb.path)
-                        }, crumb.path === directory.home ? "\u2302" : crumb.name))
-                      ),
-                      React.createElement("div", { className: "dshRemoteFolderList" }, directory.entries.filter((entry2) => !entry2.hidden).length === 0 ? React.createElement("p", null, t("emptyDirectory")) : directory.entries.filter((entry2) => !entry2.hidden).map((entry2) => React.createElement("button", {
-                        type: "button",
-                        key: entry2.path,
-                        disabled: busy,
-                        onClick: () => void browseDirectory(entry2.path)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u25B1"), React.createElement("span", null, entry2.name)))),
-                      directory.truncated ? React.createElement("small", null, t("directoryTruncated")) : null
-                    )
-                  ) : React.createElement(
-                    "div",
-                    { className: "dshRemoteWorkspaceLists" },
                     React.createElement(
-                      React.Fragment,
-                      null,
-                      React.createElement(
+                      "dl",
+                      { className: "dshRemoteHostSpecs" },
+                      React.createElement("div", null, React.createElement("dt", null, t("platform")), React.createElement("dd", null, formatPlatform(selectedHost.platform))),
+                      selectedHost.harnessVersion === void 0 ? null : React.createElement(
                         "div",
-                        { id: workspaceListId, className: "dshRemoteDirectoryList" },
-                        workspaces.length === 0 ? React.createElement("p", null, t("noRemoteWorkspaces")) : visibleWorkspaces.map((workspace) => React.createElement(
+                        null,
+                        React.createElement("dt", null, "Harness"),
+                        React.createElement("dd", null, selectedHost.harnessVersion)
+                      ),
+                      selectedHost.clientVersion === void 0 ? null : React.createElement(
+                        "div",
+                        null,
+                        React.createElement("dt", null, t("pluginVersion", { version: "" })),
+                        React.createElement(
+                          "dd",
+                          null,
+                          selectedHost.clientVersion,
+                          deviceUpdateAvailable(selectedHost) ? React.createElement("small", null, t("updateAvailableTag")) : null
+                        )
+                      )
+                    ),
+                    React.createElement(
+                      "div",
+                      { className: `dshRemoteSelectedDirectory${path === "" ? "" : " hasSelection"}` },
+                      React.createElement("span", null, glyph(React, FolderOpen), t("currentDirectory")),
+                      React.createElement("strong", { title: path || void 0 }, path || "\u2014")
+                    ),
+                    renderAccount()
+                  ),
+                  React.createElement(
+                    "section",
+                    { className: "dshRemoteBrowser", "aria-label": t("chooseDirectory") },
+                    addingWorkspace ? null : React.createElement(
+                      "label",
+                      { className: "dshRemoteWorkspaceSearch" },
+                      glyph(React, Search),
+                      React.createElement("input", {
+                        type: "search",
+                        value: workspaceSearch,
+                        placeholder: t("searchWorkspaces"),
+                        "aria-label": t("searchWorkspaces"),
+                        onChange: (event) => setWorkspaceSearch(event.target.value)
+                      })
+                    ),
+                    addingWorkspace ? React.createElement(
+                      "div",
+                      { className: "dshRemoteSectionHeading dshRemoteWorkspaceHeading" },
+                      React.createElement("strong", null, t(workspaceBackend === "codex" ? "addCodexWorkspace" : workspaceBackend === "cursor" ? "addCursorWorkspace" : workspaceBackend === "antigravity" ? "addAntigravityWorkspace" : workspaceBackend === "pi" ? "addPiWorkspace" : workspaceBackend === "claude" ? "addClaudeWorkspace" : workspaceBackend === "hermes" ? "addHermesWorkspace" : workspaceBackend === "opencode" ? "addOpencodeWorkspace" : "addRemoteWorkspace")),
+                      React.createElement("button", {
+                        type: "button",
+                        className: "dshRemoteCancelWorkspace",
+                        disabled: busy,
+                        onClick: cancelAddingWorkspace
+                      }, t("cancelAddWorkspace"))
+                    ) : null,
+                    addingWorkspace ? React.createElement(
+                      "div",
+                      { className: "dshRemoteFolderBrowser" },
+                      directory === void 0 ? React.createElement("p", null, t("loadingDirectory")) : React.createElement(
+                        React.Fragment,
+                        null,
+                        React.createElement(
+                          "nav",
+                          { className: "dshRemoteCrumbs", "aria-label": t("currentDirectory") },
+                          directory.crumbs.map((crumb) => React.createElement("button", {
+                            type: "button",
+                            key: crumb.path,
+                            disabled: busy || crumb.path === directory.path,
+                            onClick: () => void browseDirectory(crumb.path)
+                          }, crumb.path === directory.home ? "\u2302" : crumb.name))
+                        ),
+                        React.createElement("div", { className: "dshRemoteFolderList" }, directory.entries.filter((entry2) => !entry2.hidden).length === 0 ? React.createElement("p", null, t("emptyDirectory")) : directory.entries.filter((entry2) => !entry2.hidden).map((entry2) => React.createElement("button", {
+                          type: "button",
+                          key: entry2.path,
+                          disabled: busy,
+                          onClick: () => void browseDirectory(entry2.path)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u25B1"), React.createElement("span", null, entry2.name)))),
+                        directory.truncated ? React.createElement("small", null, t("directoryTruncated")) : null
+                      )
+                    ) : React.createElement(
+                      "div",
+                      { className: "dshRemoteWorkspaceLists" },
+                      React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        workspaceHeading,
+                        React.createElement(
+                          "div",
+                          { id: workspaceListId, className: "dshRemoteDirectoryList" },
+                          visibleWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noRemoteWorkspaces" : "noWorkspaceMatches")) : visibleWorkspaces.map((workspace) => React.createElement(
+                            "button",
+                            {
+                              type: "button",
+                              key: workspace.workspaceId,
+                              disabled: busy,
+                              className: workspaceBackend === "harness" && path === workspace.path ? "isSelected" : "",
+                              "aria-pressed": workspaceBackend === "harness" && path === workspace.path,
+                              onClick: () => {
+                                setWorkspaceBackend("harness"), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                              },
+                              onDoubleClick: () => void openWorkspace({ backend: "harness", path: workspace.path })
+                            },
+                            workspaceIcon,
+                            React.createElement("span", null, workspace.title),
+                            React.createElement("small", null, workspace.path)
+                          )),
+                          query !== "" || workspaces.length <= 3 || showAllWorkspaces ? null : React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteWorkspaceMore",
+                            disabled: busy,
+                            "aria-controls": workspaceListId,
+                            "aria-label": t("showAllWorkspaces"),
+                            onClick: () => setShowAllWorkspaces(!0)
+                          }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                        )
+                      ),
+                      codexAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: codexWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement(
+                            "span",
+                            { className: "dshRemoteWorkspaceSourceText" },
+                            React.createElement("strong", null, t("codexVirtualWorkspace"))
+                          ),
+                          codexAvailable ? React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addCodexWorkspace"),
+                            "aria-label": t("addCodexWorkspace"),
+                            onClick: () => startAddingWorkspace("codex")
+                          }, glyph(React, Plus)) : null
+                        ),
+                        React.createElement("div", {
+                          id: codexWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": codexWorkspaceHeadingId
+                        }, visibleCodexWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noCodexWorkspaces" : "noWorkspaceMatches")) : visibleCodexWorkspaces.map((workspace) => React.createElement(
                           "button",
                           {
                             type: "button",
                             key: workspace.workspaceId,
                             disabled: busy,
-                            className: workspaceBackend === "harness" && path === workspace.path ? "isSelected" : "",
-                            "aria-pressed": workspaceBackend === "harness" && path === workspace.path,
+                            className: workspaceBackend === "codex" && codexWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "codex" && codexWorkspaceId === workspace.workspaceId,
                             onClick: () => {
-                              setWorkspaceBackend("harness"), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                              setWorkspaceBackend("codex"), setCodexWorkspaceId(workspace.workspaceId), setCursorWorkspaceId(void 0), setPath(workspace.path);
                             },
-                            onDoubleClick: () => void openWorkspace({ backend: "harness", path: workspace.path })
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "codex",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
                           },
-                          React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
+                          React.createElement("img", { className: "dshRemoteWorkspaceIcon isGpt", src: gptWorkspaceIcon, alt: "", "aria-hidden": !0 }),
                           React.createElement("span", null, workspace.title),
-                          React.createElement("small", null, workspace.path)
-                        )),
-                        workspaces.length <= 3 || showAllWorkspaces ? null : React.createElement("button", {
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || codexWorkspaces.length <= 3 || showAllCodexWorkspaces ? null : React.createElement("button", {
                           type: "button",
                           className: "dshRemoteWorkspaceMore",
                           disabled: busy,
-                          "aria-controls": workspaceListId,
-                          "aria-label": t("showAllWorkspaces"),
-                          onClick: () => setShowAllWorkspaces(!0)
+                          "aria-controls": codexWorkspaceListId,
+                          "aria-label": t("showAllCodexWorkspaces"),
+                          onClick: () => setShowAllCodexWorkspaces(!0)
                         }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                      )
+                      ) : null,
+                      cursorAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: cursorWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement(
+                            "span",
+                            { className: "dshRemoteWorkspaceSourceText" },
+                            React.createElement("strong", null, t("cursorVirtualWorkspace"))
+                          ),
+                          cursorAvailable ? React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addCursorWorkspace"),
+                            "aria-label": t("addCursorWorkspace"),
+                            onClick: () => startAddingWorkspace("cursor")
+                          }, glyph(React, Plus)) : null
+                        ),
+                        React.createElement("div", {
+                          id: cursorWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": cursorWorkspaceHeadingId
+                        }, visibleCursorWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noCursorWorkspaces" : "noWorkspaceMatches")) : visibleCursorWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "cursor" && cursorWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "cursor" && cursorWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("cursor"), setCursorWorkspaceId(workspace.workspaceId), setCodexWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "cursor",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || cursorWorkspaces.length <= 3 || showAllCursorWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": cursorWorkspaceListId,
+                          "aria-label": t("showAllCursorWorkspaces"),
+                          onClick: () => setShowAllCursorWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null,
+                      antigravityAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: antigravityWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement(
+                            "span",
+                            { className: "dshRemoteWorkspaceSourceText" },
+                            React.createElement("strong", null, t("antigravityVirtualWorkspace"))
+                          ),
+                          antigravityAvailable ? React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addAntigravityWorkspace"),
+                            "aria-label": t("addAntigravityWorkspace"),
+                            onClick: () => startAddingWorkspace("antigravity")
+                          }, glyph(React, Plus)) : null
+                        ),
+                        React.createElement("div", {
+                          id: antigravityWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": antigravityWorkspaceHeadingId
+                        }, visibleAntigravityWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noAntigravityWorkspaces" : "noWorkspaceMatches")) : visibleAntigravityWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "antigravity" && antigravityWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "antigravity" && antigravityWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("antigravity"), setAntigravityWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "antigravity",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || antigravityWorkspaces.length <= 3 || showAllAntigravityWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": antigravityWorkspaceListId,
+                          "aria-label": t("showAllAntigravityWorkspaces"),
+                          onClick: () => setShowAllAntigravityWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null,
+                      piAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: piWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement(
+                            "span",
+                            { className: "dshRemoteWorkspaceSourceText" },
+                            React.createElement("strong", null, t("piVirtualWorkspace"))
+                          ),
+                          piAvailable ? React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addPiWorkspace"),
+                            "aria-label": t("addPiWorkspace"),
+                            onClick: () => startAddingWorkspace("pi")
+                          }, glyph(React, Plus)) : null
+                        ),
+                        React.createElement("div", {
+                          id: piWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": piWorkspaceHeadingId
+                        }, visiblePiWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noPiWorkspaces" : "noWorkspaceMatches")) : visiblePiWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "pi" && piWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "pi" && piWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("pi"), setPiWorkspaceId(workspace.workspaceId), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "pi",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || piWorkspaces.length <= 3 || showAllPiWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": piWorkspaceListId,
+                          "aria-label": t("showAllPiWorkspaces"),
+                          onClick: () => setShowAllPiWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null,
+                      opencodeAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: opencodeWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("opencodeVirtualWorkspace"))),
+                          React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addOpencodeWorkspace"),
+                            "aria-label": t("addOpencodeWorkspace"),
+                            onClick: () => startAddingWorkspace("opencode")
+                          }, glyph(React, Plus))
+                        ),
+                        React.createElement("div", {
+                          id: opencodeWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": opencodeWorkspaceHeadingId
+                        }, visibleOpencodeWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noOpencodeWorkspaces" : "noWorkspaceMatches")) : visibleOpencodeWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "opencode" && opencodeWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "opencode" && opencodeWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("opencode"), setOpencodeWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "opencode",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || opencodeWorkspaces.length <= 3 || showAllOpencodeWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": opencodeWorkspaceListId,
+                          "aria-label": t("showAllOpencodeWorkspaces"),
+                          onClick: () => setShowAllOpencodeWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null,
+                      hermesAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: hermesWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("hermesVirtualWorkspace"))),
+                          React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addHermesWorkspace"),
+                            "aria-label": t("addHermesWorkspace"),
+                            onClick: () => startAddingWorkspace("hermes")
+                          }, glyph(React, Plus))
+                        ),
+                        React.createElement("div", {
+                          id: hermesWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": hermesWorkspaceHeadingId
+                        }, visibleHermesWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noHermesWorkspaces" : "noWorkspaceMatches")) : visibleHermesWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "hermes" && hermesWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "hermes" && hermesWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("hermes"), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "hermes",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || hermesWorkspaces.length <= 3 || showAllHermesWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": hermesWorkspaceListId,
+                          "aria-label": t("showAllHermesWorkspaces"),
+                          onClick: () => setShowAllHermesWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null,
+                      claudeAvailable ? React.createElement(
+                        "section",
+                        { className: "dshRemoteCodexWorkspaceGroup" },
+                        React.createElement(
+                          "div",
+                          {
+                            id: claudeWorkspaceHeadingId,
+                            className: "dshRemoteWorkspaceSourceHeading"
+                          },
+                          React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("claudeVirtualWorkspace"))),
+                          React.createElement("button", {
+                            type: "button",
+                            className: "dshRemoteAddWorkspace",
+                            disabled: busy,
+                            title: t("addClaudeWorkspace"),
+                            "aria-label": t("addClaudeWorkspace"),
+                            onClick: () => startAddingWorkspace("claude")
+                          }, glyph(React, Plus))
+                        ),
+                        React.createElement("div", {
+                          id: claudeWorkspaceListId,
+                          className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
+                          "aria-labelledby": claudeWorkspaceHeadingId
+                        }, visibleClaudeWorkspaces.length === 0 ? React.createElement("p", null, t(query === "" ? "noClaudeWorkspaces" : "noWorkspaceMatches")) : visibleClaudeWorkspaces.map((workspace) => React.createElement(
+                          "button",
+                          {
+                            type: "button",
+                            key: workspace.workspaceId,
+                            disabled: busy,
+                            className: workspaceBackend === "claude" && claudeWorkspaceId === workspace.workspaceId ? "isSelected" : "",
+                            "aria-pressed": workspaceBackend === "claude" && claudeWorkspaceId === workspace.workspaceId,
+                            onClick: () => {
+                              setWorkspaceBackend("claude"), setClaudeWorkspaceId(workspace.workspaceId), setHermesWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
+                            },
+                            onDoubleClick: () => void openWorkspace({
+                              backend: "claude",
+                              path: workspace.path,
+                              workspaceId: workspace.workspaceId
+                            })
+                          },
+                          workspaceIcon,
+                          React.createElement("span", null, workspace.title),
+                          React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
+                        ))),
+                        query !== "" || claudeWorkspaces.length <= 3 || showAllClaudeWorkspaces ? null : React.createElement("button", {
+                          type: "button",
+                          className: "dshRemoteWorkspaceMore",
+                          disabled: busy,
+                          "aria-controls": claudeWorkspaceListId,
+                          "aria-label": t("showAllClaudeWorkspaces"),
+                          onClick: () => setShowAllClaudeWorkspaces(!0)
+                        }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
+                      ) : null
                     ),
-                    codexAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
+                    React.createElement(
+                      "footer",
+                      { className: "dshRemoteOpenBar" },
+                      connectedMenu,
                       React.createElement(
                         "div",
-                        {
-                          id: codexWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement(
-                          "span",
-                          { className: "dshRemoteWorkspaceSourceText" },
-                          React.createElement("strong", null, t("codexVirtualWorkspace"))
-                        ),
-                        codexAvailable ? React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addCodexWorkspace"),
-                          "aria-label": t("addCodexWorkspace"),
-                          onClick: () => startAddingWorkspace("codex")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" }))) : null
-                      ),
-                      React.createElement("div", {
-                        id: codexWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": codexWorkspaceHeadingId
-                      }, visibleCodexWorkspaces.length === 0 ? React.createElement("p", null, t("noCodexWorkspaces")) : visibleCodexWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "codex" && codexWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "codex" && codexWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("codex"), setCodexWorkspaceId(workspace.workspaceId), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "codex",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon isGpt", src: gptWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      codexWorkspaces.length <= 3 || showAllCodexWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": codexWorkspaceListId,
-                        "aria-label": t("showAllCodexWorkspaces"),
-                        onClick: () => setShowAllCodexWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    cursorAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: cursorWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement(
-                          "span",
-                          { className: "dshRemoteWorkspaceSourceText" },
-                          React.createElement("strong", null, t("cursorVirtualWorkspace"))
-                        ),
-                        cursorAvailable ? React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addCursorWorkspace"),
-                          "aria-label": t("addCursorWorkspace"),
-                          onClick: () => startAddingWorkspace("cursor")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" }))) : null
-                      ),
-                      React.createElement("div", {
-                        id: cursorWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": cursorWorkspaceHeadingId
-                      }, visibleCursorWorkspaces.length === 0 ? React.createElement("p", null, t("noCursorWorkspaces")) : visibleCursorWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "cursor" && cursorWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "cursor" && cursorWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("cursor"), setCursorWorkspaceId(workspace.workspaceId), setCodexWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "cursor",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      cursorWorkspaces.length <= 3 || showAllCursorWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": cursorWorkspaceListId,
-                        "aria-label": t("showAllCursorWorkspaces"),
-                        onClick: () => setShowAllCursorWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    antigravityAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: antigravityWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement(
-                          "span",
-                          { className: "dshRemoteWorkspaceSourceText" },
-                          React.createElement("strong", null, t("antigravityVirtualWorkspace"))
-                        ),
-                        antigravityAvailable ? React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addAntigravityWorkspace"),
-                          "aria-label": t("addAntigravityWorkspace"),
-                          onClick: () => startAddingWorkspace("antigravity")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" }))) : null
-                      ),
-                      React.createElement("div", {
-                        id: antigravityWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": antigravityWorkspaceHeadingId
-                      }, visibleAntigravityWorkspaces.length === 0 ? React.createElement("p", null, t("noAntigravityWorkspaces")) : visibleAntigravityWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "antigravity" && antigravityWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "antigravity" && antigravityWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("antigravity"), setAntigravityWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "antigravity",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      antigravityWorkspaces.length <= 3 || showAllAntigravityWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": antigravityWorkspaceListId,
-                        "aria-label": t("showAllAntigravityWorkspaces"),
-                        onClick: () => setShowAllAntigravityWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    piAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: piWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement(
-                          "span",
-                          { className: "dshRemoteWorkspaceSourceText" },
-                          React.createElement("strong", null, t("piVirtualWorkspace"))
-                        ),
-                        piAvailable ? React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addPiWorkspace"),
-                          "aria-label": t("addPiWorkspace"),
-                          onClick: () => startAddingWorkspace("pi")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" }))) : null
-                      ),
-                      React.createElement("div", {
-                        id: piWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": piWorkspaceHeadingId
-                      }, visiblePiWorkspaces.length === 0 ? React.createElement("p", null, t("noPiWorkspaces")) : visiblePiWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "pi" && piWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "pi" && piWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("pi"), setPiWorkspaceId(workspace.workspaceId), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "pi",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      piWorkspaces.length <= 3 || showAllPiWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": piWorkspaceListId,
-                        "aria-label": t("showAllPiWorkspaces"),
-                        onClick: () => setShowAllPiWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    opencodeAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: opencodeWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("opencodeVirtualWorkspace"))),
+                        { className: "dshRemoteOpenActions" },
+                        React.createElement("button", { type: "button", className: "dshRemotePickerCancel", onClick: () => setOpen(!1) }, t("cancelAddWorkspace")),
                         React.createElement("button", {
                           type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addOpencodeWorkspace"),
-                          "aria-label": t("addOpencodeWorkspace"),
-                          onClick: () => startAddingWorkspace("opencode")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" })))
-                      ),
-                      React.createElement("div", {
-                        id: opencodeWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": opencodeWorkspaceHeadingId
-                      }, visibleOpencodeWorkspaces.length === 0 ? React.createElement("p", null, t("noOpencodeWorkspaces")) : visibleOpencodeWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "opencode" && opencodeWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "opencode" && opencodeWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("opencode"), setOpencodeWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "opencode",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      opencodeWorkspaces.length <= 3 || showAllOpencodeWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": opencodeWorkspaceListId,
-                        "aria-label": t("showAllOpencodeWorkspaces"),
-                        onClick: () => setShowAllOpencodeWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    hermesAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: hermesWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("hermesVirtualWorkspace"))),
-                        React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addHermesWorkspace"),
-                          "aria-label": t("addHermesWorkspace"),
-                          onClick: () => startAddingWorkspace("hermes")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" })))
-                      ),
-                      React.createElement("div", {
-                        id: hermesWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": hermesWorkspaceHeadingId
-                      }, visibleHermesWorkspaces.length === 0 ? React.createElement("p", null, t("noHermesWorkspaces")) : visibleHermesWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "hermes" && hermesWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "hermes" && hermesWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("hermes"), setClaudeWorkspaceId(void 0), setHermesWorkspaceId(workspace.workspaceId), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "hermes",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      hermesWorkspaces.length <= 3 || showAllHermesWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": hermesWorkspaceListId,
-                        "aria-label": t("showAllHermesWorkspaces"),
-                        onClick: () => setShowAllHermesWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null,
-                    claudeAvailable ? React.createElement(
-                      "section",
-                      { className: "dshRemoteCodexWorkspaceGroup" },
-                      React.createElement(
-                        "div",
-                        {
-                          id: claudeWorkspaceHeadingId,
-                          className: "dshRemoteWorkspaceSourceHeading"
-                        },
-                        React.createElement("span", { className: "dshRemoteWorkspaceSourceText" }, React.createElement("strong", null, t("claudeVirtualWorkspace"))),
-                        React.createElement("button", {
-                          type: "button",
-                          className: "dshRemoteAddWorkspace",
-                          disabled: busy,
-                          title: t("addClaudeWorkspace"),
-                          "aria-label": t("addClaudeWorkspace"),
-                          onClick: () => startAddingWorkspace("claude")
-                        }, React.createElement("svg", {
-                          className: "dshRemoteAddWorkspaceIcon",
-                          viewBox: "0 0 16 16",
-                          "aria-hidden": !0,
-                          focusable: !1
-                        }, React.createElement("path", { d: "M8 3v10M3 8h10", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" })))
-                      ),
-                      React.createElement("div", {
-                        id: claudeWorkspaceListId,
-                        className: "dshRemoteDirectoryList dshRemoteCodexWorkspaceList",
-                        "aria-labelledby": claudeWorkspaceHeadingId
-                      }, visibleClaudeWorkspaces.length === 0 ? React.createElement("p", null, t("noClaudeWorkspaces")) : visibleClaudeWorkspaces.map((workspace) => React.createElement(
-                        "button",
-                        {
-                          type: "button",
-                          key: workspace.workspaceId,
-                          disabled: busy,
-                          className: workspaceBackend === "claude" && claudeWorkspaceId === workspace.workspaceId ? "isSelected" : "",
-                          "aria-pressed": workspaceBackend === "claude" && claudeWorkspaceId === workspace.workspaceId,
-                          onClick: () => {
-                            setWorkspaceBackend("claude"), setClaudeWorkspaceId(workspace.workspaceId), setHermesWorkspaceId(void 0), setPiWorkspaceId(void 0), setOpencodeWorkspaceId(void 0), setAntigravityWorkspaceId(void 0), setCodexWorkspaceId(void 0), setCursorWorkspaceId(void 0), setPath(workspace.path);
-                          },
-                          onDoubleClick: () => void openWorkspace({
-                            backend: "claude",
-                            path: workspace.path,
-                            workspaceId: workspace.workspaceId
-                          })
-                        },
-                        React.createElement("img", { className: "dshRemoteWorkspaceIcon", src: deepSeekWorkspaceIcon, alt: "", "aria-hidden": !0 }),
-                        React.createElement("span", null, workspace.title),
-                        React.createElement("small", null, `${workspace.path} \xB7 ${workspace.sessionCount}`)
-                      ))),
-                      claudeWorkspaces.length <= 3 || showAllClaudeWorkspaces ? null : React.createElement("button", {
-                        type: "button",
-                        className: "dshRemoteWorkspaceMore",
-                        disabled: busy,
-                        "aria-controls": claudeWorkspaceListId,
-                        "aria-label": t("showAllClaudeWorkspaces"),
-                        onClick: () => setShowAllClaudeWorkspaces(!0)
-                      }, React.createElement("span", { "aria-hidden": !0 }, "\u2026"))
-                    ) : null
-                  ),
-                  React.createElement(
-                    "footer",
-                    { className: "dshRemoteOpenBar" },
-                    React.createElement("div", null, React.createElement("span", null, t("currentDirectory")), React.createElement("strong", null, path || "\u2014")),
-                    React.createElement("button", {
-                      type: "button",
-                      disabled: busy || path.trim() === "" || !addingWorkspace && workspaceBackend === "codex" && codexWorkspaceId === void 0 || !addingWorkspace && workspaceBackend === "cursor" && cursorWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "antigravity" && antigravityWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "pi" && piWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "opencode" && opencodeWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "claude" && claudeWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "hermes" && hermesWorkspaceId === void 0 && path === "",
-                      onClick: () => void openWorkspace()
-                    }, t(busy ? "openingWorkspace" : addingWorkspace ? "confirmAddWorkspace" : "openWorkspace"))
+                          disabled: busy || path.trim() === "" || !addingWorkspace && workspaceBackend === "codex" && codexWorkspaceId === void 0 || !addingWorkspace && workspaceBackend === "cursor" && cursorWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "antigravity" && antigravityWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "pi" && piWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "opencode" && opencodeWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "claude" && claudeWorkspaceId === void 0 && path === "" || !addingWorkspace && workspaceBackend === "hermes" && hermesWorkspaceId === void 0 && path === "",
+                          onClick: () => void openWorkspace()
+                        }, glyph(React, FolderOpen), t(busy ? "openingWorkspace" : addingWorkspace ? "confirmAddWorkspace" : "openWorkspace"))
+                      )
+                    )
                   )
                 )
               )
@@ -6203,3 +6573,26 @@ If a code was sent, recover the original submission without changing it.`,
     }
   });
 })();
+/*! Bundled license information:
+
+lucide/dist/esm/defaultAttributes.js:
+lucide/dist/esm/icons/arrow-left-right.js:
+lucide/dist/esm/icons/chevron-right.js:
+lucide/dist/esm/icons/folder-open.js:
+lucide/dist/esm/icons/log-out.js:
+lucide/dist/esm/icons/monitor.js:
+lucide/dist/esm/icons/plus.js:
+lucide/dist/esm/icons/refresh-cw.js:
+lucide/dist/esm/icons/search.js:
+lucide/dist/esm/icons/settings-2.js:
+lucide/dist/esm/icons/shield-check.js:
+lucide/dist/esm/icons/smartphone.js:
+lucide/dist/esm/icons/x.js:
+lucide/dist/esm/lucide.js:
+  (**
+   * @license lucide v0.469.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+*/

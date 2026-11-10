@@ -456,6 +456,9 @@ importers:
       '@xterm/headless':
         specifier: 6.0.0
         version: 6.0.0
+      lucide:
+        specifier: 0.469.0
+        version: 0.469.0
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4

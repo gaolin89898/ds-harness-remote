@@ -83,6 +83,7 @@
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.5",
+    "lucide": "0.469.0",
     "qrcode": "^1.5.4",
     "zod": "^4.6.7",
     "ws": "^8.21.3",
