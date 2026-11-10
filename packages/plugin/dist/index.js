@@ -97736,6 +97736,10 @@ var HostServerConnection = class {
   reconnectRequested = false;
   resumeQueued = false;
   authRecoveryAttempted = false;
+  // Set when the Server announced its own shutdown. The Server is expected back
+  // within seconds, so the next attempts skip the wide fleet-spreading jitter
+  // and retry quickly; normal network drops keep using the full-jitter delay.
+  serverRestartRetries = 0;
   rtcFactory;
   negotiatedCapabilities = ["transport.relay"];
   controlFrameLimits = {};
@@ -97930,6 +97934,7 @@ var HostServerConnection = class {
         closing = true;
         clearLiveness();
         const closeSemantics = classifyControlClose(event.code, event.reason);
+        if (closeSemantics.serverShutdown) this.serverRestartRetries = 12;
         retainOnClose = [1e3, 1001, 4007].includes(event.code) || closeSemantics.retryable && !closeSemantics.replaced;
         const close = async () => {
           if (!forced) {
@@ -98095,6 +98100,7 @@ var HostServerConnection = class {
               throw new ControlConnectionError("INVALID_MESSAGE", "Server did not negotiate a transport capability.");
             }
             acknowledged = true;
+            this.serverRestartRetries = 0;
             clearTimeout(helloTimer);
             armLiveness();
             if (this.rtcFactory === void 0 && this.rtcFactoryProvider !== void 0 && !this.config.forceRelay) {
@@ -98800,6 +98806,20 @@ var HostServerConnection = class {
     }
   }
   waitBeforeRetry() {
+    if (this.serverRestartRetries > 0) {
+      this.serverRestartRetries -= 1;
+      const quickDelay = Math.round(Math.random() * Math.min(this.config.reconnect.maxDelayMs, 1500));
+      return new Promise((resolve9) => {
+        const timer2 = setTimeout(() => {
+          this.retryWake = void 0;
+          resolve9();
+        }, quickDelay);
+        this.retryWake = () => {
+          clearTimeout(timer2);
+          resolve9();
+        };
+      });
+    }
     const delay = Math.round(Math.random() * this.config.reconnect.maxDelayMs);
     return new Promise((resolve9) => {
       const timer2 = setTimeout(() => {

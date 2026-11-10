@@ -103,6 +103,10 @@ export class HostServerConnection {
   private reconnectRequested = false
   private resumeQueued = false
   private authRecoveryAttempted = false
+  // Set when the Server announced its own shutdown. The Server is expected back
+  // within seconds, so the next attempts skip the wide fleet-spreading jitter
+  // and retry quickly; normal network drops keep using the full-jitter delay.
+  private serverRestartRetries = 0
   private rtcFactory?: RtcPeerConnectionFactory
   private negotiatedCapabilities: string[] = ['transport.relay']
   private controlFrameLimits: ControlFrameByteLimits = {}
@@ -325,6 +329,7 @@ export class HostServerConnection {
         closing = true
         clearLiveness()
         const closeSemantics = classifyControlClose(event.code, event.reason)
+        if (closeSemantics.serverShutdown) this.serverRestartRetries = 12
         // Retain authenticated tunnels only for an expected Server outage or a
         // peer heartbeat expiry. Another instance replacing us (4003) and
         // revocation (4004) must never retain; the reason string is the
@@ -514,6 +519,7 @@ export class HostServerConnection {
               throw new ControlConnectionError('INVALID_MESSAGE', 'Server did not negotiate a transport capability.')
             }
             acknowledged = true
+            this.serverRestartRetries = 0
             clearTimeout(helloTimer)
             armLiveness()
             // Warm the RTC backend right away: loading it lazily inside the
@@ -1329,6 +1335,19 @@ export class HostServerConnection {
   }
 
   private waitBeforeRetry(): Promise<void> {
+    // After a Server-announced shutdown the Server is expected back in seconds,
+    // so a short, still jittered delay keeps a deployment interruption short
+    // without stampeding: 12 attempts at ~0.25-1.5s covers a rolling restart.
+    if (this.serverRestartRetries > 0) {
+      this.serverRestartRetries -= 1
+      // Same jittered draw, but bounded by a short cap so a restart is picked
+      // up in ~1.5s instead of the fleet-spreading maxDelayMs window.
+      const quickDelay = Math.round(Math.random() * Math.min(this.config.reconnect.maxDelayMs, 1_500))
+      return new Promise(resolve => {
+        const timer = setTimeout(() => { this.retryWake = undefined; resolve() }, quickDelay)
+        this.retryWake = () => { clearTimeout(timer); resolve() }
+      })
+    }
     // Full jitter over the configured maximum (AWS "full jitter"): every
     // retry draws uniformly from [0, maxDelayMs], so the fleet spreads out
     // even when the Server restarts. `reconnect.initialDelayMs` and
