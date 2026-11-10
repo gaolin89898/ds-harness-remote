@@ -170,6 +170,32 @@ export class Store {
     this.save()
   }
   revoke(id: string): void { this.get(id).revoked = true; this.invalidate(id) }
+  /** Remove a device together with the paired identity of the same installation. */
+  remove(id: string): string[] {
+    const target = this.get(id)
+    const ids = new Set<string>([id])
+    if (target.pairedDeviceId !== undefined && this.state.devices[target.pairedDeviceId] !== undefined) ids.add(target.pairedDeviceId)
+    for (const [otherId, device] of Object.entries(this.state.devices)) {
+      if (device.pairedDeviceId !== undefined && ids.has(device.pairedDeviceId)) ids.add(otherId)
+    }
+    const previousDevices = this.state.devices
+    const previousTokens = this.state.tokens
+    const devices = { ...previousDevices }
+    const tokens = { ...previousTokens }
+    for (const deviceId of ids) {
+      delete devices[deviceId]
+      for (const [key, value] of Object.entries(tokens)) if (value.deviceId === deviceId) delete tokens[key]
+    }
+    this.state.devices = devices
+    this.state.tokens = tokens
+    try { this.save() } catch (error) {
+      this.state.devices = previousDevices
+      this.state.tokens = previousTokens
+      throw error
+    }
+    for (const deviceId of ids) this.onInvalidate(deviceId)
+    return [...ids]
+  }
   rename(id: string, name: string): void {
     const devices = this.deviceGroup(id)
     const previous = devices.map(device => device.descriptor.name)

@@ -7,12 +7,12 @@ import {
   CheckOutlined,
   CloudServerOutlined,
   CopyOutlined,
+  DeleteOutlined,
   DesktopOutlined,
   EditOutlined,
   ExportOutlined,
   GithubOutlined,
   GlobalOutlined,
-  LinkOutlined,
   LockOutlined,
   LogoutOutlined,
   ReloadOutlined,
@@ -20,7 +20,7 @@ import {
   WindowsOutlined,
 } from '@ant-design/icons'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { api, RequestError, type Device, type DeviceList } from './api'
+import { api, apiDelete, RequestError, type Device, type DeviceList } from './api'
 
 function platformIcon(platform: string) {
   const p = (platform || '').toLowerCase()
@@ -106,6 +106,17 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
     }
   }
 
+  async function removeDevice(device: Device) {
+    setError('')
+    try {
+      await apiDelete(`/account/devices/${encodeURIComponent(device.deviceId)}`)
+      await load()
+      void message.success('设备已删除')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '删除失败，请重试。')
+    }
+  }
+
   const devices = useMemo(
     () => [...(result?.items ?? [])].sort((a, b) => Number(b.online) - Number(a.online)),
     [result],
@@ -165,9 +176,6 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
             <button type="button" className="dx-btn" onClick={() => void load()} disabled={loading}>
               <ReloadOutlined spin={loading} />刷新
             </button>
-            <a className="dx-btn is-primary" href="https://github.com/gaolin89898/ds-harness-remote#readme" target="_blank" rel="noreferrer">
-              <LinkOutlined />添加设备
-            </a>
           </div>
         </div>
 
@@ -299,27 +307,35 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="dx-icon-btn"
-                          aria-label="修改设备名称"
-                          title="修改设备名称"
-                          onClick={() => { setRenaming(device); setNewName(device.name) }}
-                        >
-                          <EditOutlined />
-                        </button>
+                        <span className="dx-row-actions">
+                          <button
+                            type="button"
+                            className="dx-icon-btn"
+                            aria-label="修改设备名称"
+                            title="修改设备名称"
+                            onClick={() => { setRenaming(device); setNewName(device.name) }}
+                          >
+                            <EditOutlined />
+                          </button>
+                          <Popconfirm
+                            title="删除这个设备？"
+                            description="删除后该设备需要重新登录才能再次接入。"
+                            okText="删除"
+                            cancelText="取消"
+                            okButtonProps={{ danger: true }}
+                            onConfirm={() => void removeDevice(device)}
+                          >
+                            <button type="button" className="dx-icon-btn is-danger" aria-label="删除设备" title="删除设备">
+                              <DeleteOutlined />
+                            </button>
+                          </Popconfirm>
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             )}
-
-            <div className="dx-invite">
-              <DesktopOutlined />
-              <span><strong>邀请新设备</strong> · 在客户端填入上方服务地址即可加入</span>
-              <a href="https://github.com/gaolin89898/ds-harness-remote#readme" target="_blank" rel="noreferrer">查看指南 →</a>
-            </div>
           </section>
 
           <aside className="dx-rail">

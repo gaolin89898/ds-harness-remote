@@ -9,10 +9,18 @@ export class RequestError extends Error {
   constructor(message: string, readonly status: number) { super(message) }
 }
 export async function api<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(body === undefined ? 'GET' : 'POST', path, body)
+}
+
+export async function apiDelete<T>(path: string): Promise<T> {
+  return request<T>('DELETE', path)
+}
+
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   let response: Response
   try {
     response = await fetch(`/api/v1${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
+      method,
       credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(window.location.pathname === '/app/embedded/devices' ? { 'X-DSH-Embedded': '1' } : {}) },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(10000),

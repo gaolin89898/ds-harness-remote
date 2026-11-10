@@ -291,6 +291,12 @@ export function createRemoteServer(config: Config) {
     if (method === 'POST' && path === '/api/v1/auth/logout') {
       sessions.delete(hash(token(req))); res.setHeader('Set-Cookie', cookie('', 0, embeddedRequest(req))); json(res, 200, { status: 'ok' }); return
     }
+    if (method === 'DELETE' && path.startsWith('/api/v1/account/devices/')) {
+      accountAuth(req)
+      const deviceId = decodeURIComponent(path.slice('/api/v1/account/devices/'.length))
+      if (deviceId === '') throw new ApiError('INVALID_MESSAGE')
+      json(res, 200, { status: 'deleted', deviceIds: store.remove(deviceId) }); return
+    }
     if (method === 'GET' && path === '/api/v1/account/devices') {
       accountAuth(req); json(res, 200, { items: accountDevices(), serverUrl: url.origin, transport: 'webrtc' }); return
     }

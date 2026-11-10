@@ -519,6 +519,8 @@
   transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
 }
 
+.dx-row-actions { display: inline-flex; align-items: center; gap: 6px; }
+.dx-icon-btn.is-danger:hover:not(:disabled) { color: #e5544b; border-color: rgba(229, 84, 75, 0.45); background: rgba(229, 84, 75, 0.1); }
 .dx-icon-btn:hover { color: var(--dx-ink); border-color: var(--dx-line-strong); background: var(--dx-surface-2); }
 .dx-icon-btn:disabled { opacity: 0.5; cursor: default; }
 .dx-icon-btn svg { width: 15px; height: 15px; }
@@ -754,20 +756,6 @@
 .dx-chip svg { width: 10px; height: 10px; }
 
 .dx-version { color: var(--dx-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; }
-
-.dx-invite {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px;
-  background: #16181e;
-  color: var(--dx-dim);
-  font-size: 11px;
-}
-
-.dx-invite strong { color: var(--dx-muted); font-size: 11.5px; font-weight: 600; }
-.dx-invite a { margin-left: auto; color: var(--dx-accent); font-size: 11px; }
-.dx-invite a:hover { color: var(--dx-accent-ink); }
 
 .dx-note-bar {
   display: flex;

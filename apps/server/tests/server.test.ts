@@ -1439,3 +1439,21 @@ describe('stale link frame dropping and configurable rate limit', () => {
     expect(closeCode).toBe(4001)
   })
 })
+
+
+describe('account device removal', () => {
+  it('removes the whole device group and invalidates its tokens', async () => {
+    const h = await device('host')
+    const keys = generateKeyPair()
+    const paired = { deviceId: randomUUID(), identityKey: keys.publicKey, name: 'paired-client', role: 'client', platform: 'linux', clientVersion: '0.4.15' }
+    expect((await request('/devices/register-owned-role', 'POST', { v: 1, device: paired }, h.accessToken)).status).toBe(200)
+    expect((await request('/account/devices', 'GET', undefined, accountToken)).data.items).toHaveLength(1)
+
+    const removed = await request(`/account/devices/${h.deviceId}`, 'DELETE', undefined, accountToken)
+    expect(removed.status).toBe(200)
+    expect([...removed.data.deviceIds].sort()).toEqual([h.deviceId, paired.deviceId].sort())
+    expect((await request('/account/devices', 'GET', undefined, accountToken)).data.items).toHaveLength(0)
+    expect((await request('/me', 'GET', undefined, h.accessToken)).status).toBe(401)
+    expect((await request(`/account/devices/${h.deviceId}`, 'DELETE', undefined, accountToken)).status).toBe(404)
+  })
+})
