@@ -177,8 +177,11 @@ export class IdentityStore {
     // DSH_HOME keeps the same device row. The Server binds a deviceId to its
     // identity key, so pinning the id alone is only accepted for a brand-new
     // registration; pin the key as well to reproduce an existing identity.
-    const pinnedId = this.env.DSH_REMOTE_DEVICE_ID?.trim() || undefined
-    const pinnedKey = this.env.DSH_REMOTE_DEVICE_KEY?.trim() || undefined
+    const prefix = this.role === 'host' ? 'DSH_REMOTE_HOST_' : this.role === 'client' ? 'DSH_REMOTE_CLIENT_' : undefined
+    const pinnedId = (prefix === undefined ? undefined : this.env[`${prefix}DEVICE_ID`]?.trim())
+      || this.env.DSH_REMOTE_DEVICE_ID?.trim() || undefined
+    const pinnedKey = (prefix === undefined ? undefined : this.env[`${prefix}DEVICE_KEY`]?.trim())
+      || this.env.DSH_REMOTE_DEVICE_KEY?.trim() || undefined
     if (pinnedId !== undefined && !UUID_RE.test(pinnedId)) {
       throw new IdentityInvalidError('DSH_REMOTE_DEVICE_ID must be a UUID.')
     }

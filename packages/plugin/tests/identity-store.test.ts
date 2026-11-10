@@ -496,6 +496,21 @@ describe('pinned device identity', () => {
     expect(clone.fingerprint).toBe(identity.fingerprint)
   })
 
+  it('prefers the role-scoped pin over the generic one', async () => {
+    const home = await temporaryDirectory()
+    const hostId = '0199c0de-0000-7000-8000-00000000000a'
+    const clientId = '0199c0de-0000-7000-8000-00000000000b'
+    const env = {
+      DSH_REMOTE_HOST_DEVICE_ID: hostId,
+      DSH_REMOTE_CLIENT_DEVICE_ID: clientId,
+      DSH_REMOTE_DEVICE_ID: '0199c0de-0000-7000-8000-00000000000c',
+    }
+    const host = await new IdentityStore({ directory: join(home, 'host'), role: 'host', env }).loadOrCreate('Host')
+    const client = await new IdentityStore({ directory: join(home, 'client'), role: 'client', env }).loadOrCreate('Host')
+    expect(host.deviceId).toBe(hostId)
+    expect(client.deviceId).toBe(clientId)
+  })
+
   it('rejects a pinned id that is not a UUID', async () => {
     const home = await temporaryDirectory()
     const store = new IdentityStore({ directory: join(home, 'invalid'), env: { DSH_REMOTE_DEVICE_ID: 'not-a-uuid' } })

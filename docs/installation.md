@@ -24,6 +24,7 @@ Server 把 `deviceId` 和设备公钥绑定在一起。默认身份在首次启�
 
 - `DSH_REMOTE_DEVICE_ID`：UUID，仅在**还没有 `device.json`** 时用于创建身份；已有身份会忽略它。
 - `DSH_REMOTE_DEVICE_KEY`：`device.key` 里的私钥（base64url）。和 ID 一起固定，才能在另一处复现同一身份。
+- 一台机器有 host 和 client 两个身份，需要分别固定时用 `DSH_REMOTE_HOST_DEVICE_ID` / `DSH_REMOTE_HOST_DEVICE_KEY` 与 `DSH_REMOTE_CLIENT_DEVICE_ID` / `DSH_REMOTE_CLIENT_DEVICE_KEY`，它们的优先级高于不带角色的通用变量。
 
 取值来自现有部署：
 

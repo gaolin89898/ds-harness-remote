@@ -87365,8 +87365,9 @@ var IdentityStore = class {
     return identity3;
   }
   async createAndReadIdentityLocked(devicePath, keyPath, deviceName) {
-    const pinnedId = this.env.DSH_REMOTE_DEVICE_ID?.trim() || void 0;
-    const pinnedKey = this.env.DSH_REMOTE_DEVICE_KEY?.trim() || void 0;
+    const prefix = this.role === "host" ? "DSH_REMOTE_HOST_" : this.role === "client" ? "DSH_REMOTE_CLIENT_" : void 0;
+    const pinnedId = (prefix === void 0 ? void 0 : this.env[`${prefix}DEVICE_ID`]?.trim()) || this.env.DSH_REMOTE_DEVICE_ID?.trim() || void 0;
+    const pinnedKey = (prefix === void 0 ? void 0 : this.env[`${prefix}DEVICE_KEY`]?.trim()) || this.env.DSH_REMOTE_DEVICE_KEY?.trim() || void 0;
     if (pinnedId !== void 0 && !UUID_RE.test(pinnedId)) {
       throw new IdentityInvalidError("DSH_REMOTE_DEVICE_ID must be a UUID.");
     }
