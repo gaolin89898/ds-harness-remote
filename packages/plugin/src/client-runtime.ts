@@ -231,7 +231,14 @@ export class ClientModeRuntime {
         }
       }
       const credentials = await this.server.authenticate(this.requireIdentity())
-      await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account)
+      try {
+        await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account)
+      } catch (error) {
+        if (!(error instanceof ServerApiError) || error.status !== 401
+          || (error.code !== 'AUTH_INVALID' && error.code !== 'TOKEN_EXPIRED')) throw error
+        const refreshed = await this.server.refreshCredentials(credentials.accessToken)
+        await this.host.authorizeHostAsOwned(refreshed.accessToken, refreshed.account)
+      }
     } catch (error) {
       this.logger.warn('automatic Host authorization failed', { code: safeErrorCode(error) })
     }
@@ -427,7 +434,14 @@ export class ClientModeRuntime {
       return this.status()
     }
     const credentials = await this.server.authenticate(this.requireIdentity())
-    await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account)
+    try {
+      await this.host.authorizeHostAsOwned(credentials.accessToken, credentials.account)
+    } catch (error) {
+      if (!(error instanceof ServerApiError) || error.status !== 401
+        || (error.code !== 'AUTH_INVALID' && error.code !== 'TOKEN_EXPIRED')) throw error
+      const refreshed = await this.server.refreshCredentials(credentials.accessToken)
+      await this.host.authorizeHostAsOwned(refreshed.accessToken, refreshed.account)
+    }
     return this.status()
   }
 
