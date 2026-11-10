@@ -16,6 +16,28 @@ Web Host 改用实际启动它的 `dsh`、`DSH_HOME` 和 profile（通常为 `we
 
 Remote 侧栏的版本徽标仍是更新提示，点击链接打开发布页；实际安装在本机 DSH 插件页完成。更新 Remote 会中断它承载的远程连接，请在运行该插件的本机操作。
 
+## 固定设备身份（可选）
+
+Server 把 `deviceId` 和设备公钥绑定在一起。默认身份在首次启动时生成并保存在
+`$DSH_HOME/ds-harness-remote/servers/<server 哈希>/{host,client}/`，之后一直复用；重装插件包不影响它。
+如果部署方式会重建目录（容器换卷、换 `DSH_HOME`、换机器），可以显式固定身份：
+
+- `DSH_REMOTE_DEVICE_ID`：UUID，仅在**还没有 `device.json`** 时用于创建身份；已有身份会忽略它。
+- `DSH_REMOTE_DEVICE_KEY`：`device.key` 里的私钥（base64url）。和 ID 一起固定，才能在另一处复现同一身份。
+
+取值来自现有部署：
+
+```sh
+jq -r .deviceId "$DSH_HOME/ds-harness-remote/servers/<哈希>/host/device.json"
+cat "$DSH_HOME/ds-harness-remote/servers/<哈希>/host/device.key"
+```
+
+注意：
+
+- 只设 ID 不设私钥，只在 Server 从未注册过该 ID 时有效；否则注册会被拒绝（`PEER_IDENTITY_MISMATCH`）。
+- 私钥是设备凭据，等同于登录凭据，不要提交到仓库；容器里用 secret 或环境变量注入。
+- 同一套 ID 和私钥不要在两台机器上同时运行，否则会互相顶掉连接（`CONNECTION_REPLACED`）。
+
 ## Linux：DSH + 一次性注册 + 开机自启
 
 **Linux 必须以 root 运行。系统服务以 root 运行，Remote Host、Agent 工具和远程终端也具有 root 权限。请仅向可信账号开放此服务器。** 当前不支持通过此安装器配置非 root 服务用户。

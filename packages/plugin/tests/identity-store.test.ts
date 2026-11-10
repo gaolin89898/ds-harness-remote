@@ -477,6 +477,74 @@ describe('IdentityStore', () => {
   })
 })
 
+describe('pinned device identity', () => {
+  it('creates the identity from DSH_REMOTE_DEVICE_ID and reproduces it with DSH_REMOTE_DEVICE_KEY', async () => {
+    const home = await temporaryDirectory()
+    const pinnedId = '0199c0de-0000-7000-8000-000000000001'
+    const first = new IdentityStore({ directory: join(home, 'first'), env: { DSH_REMOTE_DEVICE_ID: pinnedId } })
+    const identity = await first.loadOrCreate('Host')
+    expect(identity.deviceId).toBe(pinnedId)
+
+    const key = (await readFile(join(home, 'first', 'device.key'), 'utf8')).trim()
+    const second = new IdentityStore({
+      directory: join(home, 'second'),
+      env: { DSH_REMOTE_DEVICE_ID: pinnedId, DSH_REMOTE_DEVICE_KEY: key },
+    })
+    const clone = await second.loadOrCreate('Host')
+    expect(clone.deviceId).toBe(pinnedId)
+    expect(clone.publicKey).toBe(identity.publicKey)
+    expect(clone.fingerprint).toBe(identity.fingerprint)
+  })
+
+  it('rejects a pinned id that is not a UUID', async () => {
+    const home = await temporaryDirectory()
+    const store = new IdentityStore({ directory: join(home, 'invalid'), env: { DSH_REMOTE_DEVICE_ID: 'not-a-uuid' } })
+    await expect(store.loadOrCreate('Host')).rejects.toBeInstanceOf(IdentityInvalidError)
+  })
+
+  it('keeps an existing on-disk identity when a different id is pinned', async () => {
+    const home = await temporaryDirectory()
+    const directory = join(home, 'existing')
+    const original = await new IdentityStore({ directory }).loadOrCreate('Host')
+    const pinned = new IdentityStore({ directory, env: { DSH_REMOTE_DEVICE_ID: '0199c0de-0000-7000-8000-000000000002' } })
+    expect((await pinned.loadOrCreate('Host')).deviceId).toBe(original.deviceId)
+  })
+})
+
+describe('pinned device identity', () => {
+  it('creates the identity from DSH_REMOTE_DEVICE_ID and reproduces it with DSH_REMOTE_DEVICE_KEY', async () => {
+    const home = await temporaryDirectory()
+    const pinnedId = '0199c0de-0000-7000-8000-000000000001'
+    const first = new IdentityStore({ directory: join(home, 'first'), env: { DSH_REMOTE_DEVICE_ID: pinnedId } })
+    const identity = await first.loadOrCreate('Host')
+    expect(identity.deviceId).toBe(pinnedId)
+
+    const key = (await readFile(join(home, 'first', 'device.key'), 'utf8')).trim()
+    const second = new IdentityStore({
+      directory: join(home, 'second'),
+      env: { DSH_REMOTE_DEVICE_ID: pinnedId, DSH_REMOTE_DEVICE_KEY: key },
+    })
+    const clone = await second.loadOrCreate('Host')
+    expect(clone.deviceId).toBe(pinnedId)
+    expect(clone.publicKey).toBe(identity.publicKey)
+    expect(clone.fingerprint).toBe(identity.fingerprint)
+  })
+
+  it('rejects a pinned id that is not a UUID', async () => {
+    const home = await temporaryDirectory()
+    const store = new IdentityStore({ directory: join(home, 'invalid'), env: { DSH_REMOTE_DEVICE_ID: 'not-a-uuid' } })
+    await expect(store.loadOrCreate('Host')).rejects.toBeInstanceOf(IdentityInvalidError)
+  })
+
+  it('keeps an existing on-disk identity when a different id is pinned', async () => {
+    const home = await temporaryDirectory()
+    const directory = join(home, 'existing')
+    const original = await new IdentityStore({ directory }).loadOrCreate('Host')
+    const pinned = new IdentityStore({ directory, env: { DSH_REMOTE_DEVICE_ID: '0199c0de-0000-7000-8000-000000000002' } })
+    expect((await pinned.loadOrCreate('Host')).deviceId).toBe(original.deviceId)
+  })
+})
+
 async function temporaryDirectory(): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'dsh-remote-plugin-'))
   directories.push(directory)

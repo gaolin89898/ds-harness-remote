@@ -87277,6 +87277,7 @@ var trustedPeersSchema = external_exports.object({
   // Discovery can persist multiple pages; reading must accept every record we write.
   peers: external_exports.array(trustedPeerSchema)
 }).strict();
+var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 var IdentityInvalidError = class extends Error {
   constructor(message, code = "IDENTITY_INVALID") {
     super(message);
@@ -87292,9 +87293,11 @@ var IdentityStore = class {
   peers = /* @__PURE__ */ new Map();
   peerSaveChain = Promise.resolve();
   defaultOptions;
+  env;
   role;
   constructor(options = {}) {
     const env = options.env ?? process.env;
+    this.env = env;
     const dshHome = env.DSH_HOME || join5(options.homeDirectory ?? homedir2(), ".dsh");
     this.storageDirectory = options.directory ?? join5(dshHome, "ds-harness-remote");
     this.defaultOptions = options.directory === void 0 ? options : void 0;
@@ -87362,8 +87365,13 @@ var IdentityStore = class {
     return identity3;
   }
   async createAndReadIdentityLocked(devicePath, keyPath, deviceName) {
-    const keys = generateKeyPair();
-    const record11 = { schemaVersion: 1, deviceId: uuidV7(), name: deviceName, publicKey: keys.publicKey };
+    const pinnedId = this.env.DSH_REMOTE_DEVICE_ID?.trim() || void 0;
+    const pinnedKey = this.env.DSH_REMOTE_DEVICE_KEY?.trim() || void 0;
+    if (pinnedId !== void 0 && !UUID_RE.test(pinnedId)) {
+      throw new IdentityInvalidError("DSH_REMOTE_DEVICE_ID must be a UUID.");
+    }
+    const keys = pinnedKey === void 0 ? generateKeyPair() : generateKeyPair(fromBase64Url2(pinnedKey));
+    const record11 = { schemaVersion: 1, deviceId: pinnedId === void 0 ? uuidV7() : pinnedId.toLowerCase(), name: deviceName, publicKey: keys.publicKey };
     await atomicTextWrite(keyPath, `${keys.privateKey}
 `, 384);
     await atomicJsonWrite(devicePath, record11, 384);

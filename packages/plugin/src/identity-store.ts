@@ -65,6 +65,8 @@ export interface ResetIdentityOptions extends IdentityStoreOptions {
 export type RemoteDeviceRole = 'host' | 'client'
 export type IdentityErrorCode = 'IDENTITY_INVALID' | 'IDENTITY_LOCKED' | 'STORAGE_CONFLICT'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export class IdentityInvalidError extends Error {
   constructor(
     message: string,
@@ -81,10 +83,12 @@ export class IdentityStore {
   private peers = new Map<string, TrustedPeer>()
   private peerSaveChain: Promise<void> = Promise.resolve()
   private readonly defaultOptions?: IdentityStoreOptions
+  private readonly env: NodeJS.ProcessEnv
   readonly role?: RemoteDeviceRole
 
   constructor(options: IdentityStoreOptions = {}) {
     const env = options.env ?? process.env
+    this.env = env
     const dshHome = env.DSH_HOME || join(options.homeDirectory ?? homedir(), '.dsh')
     this.storageDirectory = options.directory ?? join(dshHome, 'ds-harness-remote')
     this.defaultOptions = options.directory === undefined ? options : undefined
@@ -169,8 +173,17 @@ export class IdentityStore {
   }
 
   private async createAndReadIdentityLocked(devicePath: string, keyPath: string, deviceName: string): Promise<HostIdentity> {
-    const keys = generateKeyPair()
-    const record = { schemaVersion: 1 as const, deviceId: uuidV7(), name: deviceName, publicKey: keys.publicKey }
+    // A deployment may pin the identity so a rebuilt container or a fresh
+    // DSH_HOME keeps the same device row. The Server binds a deviceId to its
+    // identity key, so pinning the id alone is only accepted for a brand-new
+    // registration; pin the key as well to reproduce an existing identity.
+    const pinnedId = this.env.DSH_REMOTE_DEVICE_ID?.trim() || undefined
+    const pinnedKey = this.env.DSH_REMOTE_DEVICE_KEY?.trim() || undefined
+    if (pinnedId !== undefined && !UUID_RE.test(pinnedId)) {
+      throw new IdentityInvalidError('DSH_REMOTE_DEVICE_ID must be a UUID.')
+    }
+    const keys = pinnedKey === undefined ? generateKeyPair() : generateKeyPair(fromBase64Url(pinnedKey))
+    const record = { schemaVersion: 1 as const, deviceId: pinnedId === undefined ? uuidV7() : pinnedId.toLowerCase(), name: deviceName, publicKey: keys.publicKey }
     // Write the key first: a crash between the two leaves device.key alone,
     // which the incomplete-pair guard above reports explicitly, instead of
     // leaving a device.json whose published public key has no private half.
