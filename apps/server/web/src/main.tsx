@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ConfigProvider, Layout, theme as antdTheme } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
-import { ThemeProvider, useColorTheme } from './theme'
+import { ThemeProvider } from './theme'
 import { LoginPanel } from './LoginPanel'
 import { DevicesPage } from './DevicesPage'
 import { HomePage } from './HomePage'
@@ -10,6 +10,7 @@ import { api, RequestError, type Account } from './api'
 import 'antd/dist/reset.css'
 import './upstream.css'
 import './selfhost.css'
+import './console.css'
 
 export function navigate(path: string) {
   if (window.location.pathname !== path) window.history.pushState({}, '', path)
@@ -18,8 +19,7 @@ export function navigate(path: string) {
 
 function App() {
   const embedded = window.location.pathname === '/app/embedded/devices'
-  const { colorTheme } = useColorTheme()
-  const dark = colorTheme === 'dark'
+  const dark = true
   const [account, setAccount] = useState<Account | null>()
   const [error, setError] = useState<string>()
   const [path, setPath] = useState(() => window.location.pathname)
@@ -59,19 +59,19 @@ function App() {
   return <ConfigProvider locale={zhCN} theme={{
     algorithm: dark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
     token: {
-      colorPrimary: dark ? '#3b82f6' : '#1677ff',
-      colorInfo: dark ? '#3b82f6' : '#1677ff',
-      colorSuccess: dark ? '#10b981' : '#059669',
-      colorWarning: dark ? '#f59e0b' : '#d97706',
-      colorError: dark ? '#f87171' : '#dc2626',
-      colorBgLayout: dark ? '#0c0e12' : '#f8fafc',
-      colorBgContainer: dark ? '#151820' : '#ffffff',
-      colorBgElevated: dark ? '#1c202a' : '#ffffff',
-      colorText: dark ? '#f1f5f9' : '#0f172a',
-      colorTextSecondary: dark ? '#94a3b8' : '#64748b',
-      colorTextPlaceholder: dark ? '#64748b' : '#94a3b8',
-      colorBorder: dark ? '#262c38' : '#e2e8f0',
-      colorBorderSecondary: dark ? '#1e232e' : '#f1f5f9',
+      colorPrimary: dark ? '#5687ed' : '#1677ff',
+      colorInfo: dark ? '#5687ed' : '#1677ff',
+      colorSuccess: dark ? '#21c761' : '#059669',
+      colorWarning: dark ? '#e4b34b' : '#d97706',
+      colorError: dark ? '#e5544b' : '#dc2626',
+      colorBgLayout: dark ? '#121318' : '#f8fafc',
+      colorBgContainer: dark ? '#181b22' : '#ffffff',
+      colorBgElevated: dark ? '#20242d' : '#ffffff',
+      colorText: dark ? '#eaebef' : '#0f172a',
+      colorTextSecondary: dark ? '#a8aeba' : '#64748b',
+      colorTextPlaceholder: dark ? '#7a818e' : '#94a3b8',
+      colorBorder: dark ? '#333a46' : '#e2e8f0',
+      colorBorderSecondary: dark ? '#262a33' : '#f1f5f9',
       borderRadius: 8,
       borderRadiusLG: 12,
       controlHeight: 40,
@@ -82,9 +82,9 @@ function App() {
     components: {
       Button: { primaryShadow: '0 4px 12px rgba(22, 119, 255, 0.25)' },
       Table: {
-        headerBg: dark ? '#1a1e28' : '#f8fafc',
-        headerColor: dark ? '#94a3b8' : '#475569',
-        rowHoverBg: dark ? '#1f2430' : '#f1f5f9',
+        headerBg: dark ? '#20242d' : '#f8fafc',
+        headerColor: dark ? '#a8aeba' : '#475569',
+        rowHoverBg: dark ? '#22262e' : '#f1f5f9',
       },
       Card: {
         headerBg: 'transparent',

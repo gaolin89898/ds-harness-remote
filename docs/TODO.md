@@ -86,7 +86,7 @@ RC.1 的源码适配与本地自动化验证见兼容性说明；不能替代真
 
 ## Claude Code ACP（Issue #125）
 
-- [x] 创建 [Issue #125](https://github.com/liguobao/ds-harness-remote/issues/125)，开始 Host `claude` 后端与专用 ACP stdio adapter 接入，默认关闭。
+- [x] 创建 [Issue #125](https://github.com/gaolin89898/ds-harness-remote/issues/125)，开始 Host `claude` 后端与专用 ACP stdio adapter 接入，默认关闭。
 - [x] 完成 Desktop Plugin 与 Android Claude 工作区/会话内存投影、独立后端识别、历史恢复与模型切换；独立 Remote Web runtime 另行接入。
 - [x] 复用已有 OpenAI 兼容端点/凭据与 `gpt-6-sol` 完成真实 Claude ACP 初始化、文字对话及本机 Gateway `Write` 工具拒绝/单次允许；同会话第二次工具调用重新审批，真实句柄的跨连接、持久授权、result 越权及重放被拒绝。
 - [x] Claude Host 中断、catalog/load 与独立有界 history：真实待审批 Write 取消后旧句柄失效/无文件；Bash 运行期间 history 不打断 turn，随后返回 cancelled；Gateway/adapter 进程重启后 catalog/load/history 与上下文继续对话通过。

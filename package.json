@@ -12,13 +12,13 @@
     "end-to-end-encryption",
     "webrtc"
   ],
-  "homepage": "https://github.com/liguobao/ds-harness-remote#readme",
+  "homepage": "https://github.com/gaolin89898/ds-harness-remote#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/liguobao/ds-harness-remote.git"
+    "url": "git+https://github.com/gaolin89898/ds-harness-remote.git"
   },
   "bugs": {
-    "url": "https://github.com/liguobao/ds-harness-remote/issues"
+    "url": "https://github.com/gaolin89898/ds-harness-remote/issues"
   },
   "author": "liguobao <lgb835485368@gmail.com>",
   "license": "MIT",

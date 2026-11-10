@@ -11,7 +11,7 @@
 - `protocol`、`crypto`、`webrtc`、`client-core` 等共享包
 - 已冻结的 Mock Host 互操作工具
 
-本仓库另提供 [最小自部署 Server](../apps/server/README.zh.md)：单账号环境变量鉴权、设备注册与凭据、Control/Relay，以及登录和设备状态页。
+本仓库另提供 [最小自部署 Server](../apps/server/README.md)：单账号环境变量鉴权、设备注册与凭据、Control/Relay，以及登录和设备状态页。
 
 完整多账号 Server、Remote Web 会话 UI 和 Admin 仍在独立 Server 项目实现；这里的最小版本复用相同协议子集，保持独立进程，不扩展为完整站点。
 
@@ -27,13 +27,13 @@
 - [开发任务与路线图](TODO.md)：跟踪未完成的工作和验证边界。
 - [更新记录](CHANGELOG.md)：记录版本变更。
 - [隐私说明](PRIVACY.md)：说明数据处理与隐私边界。
-- [插件安装指南](installation.zh.md)（[English](installation.md)）：已有 Harness 插件安装、Desktop 插件管理、profile 选择与插件卸载。
+- [插件安装指南](installation.md)：已有 Harness 插件安装、Desktop 插件管理、profile 选择与插件卸载。
 - [Codex Remote 技术说明](codex-remote.md)：说明 Codex 工作区展示、数据边界、配置、安全限制和当前验证状态。
 - [Agent 工作区接入指南](acp-integration.md)：启用 Cursor / AGY / Pi / OpenCode / Claude / Codex，以及新增 ACP adapter 的接入点。
 - [ACP Remote / Agent adapters](acp-remote.md)：说明 Agent ACP gateway、后端 adapter、allowlist 与配置。
 - [端到端加密](end-to-end-encryption.md)：解释 Noise IK、设备身份固定、密钥生命周期、Server 可见元数据、重放保护与安全边界。
 - [网络与传输](network.md)：解释出站连接、Control/Data plane、LAN/P2P/TURN/Relay 选路、NAT、降级、断线恢复与当前验证状态。
-- [版本兼容说明](compatibility.zh.md)（[English](compatibility.md)）：记录 Plugin 与各版本 DeepSeek Harness 的 carrier、Session 和 Desktop 兼容范围。
+- [版本兼容说明](compatibility.md)：记录 Plugin 与各版本 DeepSeek Harness 的 carrier、Session 和 Desktop 兼容范围。
 
 ## 历史资料
 
@@ -43,7 +43,7 @@
 
 ## 阅读路径
 
-- **项目介绍与快速开始**：默认入口为[English README](../README.md)，中文版见[中文 README](../README.zh.md)。
+- **项目介绍与快速开始**：见[项目 README](../README.md)。
 - **在终端中使用 Remote**：当前版本只提供独立 CLI（`ds-harness-remote login|status|logout`）与浏览器/Desktop Host；dsh-TUI 集成计划在后续版本单独提供。
 - **安装或使用其他 Plugin 入口**：先读[根 README](../README.md)，再读[插件包说明](../packages/plugin/README.md)。
 - **了解 Codex Remote 的实现边界**：先读[Codex Remote 技术说明](codex-remote.md)，需要实现级字段时再查[协议](protocol.md)。

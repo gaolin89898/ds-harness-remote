@@ -45,8 +45,11 @@ WebSocket: wss://{serverHost}/ws/v1/connect
 
 “我的设备”入口通过官方 `sidebar.panellist` 与 `main` 插槽打开已保存 Server 的
 `/app/embedded/devices`，仅接受无用户名密码的 HTTP(S) 地址，不向 iframe 传递设备凭据。
-自部署 Server 须配置 `DSH_SERVER_FRAME_ANCESTORS` 放行精确 Harness origin，见
-[Server 配置](../apps/server/README.zh.md#在-harness-内嵌设备页)。首次内嵌网页登录独立于
+自部署 Server 须配置 `DSH_SERVER_FRAME_ANCESTORS` 放行精确 Harness origin：Desktop 为
+`dsh-app://app`，公网 Harness 网页版为对应 HTTPS origin，Android dsh-go「网页模式」为
+`http://127.0.0.1:3080`（缺失时该页被 CSP frame-ancestors 拦下，WebView 报
+`net::ERR_BLOCKED_BY_RESPONSE`），见
+[Server 配置](../apps/server/README.md#在-harness-内嵌设备页)。首次内嵌网页登录独立于
 Plugin 的设备授权；退出内嵌页不撤销设备凭据，也不影响普通网页的登录会话。
 
 ## 3. 账号登录
@@ -504,7 +507,7 @@ server changed       → NO_SERVER（切换到该 Server 独立的本地状态�
 
 ## 最小自部署 Server
 
-本仓库 `apps/server` 提供上述账号密码、设备注册/自有角色注册、刷新、设备详情、Control、WebRTC signaling/TURN credential 与 Relay API 子集。账号来自 `DSH_SERVER_ACCOUNT`，密码来自 `DSH_SERVER_PASSWORD`；WebRTC 的 STUN/TURN 由 `DSH_SERVER_STUN_URLS` / `DSH_SERVER_TURN_URLS` / `DSH_SERVER_TURN_SECRET` 配置，留空时保持 Relay-only。配置自定义 Server 地址后选择账号密码登录。运行方法见 [README](../apps/server/README.zh.md)。
+本仓库 `apps/server` 提供上述账号密码、设备注册/自有角色注册、刷新、设备详情、Control、WebRTC signaling/TURN credential 与 Relay API 子集。账号来自 `DSH_SERVER_ACCOUNT`，密码来自 `DSH_SERVER_PASSWORD`；WebRTC 的 STUN/TURN 由 `DSH_SERVER_STUN_URLS` / `DSH_SERVER_TURN_URLS` / `DSH_SERVER_TURN_SECRET` 配置，留空时保持 Relay-only。配置自定义 Server 地址后选择账号密码登录。运行方法见 [README](../apps/server/README.md)。
 
 ## Device pairing v1
 

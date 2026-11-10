@@ -246,7 +246,7 @@ describe('会话链接排版与交互系统 (Link & Citation System)', () => {
     })
 
     it('正确分类 external 外部链接并提取域名与品牌图标', () => {
-      const info = classifyMarkdownLink('https://github.com/liguobao/ds-harness-remote', '项目仓库')
+      const info = classifyMarkdownLink('https://github.com/gaolin89898/ds-harness-remote', '项目仓库')
       expect(info.kind).toBe('external')
       expect(info.isBlocked).toBe(false)
       expect(info.domain).toBe('github.com')

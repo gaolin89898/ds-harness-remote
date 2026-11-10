@@ -81,7 +81,7 @@ elif [[ "$os" = Linux ]]; then
   { printf '#!/usr/bin/env bash\n# ds-harness-remote managed private runtime\n'; printf 'export PATH=%q:"$PATH"\n' "$runtime/node/bin:$runtime/harness/node_modules/.bin"; printf 'exec %q "$@"\n' "$runtime/harness/node_modules/.bin/dsh"; } > "$DSH_COMMAND"
   chmod 755 "$DSH_COMMAND"
 else
-  fail "No existing dsh command found. Install via Desktop Extensions / Plugin management (https://github.com/liguobao/ds-harness-remote), or enable Desktop's official dsh launcher."
+  fail "No existing dsh command found. Install via Desktop Extensions / Plugin management (https://github.com/gaolin89898/ds-harness-remote), or enable Desktop's official dsh launcher."
 fi
 # plugin exec changes cwd; service ExecStart must also use an absolute executable.
 if [[ "$DSH_COMMAND" != /* ]]; then DSH_COMMAND="$(pwd -P)/$DSH_COMMAND"; fi

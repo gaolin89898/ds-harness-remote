@@ -14,7 +14,7 @@
 
 业务都复用认证后的 Noise channel，但独立 capability、allowlist、RPC/event 和状态。
 不得将 ACP 方法塞入 Harness 或 CodeX API，也不得引入平行的 Harness session/agent/workspace/permission 协议。
-兼容版本和 carrier 选择见[兼容说明](../../compatibility.zh.md)；schema 与具体限额见[协议](../../protocol.md)。
+兼容版本和 carrier 选择见[兼容说明](../../compatibility.md)；schema 与具体限额见[协议](../../protocol.md)。
 
 ## 2. 生命周期与模块
 

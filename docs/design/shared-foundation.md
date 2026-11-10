@@ -56,7 +56,7 @@ Server 可见路由与设备/连接元数据，不读取 Relay 业务明文。�
 `harness.transport.describe` 在加密通道中探测 carrier、领域与工具支持，老 Host 保留 legacy 降级。
 当前 Host 可提供 `workspaceTypes`，Client 同时检查已协商 capability 与 `available`，启用开关不等于实际就绪。
 后端初始化不阻塞 Harness，配置热更新只影响对应后端；不可用后端不能替换成另一个后端。
-兼容 profile 以[版本说明](../compatibility.zh.md)及源码为准，不复制或翻译任意 Harness wire format。
+兼容 profile 以[版本说明](../compatibility.md)及源码为准，不复制或翻译任意 Harness wire format。
 
 ## 断线与恢复
 

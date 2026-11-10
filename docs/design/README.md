@@ -39,7 +39,7 @@
 | CodeX | stdio App Server，`codex.app.*` | Desktop 内存载体、Android 内存投影 | 不写 DSH 存储；Project / Thread authority |
 | Cursor / AGY / Pi / OpenCode / Claude | ACP gateway，`agent.acp.*` | 浏览器可用的 Desktop 内存载体、Android 投影 | 独立后端 capability、工作区 ID 与会话归属 |
 
-当前兼容范围见[兼容说明](../compatibility.zh.md)：开发基线 `0.2.1-rc.1`，保留 `0.2.0-rc.2` / rc.1，并接纳后续 `0.2.2` RC 版本。Host / Android legacy ApiProxy 实现已移除。Client 按加密 capability 与 `workspaceTypes.available` 判断协议支持及实际就绪；未来版本范围接纳不代表 runtime 已验收。
+当前兼容范围见[兼容说明](../compatibility.md)：开发基线 `0.2.1-rc.1`，保留 `0.2.0-rc.2` / rc.1，并接纳后续 `0.2.2` RC 版本。Host / Android legacy ApiProxy 实现已移除。Client 按加密 capability 与 `workspaceTypes.available` 判断协议支持及实际就绪；未来版本范围接纳不代表 runtime 已验收。
 
 ## 主路径
 

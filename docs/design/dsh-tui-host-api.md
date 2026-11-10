@@ -1,6 +1,6 @@
 # dsh-TUI Remote Host API plan
 
-Status: Draft for [issue #290](https://github.com/liguobao/ds-harness-remote/issues/290).
+Status: Draft for [issue #290](https://github.com/gaolin89898/ds-harness-remote/issues/290).
 
 ## Problem
 

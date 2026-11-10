@@ -6,6 +6,7 @@ import type { Translate } from '../client-locale.js'
 import type { OAuthProviderInfo } from '../server-api.js'
 import type { StatusFeed } from '../status-stream.js'
 import { compareVersions } from '../version-compare.js'
+import { whaleMarkPath, whaleMarkViewBox } from './brand.js'
 import { deepSeekWorkspaceIcon, gptWorkspaceIcon } from './icons.js'
 import { pendingWorkspaceSelectionKey } from './navigation.js'
 import { connectedClientModeLabel, connectedProgress, connectionErrorMessage, displayRemoteAccount, formatPlatform, messageOf, startupErrorMessage } from './presentation.js'
@@ -28,6 +29,35 @@ import type {
   SidebarEntryPreference,
   SidebarEntryStyle,
 } from './types.js'
+
+/**
+ * Device glyph for a host row. Hosts report a platform string, so Android and
+ * iOS render a phone and every desktop platform renders a laptop.
+ */
+function hostDeviceGlyph(React: ClientReact, platform: string): unknown {
+  const mobile = /android|ios|iphone|ipad/i.test(platform)
+  return React.createElement('svg', {
+    viewBox: '0 0 24 24', width: 18, height: 18, fill: 'none',
+    stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round',
+    'aria-hidden': true, focusable: false,
+  }, mobile
+    ? React.createElement('path', { d: 'M9.5 3h5A1.5 1.5 0 0 1 16 4.5v15A1.5 1.5 0 0 1 14.5 21h-5A1.5 1.5 0 0 1 8 19.5v-15A1.5 1.5 0 0 1 9.5 3Zm1.5 15h2' })
+    : React.createElement('path', { d: 'M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5v-9Zm4 12h8' }))
+}
+
+/**
+ * Label of the signed-in side shown in the workbench footer: the selected
+ * target name when a host is open, otherwise the local device or account.
+ */
+function footerAccountName(status: RemoteStatus | undefined, t: Translate): string {
+  return status?.target?.name ?? status?.deviceName
+    ?? (status?.host?.account === undefined ? t('account') : displayRemoteAccount(status.host.account))
+}
+
+function accountInitial(label: string): string {
+  const trimmed = label.trim()
+  return trimmed.length === 0 ? '·' : trimmed.slice(0, 1).toUpperCase()
+}
 
 export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalRenderer) {
   const ServerNotice = createServerNotice(React)
@@ -1245,13 +1275,20 @@ export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalR
         React.createElement('header', { className: 'dshRemotePageHeader' },
           React.createElement('div', { className: 'dshRemotePageIntro' },
             React.createElement('div', { className: 'dshRemotePageTitleRow' },
-              React.createElement('strong', null, selectedHost?.name ?? t('remoteTitle')),
-              selectedHost === undefined ? React.createElement('a', {
-                className: 'dshRemoteStarLink',
-                href: 'https://github.com/liguobao/ds-harness-remote',
-                target: '_blank',
-                rel: 'noreferrer',
-              }, t('starProject')) : null),
+              React.createElement('span', { className: 'dshRemoteBrandMark', 'aria-hidden': true },
+                React.createElement('svg', {
+                  viewBox: whaleMarkViewBox, fill: 'currentColor', 'aria-hidden': true, focusable: false,
+                }, React.createElement('path', { d: whaleMarkPath }))),
+              React.createElement('div', { className: 'dshRemotePageTitles' },
+                React.createElement('div', { className: 'dshRemotePageEyebrow' },
+                  React.createElement('span', { className: 'dshRemotePageEyebrowLabel' }, 'DSH Remote'),
+                  selectedHost === undefined ? React.createElement('a', {
+                    className: 'dshRemoteStarLink',
+                    href: 'https://github.com/gaolin89898/ds-harness-remote',
+                    target: '_blank',
+                    rel: 'noreferrer',
+                  }, t('starProject')) : null),
+                React.createElement('strong', null, selectedHost?.name ?? t('remoteTitle')))),
             React.createElement('p', null, selectedHostDetails ?? t(status?.host?.pairingHostOnly ? 'pairingHostOnly' : 'remoteDescription'))),
           React.createElement('div', { className: 'dshRemotePageActions' },
             selectedHost === undefined ? null : React.createElement('button', {
@@ -1283,7 +1320,7 @@ export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalR
             needsAuthorization ? React.createElement('section', { className: 'dshRemoteEnable' },
               React.createElement('div', { className: 'dshRemoteLoginHeading' },
                 React.createElement('a', {
-                  href: 'https://github.com/liguobao/ds-harness-remote',
+                  href: 'https://github.com/gaolin89898/ds-harness-remote',
                   target: '_blank', rel: 'noopener noreferrer',
                 },
                   React.createElement('strong', { className: 'dshRemoteLoginTitle' }, t('signInClient')),
@@ -1433,30 +1470,41 @@ export function createRemoteWorkspaceAction(React: ClientReact, portal?: PortalR
                     disabled: busy || serverUnavailable || !device.online,
                     'aria-current': connectingHost?.deviceId === device.deviceId ? 'true' : undefined,
                     onClick: () => void selectHost(device),
-                  }, React.createElement('span', null,
-                    React.createElement('strong', null, device.name),
-                    React.createElement('small', null, [
-                      formatPlatform(device.platform),
-                      device.harnessVersion === undefined ? undefined : t('harnessVersion', { version: device.harnessVersion }),
-                      device.clientVersion === undefined ? undefined : t('pluginVersion', { version: device.clientVersion }),
-                      deviceUpdateAvailable(device) ? t('updateAvailableTag') : undefined,
-                    ].filter(Boolean).join(' · '))),
-                    React.createElement('small', null, t(serverUnavailable ? 'unavailable' : device.online ? 'online' : 'offline')))))) : null,
+                  },
+                    React.createElement('span', { className: 'dshRemoteHostItemLeft' },
+                      React.createElement('span', { className: 'dshRemoteHostItemIcon', 'aria-hidden': true },
+                        hostDeviceGlyph(React, device.platform)),
+                      React.createElement('span', { className: 'dshRemoteHostItemText' },
+                        React.createElement('strong', null, device.name),
+                        React.createElement('small', null, [
+                          formatPlatform(device.platform),
+                          device.harnessVersion === undefined ? undefined : t('harnessVersion', { version: device.harnessVersion }),
+                          device.clientVersion === undefined ? undefined : t('pluginVersion', { version: device.clientVersion }),
+                          deviceUpdateAvailable(device) ? t('updateAvailableTag') : undefined,
+                        ].filter(Boolean).join(' · ')))),
+                    React.createElement('span', { className: 'dshRemoteHostItemRight' },
+                      React.createElement('small', {
+                        className: `dshRemoteHostStatus${serverUnavailable || !device.online ? ' isOffline' : ' isOnline'}`,
+                      }, t(serverUnavailable ? 'unavailable' : device.online ? 'online' : 'offline')),
+                      React.createElement('span', { className: 'dshRemoteHostItemChevron', 'aria-hidden': true }, '›')))))) : null,
               React.createElement(RemoteProgressView, { progress, t }),
               selectedHost === undefined
                 ? (connectingHost === undefined ? React.createElement(React.Fragment, null,
                   status?.host?.pairingHostOnly ? null : React.createElement('p', { className: 'dshRemoteHint' }, t('selectHostHint')),
                   React.createElement('footer', { className: 'dshRemoteAccountFooter' },
-                    React.createElement('span', { className: 'dshRemoteHostNameLine' },
-                      React.createElement('span', null, status?.target?.name ?? status?.deviceName ?? (status?.host?.account === undefined ? t('account') : displayRemoteAccount(status.host.account))),
-                      React.createElement(ServerNotice, {
-                        offline: discoveryUnavailable || (status?.host?.online === false && status.host.reconnecting),
-                        linked: connectedCount > 0 || status?.connected === true,
-                        expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt, t,
-                      })),
+                    React.createElement('div', { className: 'dshRemoteAccountIdentity' },
+                      React.createElement('span', { className: 'dshRemoteAccountAvatar', 'aria-hidden': true },
+                        accountInitial(footerAccountName(status, t))),
+                      React.createElement('div', { className: 'dshRemoteAccountCopy' },
+                        React.createElement('strong', null, footerAccountName(status, t)),
+                        React.createElement(ServerNotice, {
+                          offline: discoveryUnavailable || (status?.host?.online === false && status.host.reconnecting),
+                          linked: connectedCount > 0 || status?.connected === true,
+                          expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt, t,
+                        }))),
                     updateNotice === undefined ? null : React.createElement('a', {
                       className: 'dshRemoteAccountUpdate',
-                      href: 'https://github.com/liguobao/ds-harness-remote/releases',
+                      href: 'https://github.com/gaolin89898/ds-harness-remote/releases',
                       target: '_blank',
                       rel: 'noreferrer',
                       title: updateNotice,

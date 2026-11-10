@@ -23,6 +23,10 @@ does not claim a new full-suite pass.
 Deployed dsh-remote-server:embed-20261109 to remote.gaolin.ink with
 DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://dsh.gaolin.ink. Isolated container
 health, embedded document/CSP, login and 3-device API checks passed before switch.
+That allowlist missed the Android dsh-go Web-mode origin `http://127.0.0.1:3080`,
+so “My devices” fails in Web mode with `net::ERR_BLOCKED_BY_RESPONSE` (the
+embedding page's origin is the loopback engine); add the origin and recreate the
+container. The Desktop origin and other Web origins each need their own entry.
 Updated server and local Harness Plugin bundles, preserving state/credentials and
 backing up the previous container/image and installed bundles. Actual Windows
 Harness acceptance confirmed the sidebar position, embedded signed-in dark page,
@@ -502,7 +506,7 @@ pnpm --filter @dsh-remote/server test
 pnpm --filter @dsh-remote/server build
 ```
 
-本地启动、环境变量与 Docker 部署见 `apps/server/README.md` 和 `apps/server/README.zh.md`。Server 设备凭据数据和 `.env` 不得提交。
+本地启动、环境变量与 Docker 部署见 `apps/server/README.md`。Server 设备凭据数据和 `.env` 不得提交。
 
 安装相关入口仅保留 `scripts/install.sh`（macOS/Linux）。不提供 Windows、独立卸载或 Token 包装脚本；
 构建/测试辅助脚本不在此清理范围内。按用户本轮明确授权，Linux 要求 root，缺少 DSH 时允许安装配套
@@ -518,7 +522,7 @@ Desktop 默认保留的 `desktop` profile，只能由其官方 launcher 管理�
 
 ## Validation Baseline
 
-以下为历史验收快照，不代表当前源码基线。最近构建结果见文末 `Post-merge 0.5.20 rebuild (2026-10-27)`；当前兼容范围见 `docs/compatibility.zh.md`。
+以下为历史验收快照，不代表当前源码基线。最近构建结果见文末 `Post-merge 0.5.20 rebuild (2026-10-27)`；当前兼容范围见 `docs/compatibility.md`。
 
 截至 2026-09-16：
 
@@ -596,15 +600,13 @@ fixtures 全部保留，按操作及 Control frame 类型注册为 24 个契约�
 
 - 调试、验收截图与录屏不提交到仓库；本地留档使用已忽略的 `artifacts/` 或 `docs/screenshots/`。README 使用的 `docs/images/` 展示图与应用运行所需图片资源保留。
 - 对外发布说明与新版本 Changelog 只写用户可感知的功能、修复、兼容性变化和贡献者；不附测试数量、构建命令、bundle 校验、未验收清单或构建警告等验证流水账。内部验证结果与边界保留在 AGENTS.md / TODO。
-- `README.md`：面向用户的默认英文入口，也是 GitHub 默认 README；写项目介绍、特性、安全边界、Plugin/Client 使用和开源 Server 自部署入口。
-- `README.en.md`：保留的英文入口，与默认 `README.md` 保持内容一致。
-- `README.zh.md`：保留的中文入口，与默认 `README.md` 保持功能和版本信息一致。
+- `README.md`：唯一的用户入口（GitHub 默认 README），只保留中文；写项目介绍、特性、安全边界、Plugin/Client 使用和开源 Server 自部署入口。不再维护英文/日文版本，其他语言文档不再新增。
 - `AGENTS.md`：面向编码 Agent，写仓库结构、进度、命令和实现约束。
 - `docs/TODO.md`：未完成任务与优先级。
 - `docs/CHANGELOG.md`：版本更新记录。
 - `docs/PRIVACY.md`：隐私说明。
 - `docs/design/PRODUCT.md`、`docs/design/DESIGN.md`：产品定位与界面设计系统。
-- `apps/server/README.md`、`apps/server/README.zh.md`：开源自部署 Server 的实际能力、配置、运行方式和验证边界。
+- `apps/server/README.md`：开源自部署 Server 的实际能力、配置、运行方式和验证边界。
 - `docs/server.md`：完整 Server 项目的产品/功能设计，并说明本仓库自部署版本的范围。
 - `docs/plugin-integration.md`：Host Plugin 对接 Server 的账号认证、设备认证与凭证状态机，以及最小自部署版本支持的子集。
 - `docs/protocol.md`：跨仓库协议规范。
@@ -812,7 +814,7 @@ attach 双向流，按 Host ack 确认，保留有界队列、设备归属与断
 数据面；session/projections 返回各自历史/内存的 sequenced 投影，不进入 Harness 持久化。
 RC.1 官方 Gateway/Peer 与核心终端回归、全仓 check/test、生产 build/Hermes 和 DSH bundle
 校验通过；Plugin 最终 52 文件/349 测试。跨设备、Desktop UI、Android
-APK/原生真机与独立 Remote Web 尚未验收，详见 docs/compatibility.zh.md 与 docs/TODO.md。
+APK/原生真机与独立 Remote Web 尚未验收，详见 docs/compatibility.md 与 docs/TODO.md。
 
 2026-10-17 启动兼容修复（未发布）：`RemoteTypertGateway` 为旧 Host 返回的 `ui-theme`
 视图补齐 RC.1 所需的缺失字体默认值，避免官方 ThemeRuntime 在 `undefined.split` 处初始化

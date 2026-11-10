@@ -1,42 +1,37 @@
-// Enhanced DevicesPage with modern developer-grade UI, metric cards, platform icons, and copy utilities.
-import { Alert, Button, Card, Empty, Input, Layout, Popconfirm, Space, Table, Tag, Typography, message } from 'antd'
+// Devices console laid out like the design: topbar with section nav, page head,
+// stat strip, endpoint card and a table + insights rail grid.
+import { Popconfirm, message } from 'antd'
 import {
-  AppleOutlined,
   AndroidOutlined,
-  CheckCircleFilled,
+  AppleOutlined,
   CheckOutlined,
-  ClockCircleFilled,
   CloudServerOutlined,
   CopyOutlined,
   DesktopOutlined,
   EditOutlined,
+  ExportOutlined,
   GithubOutlined,
   GlobalOutlined,
   LinkOutlined,
+  LockOutlined,
   LogoutOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
-  UserOutlined,
   WindowsOutlined,
 } from '@ant-design/icons'
-import type { TableColumnsType } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api, RequestError, type Device, type DeviceList } from './api'
-import { ThemeToggle } from './ThemeToggle'
-import { SiteFooter } from './SiteFooter'
 
-const { Paragraph, Text, Title } = Typography
-
-function getPlatformIcon(platform: string) {
+function platformIcon(platform: string) {
   const p = (platform || '').toLowerCase()
-  if (p.includes('win') || p === 'win32') return <WindowsOutlined className="platform-icon is-win" />
-  if (p.includes('darwin') || p.includes('mac') || p.includes('apple')) return <AppleOutlined className="platform-icon is-mac" />
-  if (p.includes('android')) return <AndroidOutlined className="platform-icon is-android" />
-  if (p.includes('linux')) return <CloudServerOutlined className="platform-icon is-linux" />
-  return <DesktopOutlined className="platform-icon is-generic" />
+  if (p.includes('win') || p === 'win32') return <WindowsOutlined />
+  if (p.includes('darwin') || p.includes('mac') || p.includes('apple')) return <AppleOutlined />
+  if (p.includes('android')) return <AndroidOutlined />
+  if (p.includes('linux')) return <CloudServerOutlined />
+  return <DesktopOutlined />
 }
 
-function getPlatformName(platform: string) {
+function platformName(platform: string) {
   const map: Record<string, string> = { darwin: 'macOS', win32: 'Windows', linux: 'Linux', android: 'Android' }
   return map[platform] ?? platform
 }
@@ -58,7 +53,7 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
     try {
       const data = await api<DeviceList>('/account/devices')
       setResult(data)
-      setUpdated(new Date().toLocaleTimeString('zh-CN'))
+      setUpdated(new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }))
     } catch (err) {
       if (err instanceof RequestError && err.status === 401) onSignedOut()
       else setError(err instanceof Error ? err.message : '加载失败，请重试。')
@@ -66,6 +61,8 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
       setLoading(false)
     }
   }, [onSignedOut])
+
+  useEffect(() => { void load() }, [load])
 
   async function submitRename() {
     if (!renaming) return
@@ -83,8 +80,6 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
       setSavingName(false)
     }
   }
-
-  useEffect(() => { void load() }, [load])
 
   async function logout() {
     setLoggingOut(true)
@@ -111,330 +106,281 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
     }
   }
 
-  const devices = [...(result?.items ?? [])].sort((a, b) => Number(b.online) - Number(a.online))
-  const onlineCount = devices.filter(d => d.online).length
-  const offlineCount = devices.length - onlineCount
-
-  const columns: TableColumnsType<Device> = [
-    {
-      title: '设备名称',
-      dataIndex: 'name',
-      key: 'name',
-      render: (name: string, d) => renaming?.deviceId === d.deviceId
-        ? (
-          <Space size={6} className="selfhost-rename-row">
-            <Input
-              size="small"
-              value={newName}
-              autoFocus
-              maxLength={80}
-              className="selfhost-rename-input"
-              onChange={event => setNewName(event.target.value)}
-              onPressEnter={() => void submitRename()}
-              onKeyDown={event => { if (event.key === 'Escape') setRenaming(undefined) }}
-            />
-            <Button size="small" type="primary" loading={savingName} onClick={() => void submitRename()}>保存</Button>
-            <Button size="small" onClick={() => setRenaming(undefined)}>取消</Button>
-          </Space>
-        ) : (
-          <div className="selfhost-device-cell">
-            <div className={`selfhost-device-icon-box ${d.online ? 'is-online' : ''}`}>
-              {getPlatformIcon(d.platform)}
-            </div>
-            <div className="selfhost-device-info">
-              <div className="selfhost-device-name-row">
-                <Text strong className="selfhost-device-name">{name}</Text>
-                <Button
-                  type="text"
-                  size="small"
-                  className="selfhost-edit-btn"
-                  icon={<EditOutlined />}
-                  aria-label="修改设备名称"
-                  title="修改设备名称"
-                  onClick={() => { setRenaming(d); setNewName(d.name) }}
-                />
-              </div>
-              <Text type="secondary" className="selfhost-device-id">{d.deviceId.slice(0, 14)}…</Text>
-            </div>
-          </div>
-        ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'online',
-      key: 'online',
-      width: 120,
-      render: (online: boolean) => online ? (
-        <span className="selfhost-status-pill is-online">
-          <span className="selfhost-status-dot" />
-          <span>在线</span>
-        </span>
-      ) : (
-        <span className="selfhost-status-pill is-offline">
-          <span className="selfhost-status-dot" />
-          <span>离线</span>
-        </span>
-      ),
-    },
-    {
-      title: '角色',
-      key: 'roles',
-      width: 180,
-      render: (_, device) => (
-        <Space size={6} wrap>
-          {(device.roles ?? [device.role]).map(role => (
-            <span key={role} className={`selfhost-role-badge is-${role}`}>
-              {role === 'host' ? <CloudServerOutlined /> : <DesktopOutlined />}
-              <span>{role === 'host' ? 'Host' : '客户端'}</span>
-            </span>
-          ))}
-        </Space>
-      ),
-    },
-    {
-      title: '系统',
-      dataIndex: 'platform',
-      key: 'platform',
-      width: 140,
-      render: (platform: string) => (
-        <span className="selfhost-platform-cell">
-          {getPlatformIcon(platform)}
-          <span>{getPlatformName(platform)}</span>
-        </span>
-      ),
-    },
-    {
-      title: '插件版本',
-      dataIndex: 'clientVersion',
-      key: 'clientVersion',
-      width: 120,
-      render: (ver: string) => <span className="selfhost-version-code">{ver ? `v${ver}` : '—'}</span>,
-    },
-    {
-      title: 'Harness 版本',
-      dataIndex: 'harnessVersion',
-      key: 'harnessVersion',
-      width: 140,
-      render: (value?: string) => value ? <span className="selfhost-version-code">{`v${value}`}</span> : <Text type="secondary">—</Text>,
-    },
-  ]
+  const devices = useMemo(
+    () => [...(result?.items ?? [])].sort((a, b) => Number(b.online) - Number(a.online)),
+    [result],
+  )
+  const online = devices.filter(d => d.online).length
+  const total = devices.length
+  const offline = total - online
+  const onlinePercent = total === 0 ? 0 : Math.round((online / total) * 100)
+  const transport = result?.transport ? result.transport.toUpperCase() : 'E2E'
+  const accountInitial = account.trim().slice(0, 1).toUpperCase() || 'D'
 
   return (
-    <>
+    <div className="dx-console">
       {!embedded && (
-        <Layout.Header className="topbar product-topbar">
-          <div className="topbar-inner">
-            <div className="topbar-brand-group is-product">
-              <a className="topbar-brand" href="/" aria-label="返回首页">
-                <img className="topbar-brand-mark" src="/brand-whale.webp" alt="" width="40" height="40" />
-                <span className="topbar-brand-copy">
-                  <Title level={3}>DeepSeek Harness Remote</Title>
-                  <small>安全远程访问与控制</small>
-                </span>
-              </a>
-            </div>
-            <div className="topbar-actions">
-              <a className="topbar-github-link product-github-link" href="https://github.com/liguobao/ds-harness-remote" target="_blank" rel="noreferrer" aria-label="GitHub">
-                <GithubOutlined /> GitHub
-              </a>
-              <ThemeToggle />
-              <Popconfirm title="确认退出登录？" okText="退出" cancelText="取消" onConfirm={() => void logout()}>
-                <Button type="text" danger icon={<LogoutOutlined />} loading={loggingOut}>退出登录</Button>
-              </Popconfirm>
-            </div>
+        <header className="dx-topbar">
+          <div className="dx-topbar-brand">
+            <img src="/brand-whale.webp" alt="" width="22" height="16" />
+            <strong>DSH Remote</strong>
+            <i />
+            <span>CONSOLE</span>
           </div>
-        </Layout.Header>
+
+          <nav className="dx-nav" aria-label="控制台导航">
+            <a className="is-active" href="/app/remote" onClick={event => { event.preventDefault() }} aria-current="page"><i />设备</a>
+            <span className="is-soon" aria-disabled="true" title="暂未开放">会话</span>
+            <span className="is-soon" aria-disabled="true" title="暂未开放">工作区</span>
+            <span className="is-soon" aria-disabled="true" title="暂未开放">活动</span>
+          </nav>
+
+          <div className="dx-topbar-actions">
+            <span className="dx-sys"><i />系统正常</span>
+            <i />
+            <span className="dx-account">
+              <span className="dx-account-avatar">{accountInitial}</span>
+              <span className="dx-account-copy">
+                <strong>{account}</strong>
+                <small>verified</small>
+              </span>
+            </span>
+            <Popconfirm title="确认退出登录？" okText="退出" cancelText="取消" onConfirm={() => void logout()}>
+              <button type="button" className="dx-icon-btn" aria-label="退出登录" title="退出登录" disabled={loggingOut}>
+                <LogoutOutlined />
+              </button>
+            </Popconfirm>
+          </div>
+        </header>
       )}
 
-      <Layout.Content className="product-content selfhost-content" id="main-content">
-        <div className="app-area">
-          <div className="workspace-view">
-            <div className="hosts-page selfhost-dashboard">
-              {/* Header section */}
-              <header className="workspace-page-header selfhost-page-header">
-                <div className="selfhost-header-title-group">
-                  <div className="selfhost-title-icon-badge">
-                    <CloudServerOutlined />
-                  </div>
-                  <div>
-                    <div className="selfhost-header-row">
-                      <Title level={2} className="selfhost-main-title">我的设备</Title>
-                      <div className="selfhost-user-chip">
-                        <UserOutlined />
-                        <span className="selfhost-account-name">{account}</span>
-                        <span className="selfhost-account-tag">已认证</span>
-                      </div>
-                    </div>
-                    <Paragraph className="selfhost-subtitle" type="secondary">
-                      管理所有连接到此远程服务的 Host 与客户端设备集群
-                    </Paragraph>
-                  </div>
-                </div>
-
-                <Space className="workspace-page-actions selfhost-header-actions" wrap>
-                  <Button
-                    type="default"
-                    className="selfhost-refresh-btn"
-                    icon={<ReloadOutlined spin={loading} />}
-                    onClick={() => void load()}
-                    loading={loading}
-                  >
-                    刷新
-                  </Button>
-                  <ThemeToggle />
-                  <Popconfirm title="确认退出当前账号？" okText="退出" cancelText="取消" onConfirm={() => void logout()}>
-                    <Button type="text" danger className="selfhost-logout-btn" icon={<LogoutOutlined />} loading={loggingOut}>
-                      退出登录
-                    </Button>
-                  </Popconfirm>
-                </Space>
-              </header>
-
-              {error && <Alert className="selfhost-error" type="error" showIcon closable message={error} onClose={() => setError('')} />}
-
-              {/* Metric stats grid */}
-              <div className="selfhost-metrics-grid">
-                <div className="selfhost-stat-card is-online">
-                  <div className="stat-card-icon">
-                    <CheckCircleFilled />
-                  </div>
-                  <div className="stat-card-body">
-                    <div className="stat-card-number">{onlineCount}</div>
-                    <div className="stat-card-label">台设备在线</div>
-                  </div>
-                  <span className="stat-card-pill is-online">
-                    <span className="pulse-dot" /> 活跃
-                  </span>
-                </div>
-
-                <div className="selfhost-stat-card is-offline">
-                  <div className="stat-card-icon">
-                    <ClockCircleFilled />
-                  </div>
-                  <div className="stat-card-body">
-                    <div className="stat-card-number">{offlineCount}</div>
-                    <div className="stat-card-label">台设备离线</div>
-                  </div>
-                  <span className="stat-card-pill is-offline">待机</span>
-                </div>
-
-                <div className="selfhost-stat-card is-total">
-                  <div className="stat-card-icon">
-                    <DesktopOutlined />
-                  </div>
-                  <div className="stat-card-body">
-                    <div className="stat-card-number">{devices.length}</div>
-                    <div className="stat-card-label">总设备数</div>
-                  </div>
-                  <span className="stat-card-pill is-total">集群</span>
-                </div>
-
-                <div className="selfhost-stat-card is-protocol">
-                  <div className="stat-card-icon">
-                    <SafetyCertificateOutlined />
-                  </div>
-                  <div className="stat-card-body">
-                    <div className="stat-card-number">{result?.transport ? result.transport.toUpperCase() : 'WEBRTC / P2P'}</div>
-                    <div className="stat-card-label">端到端加密通道</div>
-                  </div>
-                  <span className="stat-card-pill is-protocol">安全传输</span>
-                </div>
-              </div>
-
-              {/* Endpoint card */}
-              <Card className="page-card selfhost-connection selfhost-endpoint-card" bordered={false}>
-                <div className="selfhost-endpoint-header">
-                  <Space size={8} align="center">
-                    <GlobalOutlined className="selfhost-endpoint-icon" />
-                    <Text strong className="selfhost-endpoint-title">远程服务地址 (Endpoint URL)</Text>
-                  </Space>
-                  <Tag color="success" className="selfhost-endpoint-badge">
-                    <span className="pulse-dot" /> 服务正常运行
-                  </Tag>
-                </div>
-                <div className="selfhost-endpoint-box">
-                  <div className="selfhost-endpoint-url-bar">
-                    <span className="selfhost-endpoint-protocol">HTTPS</span>
-                    <Text code className="selfhost-address selfhost-endpoint-text">
-                      {result?.serverUrl ?? '加载中…'}
-                    </Text>
-                  </div>
-                  <Space size={8} className="selfhost-endpoint-actions">
-                    <Button
-                      type="primary"
-                      icon={copied ? <CheckOutlined /> : <CopyOutlined />}
-                      onClick={() => void copyAddress()}
-                      className="selfhost-copy-btn"
-                    >
-                      {copied ? '已复制' : '复制地址'}
-                    </Button>
-                    {result?.serverUrl && (
-                      <Button
-                        type="default"
-                        icon={<LinkOutlined />}
-                        href={result.serverUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="selfhost-test-btn"
-                        title="打开服务地址"
-                      >
-                        测试访问
-                      </Button>
-                    )}
-                  </Space>
-                </div>
-                <Paragraph className="selfhost-endpoint-tip" type="secondary">
-                  在需要受控或发起连接的主机插件配置及移动客户端中填入此地址，即可自动加入同一加密通信网络。
-                </Paragraph>
-              </Card>
-
-              {/* Devices Table Card */}
-              <Card
-                className="page-card hosts-list-card selfhost-table-card"
-                bordered={false}
-                title={
-                  <Space size={8} align="center">
-                    <DesktopOutlined className="selfhost-table-header-icon" />
-                    <span>设备状态与列表</span>
-                  </Space>
-                }
-                extra={
-                  result ? (
-                    <div className="selfhost-table-extra">
-                      <span className="selfhost-extra-badge">
-                        <span className="selfhost-status-dot is-online" />
-                        <span>{onlineCount} / {devices.length} 台在线</span>
-                      </span>
-                    </div>
-                  ) : undefined
-                }
-              >
-                {!error && !loading && !devices.length ? (
-                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无已注册设备，请在客户端配置此服务地址完成绑定" />
-                ) : (
-                  <Table<Device>
-                    rowKey="deviceId"
-                    columns={columns}
-                    dataSource={devices}
-                    loading={loading}
-                    pagination={false}
-                    scroll={{ x: 'max-content' }}
-                    className="selfhost-devices-table"
-                  />
-                )}
-              </Card>
-
-              {updated && (
-                <div className="selfhost-footer-caption">
-                  <span className="selfhost-sync-indicator" />
-                  <span>最后数据同步时间：{updated}</span>
-                </div>
-              )}
-            </div>
+      <main className="dx-main" id="main-content">
+        <div className="dx-page-head">
+          <div>
+            <span className="dx-eyebrow">Control center</span>
+            <h1>我的设备</h1>
+            <p>管理所有连接到此 Remote 实例的 Host 与客户端设备。</p>
+          </div>
+          <div className="dx-head-actions">
+            <button type="button" className="dx-btn" onClick={() => void load()} disabled={loading}>
+              <ReloadOutlined spin={loading} />刷新
+            </button>
+            <a className="dx-btn is-primary" href="https://github.com/gaolin89898/ds-harness-remote#readme" target="_blank" rel="noreferrer">
+              <LinkOutlined />添加设备
+            </a>
           </div>
         </div>
-      </Layout.Content>
-      {!embedded && <SiteFooter />}
-    </>
+
+        {error && <div className="dx-alert" role="alert">{error}</div>}
+
+        <section className="dx-stats" aria-label="设备概览">
+          <div className="dx-stat">
+            <div className="dx-stat-value">
+              <strong className="is-green">{online}</strong>
+              <span className="dx-pill is-green"><i />活跃</span>
+            </div>
+            <div className="dx-stat-label">在线设备</div>
+            <div className="dx-stat-meta">/ {total} 台已注册</div>
+          </div>
+          <div className="dx-stat">
+            <div className="dx-stat-value"><strong>{total}</strong></div>
+            <div className="dx-stat-label">已注册设备</div>
+            <div className="dx-stat-meta">{offline} 台离线</div>
+          </div>
+          <div className="dx-stat">
+            <div className="dx-stat-value"><strong className="is-accent">{transport}</strong></div>
+            <div className="dx-stat-label">加密通道</div>
+            <div className="dx-stat-meta">WebRTC · DTLS</div>
+          </div>
+          <div className="dx-stat">
+            <div className="dx-stat-value"><strong>{updated || '—'}</strong></div>
+            <div className="dx-stat-label">最后同步</div>
+            <div className="dx-stat-meta">点击刷新同步</div>
+          </div>
+        </section>
+
+        <section className="dx-endpoint" aria-label="远程服务地址">
+          <span className="dx-endpoint-icon"><GlobalOutlined /></span>
+          <div className="dx-endpoint-copy">
+            <div className="dx-endpoint-head">
+              <strong>远程服务地址</strong>
+              <span>HTTPS · 443</span>
+            </div>
+            <code className="dx-endpoint-url">{result?.serverUrl ?? '加载中…'}</code>
+          </div>
+          <div className="dx-endpoint-actions">
+            <span className="dx-pill is-green"><i />运行中</span>
+            <button type="button" className="dx-btn is-primary" onClick={() => void copyAddress()}>
+              {copied ? <CheckOutlined /> : <CopyOutlined />}{copied ? '已复制' : '复制地址'}
+            </button>
+            {result?.serverUrl && (
+              <a className="dx-icon-btn" href={result.serverUrl} target="_blank" rel="noreferrer" aria-label="打开服务地址" title="打开服务地址">
+                <ExportOutlined />
+              </a>
+            )}
+          </div>
+        </section>
+        <p className="dx-endpoint-tip">在需要受控或发起连接的主机插件配置及移动客户端中填入此地址，即可自动加入同一加密通信网络。</p>
+
+        <div className="dx-grid">
+          <section className="dx-card" aria-label="设备状态与列表">
+            <div className="dx-card-head">
+              <strong>设备状态与列表</strong>
+              <span>{online} / {total} 台在线</span>
+            </div>
+
+            {devices.length === 0 ? (
+              <div className="dx-empty">
+                {loading ? '正在加载设备…' : '暂无已注册设备，请在客户端配置此服务地址完成绑定'}
+              </div>
+            ) : (
+              <table className="dx-table">
+                <thead>
+                  <tr>
+                    <th>设备</th>
+                    <th>状态</th>
+                    <th>角色</th>
+                    <th>系统</th>
+                    <th>版本</th>
+                    <th aria-label="操作" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {devices.map(device => (
+                    <tr key={device.deviceId} className={device.online ? '' : 'is-dim'}>
+                      <td>
+                        {renaming?.deviceId === device.deviceId ? (
+                          <div className="dx-rename">
+                            <input
+                              value={newName}
+                              autoFocus
+                              maxLength={80}
+                              onChange={event => setNewName(event.target.value)}
+                              onKeyDown={event => {
+                                if (event.key === 'Enter') void submitRename()
+                                if (event.key === 'Escape') setRenaming(undefined)
+                              }}
+                            />
+                            <button type="button" className="is-primary" disabled={savingName} onClick={() => void submitRename()}>
+                              {savingName ? '保存中' : '保存'}
+                            </button>
+                            <button type="button" onClick={() => setRenaming(undefined)}>取消</button>
+                          </div>
+                        ) : (
+                          <div className="dx-device-cell">
+                            <span className="dx-device-icon">{platformIcon(device.platform)}</span>
+                            <span>
+                              <strong>{device.name}</strong>
+                              <small>{device.deviceId.slice(0, 12)}…</small>
+                            </span>
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`dx-pill ${device.online ? 'is-green' : 'is-grey'}`}>
+                          <i />{device.online ? '在线' : '离线'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="dx-role-chips">
+                          {(device.roles ?? [device.role]).map(role => (
+                            <span key={role} className={`dx-chip${role === 'host' ? ' is-host' : ''}`}>
+                              {role === 'host' ? <CloudServerOutlined /> : <DesktopOutlined />}
+                              {role === 'host' ? 'Host' : '客户端'}
+                            </span>
+                          ))}
+                        </span>
+                      </td>
+                      <td><span className="dx-version">{platformName(device.platform)}</span></td>
+                      <td>
+                        <span className="dx-version">
+                          {device.clientVersion ? `v${device.clientVersion}` : '—'}
+                          {device.harnessVersion ? ` · v${device.harnessVersion}` : ''}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="dx-icon-btn"
+                          aria-label="修改设备名称"
+                          title="修改设备名称"
+                          onClick={() => { setRenaming(device); setNewName(device.name) }}
+                        >
+                          <EditOutlined />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <div className="dx-invite">
+              <DesktopOutlined />
+              <span><strong>邀请新设备</strong> · 在客户端填入上方服务地址即可加入</span>
+              <a href="https://github.com/gaolin89898/ds-harness-remote#readme" target="_blank" rel="noreferrer">查看指南 →</a>
+            </div>
+          </section>
+
+          <aside className="dx-rail">
+            <section className="dx-card">
+              <div className="dx-card-head">
+                <strong>连接概览</strong>
+                <span className="dx-pill is-green"><i />实时</span>
+              </div>
+              <div className="dx-rail-body">
+                <div className="dx-quality-value">
+                  <strong>{onlinePercent}</strong><span>%</span>
+                </div>
+                <div className="dx-quality-label">当前设备在线比例</div>
+                <div className="dx-bars" aria-hidden="true">
+                  {devices.length === 0
+                    ? Array.from({ length: 12 }, (_, index) => <i key={index} className="is-off" />)
+                    : devices.map(device => (
+                      <i key={device.deviceId} className={device.online ? 'is-on' : 'is-off'} />
+                    ))}
+                </div>
+                <div className="dx-kv"><span>在线</span><span>{online}</span></div>
+                <div className="dx-kv"><span>离线</span><span>{offline}</span></div>
+                <div className="dx-kv"><span>传输方式</span><span>{transport}</span></div>
+              </div>
+            </section>
+
+            <section className="dx-card">
+              <div className="dx-card-head">
+                <strong>会话信息</strong>
+                <a href="https://github.com/gaolin89898/ds-harness-remote" target="_blank" rel="noreferrer" style={{ color: 'var(--dx-accent)', fontSize: 10 }}>
+                  GitHub ↗
+                </a>
+              </div>
+              <div className="dx-rail-body">
+                <div className="dx-kv"><span>账号</span><span>{account}</span></div>
+                <div className="dx-kv"><span>最后同步</span><span>{updated || '—'}</span></div>
+                <div className="dx-kv"><span>加密</span><span>端到端</span></div>
+                <div className="dx-tip"><LockOutlined /><span><code>dsh plugin list</code> · 查看已安装插件</span></div>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <div className="dx-note-bar">
+          <SafetyCertificateOutlined />
+          <span>所有设备会话均在设备间端到端加密，自建服务无法读取内容。</span>
+          <a href="https://github.com/gaolin89898/ds-harness-remote/blob/main/docs/protocol.md" target="_blank" rel="noreferrer">安全模型 →</a>
+        </div>
+      </main>
+
+      {!embedded && (
+        <footer className="dx-foot">
+          <span>© 2025 DSH REMOTE · SELF-HOSTED</span>
+          <nav>
+            <span className="dx-foot-status"><i />ALL SYSTEMS NORMAL</span>
+            <a href="https://github.com/gaolin89898/ds-harness-remote/blob/main/docs" target="_blank" rel="noreferrer">文档</a>
+            <a href="https://github.com/gaolin89898/ds-harness-remote" target="_blank" rel="noreferrer"><GithubOutlined /> GitHub</a>
+            <a href="https://github.com/gaolin89898/ds-harness-remote/issues" target="_blank" rel="noreferrer">支持</a>
+          </nav>
+        </footer>
+      )}
+    </div>
   )
 }

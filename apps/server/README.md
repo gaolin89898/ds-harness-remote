@@ -1,77 +1,75 @@
-# Self-hosted Server
+# 自部署 Server
 
-**English** · [中文](README.zh.md)
+单账号 Remote Server，支持 WebRTC（LAN / P2P / TURN）与端到端加密 Relay，环境变量配置账号密码，Web 提供首页、登录和设备状态页。Server 不包含在 Host 插件 bundle 中，需要单独部署。
 
-A single-account Remote Server with WebRTC (LAN / P2P / TURN) and end-to-end encrypted Relay, configured through environment variables. Its Web UI includes a landing page, sign-in, and device status page. The Server is deployed separately from the Host plugin bundle.
+当前版本定位为继续维护的最小自部署 Server。完整 Server Web 的产品形态仍在调整，暂不承诺在本仓库开源当前或未来的完整站点。
 
-This remains a small self-hosted Server that we intend to maintain. The product shape of the full Server Web is still evolving, so this repository does not promise to open source the current or future full site.
+## 自部署页面
 
-## Self-hosted Web flow
+首页地址是 `/`，点击“开始使用”进入登录页；登录成功后进入 `/app/remote` 设备列表。Host 和客户端都填写同一个 Server 地址，并使用相同的账号密码登录。设备凭据由 Server 保存，Web 登录会话使用 HttpOnly Cookie。
 
-The `/` landing page links to `/app/login`; a successful sign-in continues to `/app/remote`. Point both Host and Client at the same Server URL and use the same account and password. Device credentials are persisted by the Server, while Web sessions use an HttpOnly cookie.
+同一 Plugin 安装的 Host 和客户端合并为一行，角色列同时显示两个角色；在线数量按设备统计，任一角色在线即显示在线，改名同步两个角色。两个角色的凭据及撤销仍保持独立。同名的不同设备不会合并。
 
-The Host and Client roles of one Plugin installation share a row with both role tags. Online counts use devices, either role can make the device online, and renaming updates both roles. Credentials and revocation remain independent. Matching names alone never merge separate devices.
+已有的重复记录需要同时更新 Server 和 Plugin；插件重启或 Client 再次登录时会用本机两份有效凭据补齐关联。只有一份有效凭据的设备继续单独显示。
 
-For existing duplicate rows, update both the Server and Plugin. On restart or Client sign-in, the Plugin links its two existing valid credentials. Devices with only one valid role continue to appear separately.
+## 在 Harness 内嵌设备页
 
-## Embed devices in Harness
+Plugin 在 Harness 左侧 SSH 下方增加“我的设备”，在主区域打开已保存 Server 的 `/app/embedded/devices` 页面。内嵌页保留设备表格，省去网站导航和页脚。
 
-The Plugin adds **My devices** below SSH in the Harness sidebar and opens the saved Server's `/app/embedded/devices` page inside the main area. The embedded page keeps the device table without the website navigation or footer.
-
-To enable it on a self-hosted Server, use HTTPS and set the exact Harness origins allowed to frame this page:
+自部署 Server 需要使用 HTTPS，并配置允许嵌入的 Harness 精确 origin：
 
 ```dotenv
 DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://harness.example.com
 ```
 
-`dsh-app://app` allows the Desktop app; replace the HTTPS example with your Harness Web origin. Empty (default) disables embedding. Wildcards and page paths are rejected. Recreate the Server container after changing the setting. Other website pages remain protected from framing.
+`dsh-app://app` 用于 Desktop；将 HTTPS 示例替换为自己的 Harness Web origin。Android dsh-go App 的「网页模式」由本机引擎提供 Harness 网页，来源是 `http://127.0.0.1:3080`；要在该模式下用「我的设备」，把该 origin 一并加上（例如 `DSH_SERVER_FRAME_ANCESTORS=dsh-app://app,https://harness.example.com,http://127.0.0.1:3080`）；其他网页模式来源（例如 SSH 转发后的回环端口）需要各自单独列一条。留空（默认）时禁止嵌入，不接受通配符和页面路径。修改后重新创建 Server 容器；网站其他页面仍禁止嵌入。
 
-Sign in once inside the embedded page. Its HttpOnly, Secure, Partitioned cookie is separate from the ordinary website session and device credentials; signing out here does not disconnect Host or Client roles.
+首次在内嵌页中登录一次。该页使用独立的 HttpOnly、Secure、Partitioned Cookie，与普通网页登录和设备凭据分开；在此退出登录不会断开 Host 或客户端。
 
-## Refresh response recovery
+## 刷新响应丢失恢复
 
-If a refresh succeeds but its response is lost, retrying the previous refresh token returns the same successor pair, including after a Server restart. Recovery remains available until that successor is rotated again, revoked, or expired; it does not extend either token's lifetime. An expired recovered access token can be replaced by rotating the recovered refresh token. Older tokens are rejected without revoking current credentials.
+刷新成功但响应丢失时，重试旧 refresh token 会返回同一组后继凭据，Server 重启后也可恢复。恢复持续到后继再次轮换、撤销或过期，不延长任何 token 的生命周期。若恢复的 access token 已过期，可用恢复的 refresh token 再次轮换。更早的旧 token 会被拒绝，但不撤销当前有效凭据。
 
-Existing device state remains compatible. Tokens already consumed before this Server upgrade have no recovery metadata and cannot be recovered. Revoked or expired credentials still require sign-in. Updating the Plugin alone does not add this Server behavior. Recovery metadata contains no plaintext bearer tokens; see [the refresh protocol](../../docs/protocol.md#82-refresh).
+已有设备数据保持兼容。升级前已经消耗的 token 没有恢复元数据，无法恢复；已撤销或过期的凭据仍需重新登录。仅更新 Plugin 不会增加此 Server 行为。恢复元数据不保存明文 bearer token，详见 [刷新协议](../../docs/protocol.md#82-refresh)。
 
-## Docker deployment
+## Docker 部署
 
 ```bash
 cd apps/server
 cp .env.example .env
-# Edit .env: set your account, password, and public URL
+# 编辑 .env，设置账号、密码和访问地址
 docker compose up -d --build
 ```
 
-Open <http://localhost:8080>. Device credentials persist in the `server-data` volume. Stop the service with `docker compose down`.
+打开 <http://localhost:8080>。设备凭据保存在 `server-data` 卷；停止使用 `docker compose down`。
 
-Public image: `ghcr.io/liguobao/ds-harness-remote/server:latest`. Pull it directly when needed:
+公开镜像地址：`ghcr.io/gaolin89898/ds-harness-remote/server:latest`。需要时可以直接拉取：
 
 ```bash
-docker pull ghcr.io/liguobao/ds-harness-remote/server:latest
+docker pull ghcr.io/gaolin89898/ds-harness-remote/server:latest
 ```
 
-If an older image fails to resolve `@dsh-remote/protocol`, update the source and rebuild with `docker compose build --no-cache server && docker compose up -d server`. The image explicitly includes the compiled protocol package and checks the Server import graph during the build. Rebuilding preserves the data volume.
+若旧镜像启动时无法解析 `@dsh-remote/protocol`，更新源码后执行 `docker compose build --no-cache server && docker compose up -d server`。镜像显式包含 protocol 编译产物，并在构建阶段校验 Server 的模块加载；重建会保留数据卷。
 
-The GitHub Tag workflow builds the production image. Put an HTTPS reverse proxy in front of it instead of exposing the Node listener directly to the public internet.
+发布镜像由 GitHub Tag 工作流构建。生产环境应使用 HTTPS 反向代理，不要直接把 Node 监听端口暴露到公网。
 
-### Blank page or static assets returning 403
+### 页面白屏或静态资源返回 403
 
-`DSH_SERVER_PUBLIC_URL` must match the browser-facing origin, including `http` / `https`, hostname, and any non-default port. Do not use the internal container address or a page path. For access through `https://remote.example.com`, set this in `.env`:
+`DSH_SERVER_PUBLIC_URL` 必须与浏览器实际访问的 origin 一致，包括 `http` / `https`、域名和非默认端口；不要填写容器内部地址或页面路径。例如通过 `https://remote.example.com` 访问时，在 `.env` 设置：
 
 ```dotenv
 DSH_SERVER_PUBLIC_URL=https://remote.example.com
 ```
 
-Apply it with `docker compose up -d --force-recreate server`; `docker compose restart` does not update environment variables. Add `--no-build` when using a prebuilt image. Keep the existing data volume; do not run `down -v`.
+修改后执行 `docker compose up -d --force-recreate server`；仅 `docker compose restart` 不会更新环境变量。使用预构建镜像时可加 `--no-build`。保留现有数据卷，不要执行 `down -v`。
 
-If JS/CSS returns 403 with `AUTH_INVALID` in the JSON response, compare this setting with the request's `Origin`. The Server checks origins before serving static assets, so the HTML may load while JS/CSS is rejected. The browser then reports an `application/json` MIME error and displays a blank page. Do not change MIME types or remove origin checks to bypass this. If the response comes from the reverse proxy, check its access rules; preserve the browser's original `Origin` header.
+如果 JS/CSS 返回 403，且响应 JSON 中为 `AUTH_INVALID`，优先核对上述配置与请求的 `Origin`。Server 在静态资源处理前执行 origin 校验；因此首页可能打开，JS/CSS 却被拒绝，浏览器随后报告 MIME 为 `application/json` 并白屏。不要通过修改 MIME 或删除 origin 校验来绕过。若响应来自反向代理，则检查代理访问规则；代理应保留浏览器原始 `Origin`。
 
-For protocol entry-resolution errors during Docker source builds, also inspect source permissions (`ls -ld packages/protocol packages/protocol/package.json`). The image normalizes read/directory-traversal permissions on published files and checks module loading as the final `node` user.
+源码 Docker 构建报 protocol 入口无法解析时，也检查文件权限（`ls -ld packages/protocol packages/protocol/package.json`）。镜像会规范化发布文件的读取/目录遍历权限，并在最终 `node` 用户下校验模块加载。
 
-## Local setup
+## 本地启动
 
-Requires Node.js 22 and pnpm 9.15.4. From the repository root:
+需要 Node.js 22、pnpm 9.15.4。在仓库根目录执行：
 
 ```bash
 pnpm install
@@ -80,85 +78,85 @@ pnpm --filter @dsh-remote/server build
 cp apps/server/.env.example apps/server/.env
 ```
 
-Edit `apps/server/.env` with your account and a password of at least 12 characters, then start:
+编辑 `apps/server/.env`，设置账号和至少 12 字符的密码，然后启动：
 
 ```bash
 cd apps/server
 node --env-file=.env dist/main.js
 ```
 
-Open <http://localhost:8080>. Set the same Server URL on your Host and Client, then sign in with the same account. Use an email address as the account name for compatibility with existing clients.
+打开 <http://localhost:8080>。Host 和客户端填写同一 Server 地址，使用同一账号密码登录。建议账号使用邮箱格式，以兼容现有客户端。
 
-| Variable | Purpose / default |
+| 环境变量 | 用途 / 默认值 |
 | --- | --- |
-| `DSH_SERVER_ACCOUNT` | Required login account |
-| `DSH_SERVER_PASSWORD` | Required; at least 12 characters |
-| `DSH_SERVER_PUBLIC_URL` | Browser-facing URL; default `http://localhost:8080` |
-| `DSH_SERVER_FRAME_ANCESTORS` | Exact origins allowed to embed `/app/embedded/devices`, comma-separated; empty (default) disables embedding |
-| `DSH_SERVER_HOST` | Listen / port-binding address; default `127.0.0.1`, use `0.0.0.0` for LAN access |
-| `DSH_SERVER_PORT` | Default `8080` |
-| `DSH_SERVER_DATA_FILE` | Default `data/state.json`, relative to the working directory |
-| `DSH_SERVER_TRUSTED_PROXY_IPS` | Comma-separated trusted reverse-proxy peer IPs; empty (default) disables forwarded-IP handling |
-| `DSH_SERVER_STUN_URLS` | Comma-separated STUN URLs handed to Host/Client; empty (default) keeps host candidates only |
-| `DSH_SERVER_TURN_URLS` | Comma-separated TURN URLs; requires `DSH_SERVER_TURN_SECRET` or `DSH_SERVER_TURN_USERNAME` + `DSH_SERVER_TURN_PASSWORD` |
-| `DSH_SERVER_TURN_SECRET` | coturn REST API shared secret; never sent to clients |
-| `DSH_SERVER_TURN_USERNAME` | Static TURN username for deployments that cannot use a shared secret; mutually exclusive with `DSH_SERVER_TURN_SECRET` |
-| `DSH_SERVER_TURN_PASSWORD` | Static TURN password; must be set together with `DSH_SERVER_TURN_USERNAME` |
-| `DSH_SERVER_TURN_TTL_SECONDS` | TURN credential lifetime in seconds, 60–3600, default `300` (applies to short-lived credentials only) |
+| `DSH_SERVER_ACCOUNT` | 必填，登录账号 |
+| `DSH_SERVER_PASSWORD` | 必填，至少 12 字符 |
+| `DSH_SERVER_PUBLIC_URL` | 浏览器访问地址，默认 `http://localhost:8080` |
+| `DSH_SERVER_FRAME_ANCESTORS` | 允许嵌入 `/app/embedded/devices` 的精确 origin，逗号分隔；留空（默认）时禁止嵌入 |
+| `DSH_SERVER_HOST` | 监听/端口映射地址，默认 `127.0.0.1`；局域网设为 `0.0.0.0` |
+| `DSH_SERVER_PORT` | 默认 `8080` |
+| `DSH_SERVER_DATA_FILE` | 默认 `data/state.json`，相对启动目录 |
+| `DSH_SERVER_TRUSTED_PROXY_IPS` | 受信任反向代理 peer IP 列表，逗号分隔；留空（默认）时忽略转发 IP |
+| `DSH_SERVER_STUN_URLS` | 下发给 Host/Client 的 STUN URL，逗号分隔；留空（默认）时只使用 host candidate |
+| `DSH_SERVER_TURN_URLS` | TURN URL，逗号分隔；必须同时配置 `DSH_SERVER_TURN_SECRET` 或 `DSH_SERVER_TURN_USERNAME` + `DSH_SERVER_TURN_PASSWORD` |
+| `DSH_SERVER_TURN_SECRET` | coturn REST API 共享密钥；不会下发给客户端 |
+| `DSH_SERVER_TURN_USERNAME` | 无法使用共享密钥的部署的静态 TURN 用户名；与 `DSH_SERVER_TURN_SECRET` 互斥 |
+| `DSH_SERVER_TURN_PASSWORD` | 静态 TURN 密码；必须与 `DSH_SERVER_TURN_USERNAME` 同时配置 |
+| `DSH_SERVER_TURN_TTL_SECONDS` | TURN credential 有效期秒数，60–3600，默认 `300`（仅对短期凭据生效） |
 
-For public access, use an HTTPS reverse proxy and set `DSH_SERVER_PUBLIC_URL` to your domain. The proxy must support WebSocket Upgrade at `/ws/v1/connect` with an idle timeout above 75 seconds.
+公网使用 HTTPS 反向代理，并将 `DSH_SERVER_PUBLIC_URL` 设为实际域名；代理需支持 `/ws/v1/connect` 的 WebSocket Upgrade，空闲超时大于 75 秒。
 
-## WebRTC and TURN
+## WebRTC 与 TURN
 
-The Server coordinates the same four paths as the hosted Server: `LAN -> P2P -> TURN -> Relay`.
+Server 协调与托管 Server 相同的四条路径：`LAN -> P2P -> TURN -> Relay`。
 
-- It forwards WebRTC `signal.offer` / `signal.answer` / `signal.ice` between the two devices of an authorized connection, and forwards the initiator's `transport.selected` (including the legacy `lan -> p2p` downgrade for older Hosts).
-- It issues short-lived STUN/TURN servers through `GET /api/v1/turn/credentials` only to the two devices of an establishing connection. TURN credentials use the coturn REST API: `username=<expiryUnixSeconds>:<deviceId>`, `credential=base64(HMAC-SHA1(secret, username))`.
-- It never sees or decrypts session traffic: WebRTC carries Noise ciphertext directly, TURN only forwards WebRTC packets, and Relay forwards ciphertext over WebSocket.
-- When WebRTC or TURN is unavailable, Clients fall back to the encrypted Relay automatically. Leaving `DSH_SERVER_STUN_URLS` / `DSH_SERVER_TURN_URLS` empty keeps the Relay-only behavior.
+- 在已授权连接的两台设备之间转发 WebRTC `signal.offer` / `signal.answer` / `signal.ice`，并转发发起方的 `transport.selected`（包含对旧 Host 的 `lan -> p2p` 兼容降级）。
+- 仅向正在建立的连接的两台设备签发短期 STUN/TURN 配置：`GET /api/v1/turn/credentials`。TURN credential 采用 coturn REST API：`username=<过期秒级时间戳>:<deviceId>`，`credential=base64(HMAC-SHA1(secret, username))`。
+- Server 不读取也不解密业务流量：WebRTC 直接承载 Noise 密文，TURN 只转发 WebRTC 数据包，Relay 通过 WebSocket 转发密文。
+- WebRTC/TURN 不可用时客户端会自动回退到加密 Relay；`DSH_SERVER_STUN_URLS` / `DSH_SERVER_TURN_URLS` 留空即保持原来的 Relay-only 行为。
 
-Deploy coturn separately with `use-auth-secret` and `static-auth-secret` matching `DSH_SERVER_TURN_SECRET`, open the TURN ports (normally 3478/UDP and TCP plus a relay port range), and point the STUN/TURN URLs at addresses reachable from the Host and Client. The HTTPS reverse proxy is only needed for the control WebSocket and REST API; WebRTC and TURN traffic do not pass through it.
+需要单独部署 coturn，配置 `use-auth-secret` 且 `static-auth-secret` 与 `DSH_SERVER_TURN_SECRET` 一致，开放 TURN 端口（通常为 3478/UDP、TCP 以及 relay 端口段），并让 STUN/TURN URL 指向 Host 与 Client 都能访问的地址。HTTPS 反向代理只需承载控制 WebSocket 与 REST API，WebRTC/TURN 流量不经过它。
 
-For a TURN deployment that cannot use a shared secret, set `DSH_SERVER_TURN_USERNAME` + `DSH_SERVER_TURN_PASSWORD` instead of `DSH_SERVER_TURN_SECRET` (never both); the Server then hands the static pair to connection participants. Prefer short-lived REST API credentials — static ones are shared by every connection until rotated.
+无法使用共享密钥的 TURN 部署可改设 `DSH_SERVER_TURN_USERNAME` + `DSH_SERVER_TURN_PASSWORD`（与 `DSH_SERVER_TURN_SECRET` 互斥，二者不可同时配置）；Server 会把静态凭据下发给连接参与方。优先使用 REST API 短期凭据——静态凭据在轮换前被所有连接共用。
 
-### Rate limiting behind a reverse proxy
+### 反向代理下的限流
 
-By default the Server rate-limits by the socket peer IP and ignores `X-Forwarded-For`. Behind a reverse proxy every connection comes from the proxy, so all clients share one 240/min API limit and one 20/min login limit. Set `DSH_SERVER_TRUSTED_PROXY_IPS` to a comma-separated list of proxy peer IPs to restore per-client limits:
+默认按 socket peer IP 限流并忽略 `X-Forwarded-For`。使用反向代理时所有连接都来自代理，全部客户端会共用 240/min 的 API 限额和 20/min 的登录限额。将 `DSH_SERVER_TRUSTED_PROXY_IPS` 设为受信任代理 peer IP 的逗号分隔列表，即可按真实客户端 IP 分别限流：
 
 ```dotenv
 DSH_SERVER_TRUSTED_PROXY_IPS=172.18.0.2,2001:db8::2
 ```
 
-Only bare IPv4 and IPv6 literals are accepted. Ports (`10.0.0.1:8080`), CIDR ranges (`10.0.0.0/8`) and hostnames make the Server fail at startup; no private network is trusted implicitly. IPv4-mapped IPv6 (`::ffff:127.0.0.1`) is normalized to `127.0.0.1`, so either form matches the same entry.
+只接受纯 IPv4 / IPv6 字面量；端口（`10.0.0.1:8080`）、CIDR 网段（`10.0.0.0/8`）和域名会在启动时报错，也不会默认信任任何私网网段。IPv4-mapped IPv6（`::ffff:127.0.0.1`）会规范化为 `127.0.0.1`，两种写法匹配同一条配置。
 
-A request from a trusted peer must carry exactly one `X-Forwarded-For` header whose value is a single IP literal. A missing or duplicate header, a comma-separated list, an `IP:port` value or a hostname is rejected with HTTP 400 `INVALID_MESSAGE`. Requests from any other peer always use their socket IP, so a client cannot spoof a different address by sending the header itself.
+来自受信任 peer 的请求必须带且仅带一个 `X-Forwarded-For` 头，且值为单个 IP 字面量。缺失、重复、逗号分隔多 IP、`IP:port` 或域名都会返回 HTTP 400 `INVALID_MESSAGE`。其他 peer 的请求一律按 socket IP 处理，客户端无法自行伪造该头来冒充别的地址。
 
-The trusted proxy must **overwrite** `X-Forwarded-For` with the real client IP (do not append to or pass through a client-supplied value), and the Server port must not be reachable directly from the public internet, or the trust boundary is bypassed. In Docker the trusted IP is the proxy's address **as seen from the Server container** (check `docker network inspect <network>`), not `127.0.0.1`: inside the container that address is the Server itself. WebSocket upgrades and clients sharing one public NAT IP still share a per-IP limit.
+受信任代理必须**覆盖** `X-Forwarded-For` 为真实客户端 IP（不要追加或透传客户端自带的值），并且 Server 端口不能直接暴露到公网，否则信任边界会被绕过。在 Docker 中应填写代理**在 Server 容器内看到的地址**（可用 `docker network inspect <网络名>` 查看），不是 `127.0.0.1`：容器内该地址是 Server 自身。WebSocket 连接和共享同一公网 NAT IP 的客户端仍按同一 IP 共享限额。
 
-Apply the change with `docker compose up -d --force-recreate server`; `docker compose restart` does not reload environment variables.
+修改后执行 `docker compose up -d --force-recreate server`；`docker compose restart` 不会重新加载环境变量。
 
-## Features
+## 功能
 
-- Device registration, credential refresh, device discovery, Control, WebRTC LAN/P2P/TURN coordination, and end-to-end encrypted Relay.
-- Single-process operation with persistent data. Device credentials survive restarts; Web users sign in again. Changing the password requires devices to reauthorize.
+- 支持设备注册、凭据刷新、设备发现、Control、WebRTC LAN/P2P/TURN 协调与端到端加密 Relay。
+- 单进程运行；持久化保存 `data` 目录。重启后设备凭据保留，Web 需重新登录；修改密码后设备需重新授权。
 
-Tests: `pnpm --filter @dsh-remote/server test`. Cross-machine and long-running validation remain pending. UI sources: [web/UPSTREAM.md](web/UPSTREAM.md).
+验证：`pnpm --filter @dsh-remote/server test`。真实跨机与长期连接仍待回归。UI 复用来源见 [web/UPSTREAM.md](web/UPSTREAM.md)。
 
-## FAQ
+## 常见问题
 
-### Will this repository open source the current full Server Web?
+### 会开源当前的完整 Server Web 吗？
 
-Not for now. The product shape of Server Web is still being worked out and will continue to evolve with that direction. This repository only promises to maintain the small self-hosted version described above.
+暂不考虑。Server Web 的产品形态我还在调整，后续会按实际思路继续演进；当前仓库只承诺维护上面介绍的最小自部署版本。
 
-### Why are multi-account support, full membership, and Remote Web not included?
+### 为什么没有多账号、完整 membership 和 Remote Web？
 
-These capabilities are not especially difficult to build, but users have different scenarios and trade-offs, so it is reasonable to adapt them to your own needs. Remote Web may be added to this Server after it becomes stable; there is no fixed schedule.
+这些能力本身实现门槛不高，但不同用户会有不同的场景和取舍，建议按自己的需求修改。Remote Web 稳定后，未来也可能加入当前 Server；目前没有固定时间表。
 
-## Release Tag checks
+## 发布 Tag 检查
 
-A release tag must match the versions in the root `package.json` and `packages/plugin/package.json`, for example `v0.4.15`. The Tag workflow runs workspace checks, tests, builds, npm plugin packing, browser-extension packaging, and SHA256 checksums; the Server image is built from the same tag.
+发布 Tag 必须与根 `package.json` 和 `packages/plugin/package.json` 的版本一致，例如 `v0.4.15`。Tag 工作流会执行 workspace check、测试、构建、插件 npm 打包、Browser 扩展打包和 SHA256 校验；Server Docker 镜像也从同一个 Tag 构建。
 
-Run the checks locally before creating a tag:
+本地可先运行：
 
 ```bash
 pnpm --filter './packages/**' -r build

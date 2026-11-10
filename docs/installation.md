@@ -1,139 +1,137 @@
-# Remote plugin installation
+# Remote 插件安装指南
 
-[简体中文](installation.zh.md)
+安装入口只保留 `scripts/install.sh`，不提供 Windows、独立卸载或 Token 包装脚本。
 
-The sole installer is `scripts/install.sh`. There are no Windows, separate uninstall or token-wrapper scripts.
+## DSH 插件页在线更新
 
-## Online updates in DSH Plugin management
+DSH 0.2.2 起，**从 npm 安装**的 Remote 可在 **扩展 / 插件管理 → ds-harness-remote** 中检查版本并确认更新。更新由 DSH 官方插件管理器执行；支持热更新的宿主会先停止旧版再安装新版，失败或取消时尝试恢复旧版。恢复也可能失败，请以插件页的最终结果为准；宿主要求重启时按提示重启。
 
-Starting with DSH 0.2.2, Remote **installed from npm** can check for versions and update under **Extensions / Plugin management → ds-harness-remote**. The official DSH plugin manager owns the update. With hot reload, it stops the old version before installing the new one and attempts to restore the previous version if installation fails or is cancelled. Restoration can also fail; check the final result in Plugin management and restart when requested.
-
-GitHub, local directory, `file:` and `link:` installations are not eligible for official online updates. To switch to npm, use the same Desktop's official `dsh` launcher:
+GitHub、本地目录、`file:` 和 `link:` 安装不会出现官方在线更新入口。要改用 npm，在同一 Desktop 的官方 `dsh` 启动器中执行：
 
 ```sh
 dsh plugin --profile desktop add -w ds-harness-remote@latest
 ```
 
-For a Web Host, use its actual launcher, `DSH_HOME` and profile (usually `web`). Restart when requested after switching sources, then check versions in Plugin management. Keep the profile and Remote credential directory.
+Web Host 改用实际启动它的 `dsh`、`DSH_HOME` 和 profile（通常为 `web`）。切换安装来源后按宿主提示重启，再回插件页检查版本；不要删除 profile 或 Remote 凭据目录。
 
-The Remote sidebar version badge remains a notice linking to release notes. Install updates through the local DSH Plugin management page. Updating Remote interrupts the remote connections it carries, so perform this operation on the machine running the plugin.
+Remote 侧栏的版本徽标仍是更新提示，点击链接打开发布页；实际安装在本机 DSH 插件页完成。更新 Remote 会中断它承载的远程连接，请在运行该插件的本机操作。
 
-## Linux: DSH, one-time registration and boot startup
+## Linux：DSH + 一次性注册 + 开机自启
 
-**Linux requires root. The system service runs as root, so Remote Host, Agent tools and remote terminals also have root privileges. Only grant access to trusted accounts.** This installer currently does not configure a non-root service user.
+**Linux 必须以 root 运行。系统服务以 root 运行，Remote Host、Agent 工具和远程终端也具有 root 权限。请仅向可信账号开放此服务器。** 当前不支持通过此安装器配置非 root 服务用户。
 
-### Install
+### 安装
 
-Download and inspect the script first. This example reads the token privately inside a root shell rather than putting it in command arguments or shell history:
+下载并检查脚本后运行。下面的命令让 Token 在 root Shell 中隐藏输入，不写入命令行参数或 shell 历史：
 
 ```sh
 curl -fsSL https://dsh.r2049.cn/app/install.sh -o install.sh
-# Inspect the downloaded script before running:
+# 检查下载的脚本内容后执行：
 sudo -H bash -c '
-  read -r -s -p "One-time Host registration token: " token; printf "\n"
+  read -r -s -p "一次性 Host 注册 Token: " token; printf "\n"
   DSH_REMOTE_REGISTRATION_TOKEN="$token" bash ./install.sh
 '
 ```
 
-Omit `sudo -H` when already in a root shell. For a repository checkout, replace `./install.sh` with `./scripts/install.sh`. Repository changes are not automatically deployed to the hosted endpoint; confirm your downloaded script includes the full Linux flow.
+若已在 root Shell 中，可去掉 `sudo -H`。使用仓库版本时，把 `./install.sh` 替换为 `./scripts/install.sh`。仓库更新不代表线上脚本已经部署，请先确认所用脚本包含本轮 Linux 完整安装功能。
 
-The installer:
+脚本执行：
 
-1. Reuses `DSH_COMMAND` or an existing DSH on PATH without upgrading it.
-2. If absent, installs official Node.js 24.9.0, DSH and private pnpm 9.15.4 under `/opt/ds-harness-remote/runtime.*`. The Node.js archive is pinned to the [official SHA-256 checksums](https://nodejs.org/dist/v24.9.0/SHASUMS256.txt). The stable launcher is `/opt/ds-harness-remote/bin/dsh`, reused on subsequent runs.
-3. Installs/updates Remote using official `dsh plugin` management, defaulting to the `web` profile and npm `latest`.
-4. If a token is supplied, exchanges it through the existing Host registration-code API and persists device credentials. The token is not written to logs, service configuration or persistent device-credential fields. It is not a model API key.
-5. Verifies the profile has an active official Web Host startup, configures a systemd **system service**, enables boot startup, and starts/restarts the matching installer-managed instance. No login or linger is needed.
+1. 检查已有 `DSH_COMMAND` 或 PATH 中的 DSH；存在则复用，不自动升级它。
+2. 找不到 DSH 时，在 `/opt/ds-harness-remote/runtime.*` 中安装官方 Node.js 24.9.0、DSH 与插件管理所需的私有 pnpm 9.15.4。Node.js 归档按[官方校验清单](https://nodejs.org/dist/v24.9.0/SHASUMS256.txt)中的固定 SHA-256 校验。稳定 launcher 为 `/opt/ds-harness-remote/bin/dsh`，重复运行会复用。
+3. 使用官方 `dsh plugin` 安装或更新所选 profile 的 Remote，默认 `web` profile 和 npm `latest`。
+4. 传入 Token 时，通过既有 Host 注册码接口兑换并保存设备凭据。Token 不写入日志、服务配置或持久设备凭据字段；不是模型 API Key。
+5. 检查 profile 确认启用了官方 Web Host 入口，配置 systemd **系统服务**，启用开机自启并启动/重启本安装器管理的匹配实例。无需登录或开启 linger。
 
-It does not change system Node.js, global PATH or npm configuration, or install OS dependencies through apt/yum. Initial bootstrap requires Linux x64/arm64 with libraries compatible with official Node.js binaries, plus existing `curl`, `tar` and `sha256sum`. Automatic services require a working systemd system manager; use `DSH_REMOTE_AUTOSTART=0` in non-systemd containers to skip service setup.
+脚本不修改系统 Node.js、全局 PATH 或 npm 配置，不通过 apt/yum 等安装系统依赖。首次引导要求 Linux x64/arm64、兼容官方 Node.js 二进制的运行库，以及已有的 `curl`、`tar`、`sha256sum`。自动服务需要 systemd 系统管理器可用；非 systemd 容器可用 `DSH_REMOTE_AUTOSTART=0` 跳过服务配置。
 
-Without a token, registration is skipped; sign in through Remote later. A running service does not mean the Host is authorized or online. Network access, occupied ports and model-provider configuration can also affect initial operation.
+未传 Token 时跳过注册，可随后在 Remote 登录；服务进程运行不等于 Host 已完成账号授权或已经在线。首次启动还可能受网络、端口和模型服务配置影响。
 
-### Inspect the service
+### 查看服务
 
-For the default profile:
+默认 profile 的服务：
 
 ```sh
 sudo systemctl status ds-harness-remote-web.service
 sudo systemctl is-enabled ds-harness-remote-web.service
 ```
 
-Web binds only to `127.0.0.1`. The installer checks systemd process state, not end-to-end Host availability in a client.
+服务 Web 端口只绑定 `127.0.0.1`。脚本确认的是 systemd 进程状态，不代替客户端上的 Host 在线验收。
 
-### Reinstallation and safety
+### 重复安装和安全边界
 
-Remote credentials live under `$DSH_HOME/ds-harness-remote` (default `~/.dsh/ds-harness-remote`). Installation credential setup and the first startup after an upgrade automatically move the old `remote` directory before reading or creating credentials. No manual migration command or re-pairing is needed.
+Remote 凭据存于 `$DSH_HOME/ds-harness-remote`（默认 `~/.dsh/ds-harness-remote`）。安装器处理凭据时，以及升级后首次启动时，都会在读取或创建凭据前自动迁移旧 `remote` 目录，无需手动迁移命令或重新配对。
 
-Before moving, migration verifies the known Remote layout, device key pairs, trusted-peer fingerprints, credential device IDs and Server scope hashes. Unknown files or inconsistent records stop migration; a directory name alone is not treated as proof of ownership. The entire directory moves together, retaining identities, Server scopes, tokens and trusted peers.
+迁移前校验 Remote 已知目录结构、设备公私钥配对、信任指纹、凭据设备 ID 和 Server scope 哈希，不能只凭目录名认定归属；未知文件或记录不一致时停止迁移。整体移动保留身份、Server 隔离、Token 和信任记录。
 
-If a verified directory cannot be moved because of permissions, a busy filesystem or a filesystem boundary, Remote records the fallback choice outside the credential tree, and this and subsequent processes continue using the same legacy directory. It does not create replacement identities or clear authorization. If this record cannot be saved, startup stops without changing credentials. This fallback requires the original directory to remain intact and the destination to remain absent. Stop old Harness instances as part of upgrading/restarting; if both directories exist, or locks or symlinks are found, migration stops without merging or overwriting credentials.
+已确认归属的目录若因权限、文件占用或跨文件系统而无法移动，且原目录仍完整、目标目录仍不存在，在凭据树外保存回退记录，本进程和后续进程统一使用原目录，不新建替代身份、不清空授权；无法保存回退记录时停止启动，但不改动凭据。升级/重启时应停止旧 Harness 实例；新旧目录同时存在，或发现锁、符号链接时，迁移停止，不合并、不覆盖凭据。
 
-Older installer releases used `/opt/dsh-remote` and `dsh-remote-<profile>.service`. These names are not automatically migrated. The installer refuses to proceed if an owned legacy service is still active or enabled. Before reinstalling with the new defaults, stop and disable the old service (for the default profile: `sudo systemctl disable --now dsh-remote-web.service`). Old `dsh-remote` settings are no longer imported; configure Remote again after reinstalling.
+旧安装器使用 `/opt/dsh-remote` 和 `dsh-remote-<profile>.service`，新版不自动迁移这些名称；安装器发现归属本项目的旧服务仍运行或启用时，会在改包前拒绝继续。按新默认值重装前，先停用旧服务（默认 profile：`sudo systemctl disable --now dsh-remote-web.service`）。旧 `dsh-remote` 设置不再自动导入，重装后请重新配置 Remote。
 
-- Routine updates do not need another token. A consumed one-time token cannot be reused.
-- Existing Host credentials are never silently replaced. Stop the original Host and sign out through official controls before changing accounts with a fresh token.
-- If registration succeeds but service startup fails, credentials remain. Repair the environment and rerun without a token.
-- Units carry a canonical `DSH_HOME` ownership marker. Only matching installer-managed units are updated. Different homes, unmarked legacy units and symlinks are not taken over.
-- Web capability and unit ownership are preflighted before token redemption. Headless, SDK and terminal-only profiles (including `dsh-tui`) do not get Web units; use `DSH_REMOTE_AUTOSTART=0` and manage those processes separately. dsh-TUI integration itself is not part of this release.
-- Only matching managed services are started/restarted. Other DSH processes are not stopped automatically; exit old foreground processes using the same home to prevent connection replacement or port conflicts.
-- Legacy services, runtimes and credentials are not migrated or deleted. There is no automatic rollback; failed bootstrap directories may remain for inspection.
+- 普通更新无需再次提供 Token；一次性 Token 已消费后不能重复使用。
+- 已有 Host 凭据时拒绝静默覆盖。换绑账号前，应停止原 Host 并通过官方入口退出登录，再使用新 Token。
+- 若已注册成功、随后服务启动失败，凭据仍保留；修复环境后不带 Token 重跑。
+- 服务带有规范化 `DSH_HOME` 归属标记。只允许更新匹配 home 的安装器管理服务；不同 home、无标记的旧服务和符号链接均不接管。
+- profile 的 Web 能力和服务归属在 Token 兑换之前预检查。`headless`、SDK 和终端类 profile（含 `dsh-tui`）不自动生成 Web 服务；可设置 `DSH_REMOTE_AUTOSTART=0`，自行管理进程。dsh-TUI 集成本身不在本版本内。
+- 仅启动/重启归属匹配的管理服务，不自动停止其他 DSH 进程。使用同一 home 的旧前台进程应先手动退出，避免连接抢占或端口冲突。
+- 不自动迁移、删除旧服务、runtime 或凭据，不提供自动回滚。引导安装中途失败的私有目录可能保留，便于检查。
 
-## macOS: reuse Desktop / CLI
+## macOS：复用已有 Desktop / CLI
 
-Run as a normal user:
+macOS 使用普通用户：
 
 ```sh
 curl -fsSL https://dsh.r2049.cn/app/install.sh | bash
 ```
 
-The installer prefers Desktop's official launcher under `~/Applications` or `/Applications`, otherwise `dsh` on PATH. Both present is valid; neither present fails. It does not install Desktop, DSH or Node.js, or create services.
+优先使用 `~/Applications` 或 `/Applications` 的 Desktop 官方 launcher，否则 PATH 中的 `dsh`。两者都有时优先 Desktop；都没有才停止，不安装 Desktop、DSH 或 Node.js，不创建服务。
 
-Desktop defaults to `desktop`; standalone CLI defaults to `web`. Override with `DSH_COMMAND` / `DSH_PROFILE`. Token registration uses the same installer; restart the selected Desktop/CLI manually afterward. Without a token, sign in through Remote or `/remote login`.
+Desktop 默认 `desktop` profile，独立 CLI 默认 `web`，可用 `DSH_COMMAND` / `DSH_PROFILE` 显式选择。Token 注册使用同一安装入口，安装后仍需手动重启所选 Desktop/CLI 实例。不传 Token 时在 Remote 或 `/remote login` 登录。
 
-Alternatively, open Desktop **Extensions / Plugin management** and install from npm:
+Desktop 也可打开 **扩展 / 插件管理**，从 npm 安装：
 
 ```text
 ds-harness-remote@0.6.3
 ```
 
-An ordinary standalone CLI cannot manage the reserved `desktop` profile; use Desktop's official launcher.
+普通独立 CLI 不能管理保留的 `desktop` profile，必须使用 Desktop 官方 launcher。
 
-## Options and environment
+## 参数和环境变量
 
-| Setting | Meaning |
+| 配置 | 含义 |
 | --- | --- |
-| `DSH_COMMAND` | Existing launcher; an invalid explicit selection fails rather than switching instances |
-| `DSH_PROFILE` | Selected profile; standalone defaults to `web`, Desktop to `desktop` |
-| `DSH_HOME` | Existing value is preserved; registration and runtime share one home, usually root's `.dsh` on Linux |
-| `REMOTE_VERSION` | Remote release, default npm `latest` |
-| `INTELLIGENT_UI` | `1` also installs the Intelligent UI companion into the same profile; default `0` |
-| `INTELLIGENT_UI_VERSION` | Intelligent UI release when `INTELLIGENT_UI=1`, default npm `latest` |
-| `DSH_VERSION` | New Linux DSH installation version, default npm `latest`; does not upgrade an existing DSH |
-| `DSH_REMOTE_REGISTRATION_TOKEN` | One-time Host token; private interactive input is recommended |
-| `DSH_REMOTE_AUTOSTART=0` | Skip Linux service setup/start; root is still required |
-| `DSH_INSTALL_ROOT` | Linux private bootstrap root, default `/opt/ds-harness-remote`; absolute path required |
-| `DSH_SYSTEMD_DIR` | System unit directory, default `/etc/systemd/system`; leave unchanged for ordinary deployments |
+| `DSH_COMMAND` | 已有 launcher 路径；显式指定却找不到时失败，不静默换实例 |
+| `DSH_PROFILE` | 所选 profile；独立默认 `web`，Desktop 默认 `desktop` |
+| `DSH_HOME` | 保留已有值，注册凭据与运行实例使用同一 home；Linux 通常为 root 的 home 下 `.dsh` |
+| `REMOTE_VERSION` | Remote 版本，默认 npm `latest` |
+| `INTELLIGENT_UI` | 为 `1` 时同时把 Intelligent UI 安装到同一 profile；默认 `0` |
+| `INTELLIGENT_UI_VERSION` | `INTELLIGENT_UI=1` 时的 Intelligent UI 版本，默认 npm `latest` |
+| `DSH_VERSION` | Linux 缺少 DSH 时的新安装版本，默认 npm `latest`，不升级已有 DSH |
+| `DSH_REMOTE_REGISTRATION_TOKEN` | 一次性 Host 注册 Token；推荐通过隐藏输入传入 |
+| `DSH_REMOTE_AUTOSTART=0` | Linux 跳过系统服务配置/启动，仍要求 root |
+| `DSH_INSTALL_ROOT` | Linux 私有引导安装根目录，默认 `/opt/ds-harness-remote`，必须是绝对路径 |
+| `DSH_SYSTEMD_DIR` | 系统 unit 目录，默认 `/etc/systemd/system`；普通部署不要修改 |
 
-`bash install.sh --token '<one-time-token>'` and a positional token are also accepted, but may expose it through process listings or shell history. Do not use shell tracing/debugging with credentials. Invalid, expired or consumed tokens fail registration.
+也接受 `bash install.sh --token '<一次性Token>'` 或位置参数，但它们可能出现在进程列表和 shell 历史中。不要使用 shell trace/debug 执行带凭据的命令。Token 无效、过期或已消费时注册明确失败。
 
-## Stop and remove
+## 停用和卸载
 
-Disable the Linux system service first, replacing `web` with the actual profile:
+先停用 Linux 系统服务（按实际 profile 替换 `web`）：
 
 ```sh
 sudo systemctl disable --now ds-harness-remote-web.service
 ```
 
-Then use the same launcher, profile and `DSH_HOME` with official plugin removal. For the default newly bootstrapped launcher:
+然后使用同一 launcher、profile 和 `DSH_HOME` 执行官方插件移除命令，例如新引导安装的默认路径：
 
 ```sh
 sudo -H /opt/ds-harness-remote/bin/dsh plugin --profile web remove -w ds-harness-remote
 ```
 
-Use Desktop Plugin management on Desktop. Runtime directories, profiles, device credentials and unit files are not automatically deleted. Windows users can still use official Plugin management or an existing Harness CLI, but no Windows installer is maintained here.
+Desktop 使用官方插件管理移除。不会自动删除 runtime、profile、设备凭据或服务 unit。Windows 用户仍可使用官方插件管理或已有 Harness 官方命令，但本仓库不再提供 Windows 安装脚本。
 
-## Download source and validation limits
+## 下载源与验证范围
 
-If the domain is unavailable, replace `https://dsh.r2049.cn/app` with `https://raw.githubusercontent.com/liguobao/ds-harness-remote/main/scripts`.
+域名不可访问时，将 `https://dsh.r2049.cn/app` 换为 `https://raw.githubusercontent.com/gaolin89898/ds-harness-remote/main/scripts`。
 
-Smoke checks with mocked downloads/systemctl and temporary target directories are not clean-server installation, production token redemption or reboot acceptance. Verify the service on the target server and confirm the Host is online in a client. Repository updates do not deploy hosted scripts automatically.
+模拟下载、systemctl 和目标目录的烟测不等于干净 Linux 服务器的完整下载安装、真实 Token 兑换或重启自启验收。上线前应在目标服务器检查服务状态，并从客户端确认 Host 在线。本仓库修改不会自动部署线上脚本。

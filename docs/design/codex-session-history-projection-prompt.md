@@ -37,7 +37,7 @@ Desktop 原生 UI / Android Workspace、Session、Chat
 ```
 
 Desktop 虚拟 carrier 只实现 UI 需要的固定 endpoint；未知方法拒绝，不能回落到 Host 本地 Harness Session。
-各版本 carrier 和 Session V3 兼容以[兼容说明](../compatibility.zh.md)和源码为准。
+各版本 carrier 和 Session V3 兼容以[兼容说明](../compatibility.md)和源码为准。
 
 ## 4. 方法与原生操作
 

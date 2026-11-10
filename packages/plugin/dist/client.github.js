@@ -3385,7 +3385,7 @@ If a code was sent, recover the original submission without changing it.`,
             { className: "dshRemoteAcpSummaryText" },
             React.createElement("strong", null, t("agentBackends")),
             React.createElement("p", null, t("acpHint"), React.createElement("a", {
-              href: "https://github.com/liguobao/ds-harness-remote/blob/feat/cursor-remote/docs/acp-remote.md",
+              href: "https://github.com/gaolin89898/ds-harness-remote/blob/feat/cursor-remote/docs/acp-remote.md",
               target: "_blank",
               rel: "noopener noreferrer",
               onClick: (event) => event.stopPropagation()
@@ -3908,6 +3908,8 @@ If a code was sent, recover the original submission without changing it.`,
       ".dshRemotePageHeader{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 24px;border-bottom:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);-webkit-app-region:no-drag}.dshRemotePageIntro{min-width:0;flex:1;-webkit-app-region:no-drag}.dshRemotePageHeader strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px;font-weight:700;line-height:1.4;letter-spacing:-0.01em}.dshRemotePageHeader p{min-width:0;max-width:70ch;margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dsw-alias-label-secondary);font-size:13px;line-height:1.5}.dshRemoteStarLink{-webkit-app-region:no-drag}.dshRemotePageActions{flex:0 0 auto;display:flex;align-items:center;gap:6px;-webkit-app-region:no-drag;pointer-events:auto}.dshRemotePageActions>button{height:36px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border:0;border-radius:8px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary);line-height:1;cursor:pointer;-webkit-app-region:no-drag;pointer-events:auto;transition:all .16s ease}.dshRemotePageActions>button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}.dshRemotePageActions>button:disabled{opacity:.45;cursor:default}.dshRemotePageBack,.dshRemotePageRefresh{min-width:48px;padding:0 12px;font:inherit;font-size:13px;font-weight:500}.dshRemotePageBack{color:var(--dsw-alias-label-secondary)!important}.dshRemotePageClose{width:36px;padding:0;font-size:22px;border-radius:50%}",
       ".dshRemotePageBody{padding:24px;overflow:auto;display:flex;flex-direction:column;gap:24px}.dshRemotePageBody button{font:inherit;color:inherit}",
       ".dshRemotePageTitleRow{display:flex;align-items:center;gap:12px;min-width:0}.dshRemotePageTitleRow>strong{min-width:0;flex:0 1 auto}.dshRemoteStarLink{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:var(--dsw-alias-bg-layer-3);border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);font-size:11px;font-weight:500;text-decoration:none;transition:all .18s ease}.dshRemoteStarLink:hover{color:#f59e0b;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.35);text-decoration:none}.dshRemoteStarLink:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px;border-radius:999px}",
+      // Workbench header: brand mark, mono eyebrow and title stack, as on the site.
+      ".dshRemotePageTitleRow{display:flex;align-items:center;gap:14px;min-width:0}.dshRemoteBrandMark{box-sizing:border-box;width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-brand-primary)}.dshRemoteBrandMark>svg{width:23px;height:17px;display:block}.dshRemotePageTitles{min-width:0;display:flex;flex-direction:column;gap:3px}.dshRemotePageEyebrow{display:flex;align-items:center;gap:8px;min-width:0}.dshRemotePageEyebrowLabel{color:var(--dsw-alias-label-tertiary);font-size:10px;font-weight:600;line-height:1.2;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}.dshRemotePageEyebrow .dshRemoteStarLink{text-transform:none;letter-spacing:normal;font-size:10.5px;padding:2px 8px;line-height:1.5}.dshRemotePageTitles>strong{font-size:19px;line-height:1.3;letter-spacing:-0.01em}.dshRemoteHostList>button .dshRemoteHostItemIcon{color:var(--dsw-alias-brand-primary)}.dshRemotePageActions>button{background:transparent;border:1px solid var(--dsw-alias-border-l2)}.dshRemotePageActions>button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-border-l3)}.dshRemotePageClose{border-radius:8px!important}",
       // Registry update link inside the modal's account footer row, and the mini
       // upgrade affordances on the sidebar entry buttons. The host-row
       // "update available" marker stays plain text inside the joined detail string.
@@ -3925,7 +3927,7 @@ If a code was sent, recover the original submission without changing it.`,
       ".dshRemoteAcpList>.dshRemoteAuthorizationSetting{grid-template-columns:minmax(0,1fr) auto 40px 56px;column-gap:18px}.dshRemoteAcpCheckCell{grid-column:2;display:flex;align-items:center;gap:10px;min-width:0}.dshRemoteAcpCheckLink,.dshRemoteAcpRemoveLink{justify-self:start}.dshRemoteAcpCheckResult{position:static}",
       ".dshRemoteAcpCheckLink.isPassed{color:var(--dsw-alias-state-success-primary)}.dshRemoteAcpCheckLink.isFailed{color:var(--dsw-alias-state-danger-primary)}.dshRemoteAcpCheckLink.isChecking{color:var(--dsw-alias-label-secondary)}.dshRemoteAcpInstallLink{color:var(--dsw-alias-brand-primary);font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;white-space:nowrap}.dshRemoteAcpInstallLink.isInstalling{color:var(--dsw-alias-label-secondary);pointer-events:none}",
       ".dshRemoteCancelWorkspace{min-height:36px;border:0;background:transparent;color:var(--dsw-alias-label-secondary);padding:6px 0;cursor:pointer}.dshRemoteCancelWorkspace:hover:not(:disabled){color:var(--dsw-alias-label-primary);text-decoration:underline}.dshRemoteCancelWorkspace:disabled{opacity:.5;cursor:default}",
-      '.dshRemoteHostList{display:flex;flex-direction:column;gap:8px;max-height:310px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:2px 0;border-top:0}.dshRemoteHostList.isCollapsed{max-height:none;overflow-y:visible}.dshRemoteHostList>button{min-height:64px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-2);padding:12px 16px;cursor:pointer;transition:all .18s cubic-bezier(.16,1,.3,1);box-shadow:0 1px 3px rgba(0,0,0,.03)}.dshRemoteHostList>button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-brand-primary);transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.08)}.dshRemoteHostList>button:disabled{opacity:.5;cursor:default}.dshRemoteHostList>button[aria-current="true"]{background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-brand-primary);box-shadow:0 0 0 1px var(--dsw-alias-brand-primary)}.dshRemoteHostItemLeft{display:flex;align-items:center;gap:12px;min-width:0;flex:1}.dshRemoteHostItemIcon{width:38px;height:38px;border-radius:10px;background:var(--dsw-alias-bg-layer-3);border:1px solid var(--dsw-alias-border-l2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .18s ease}.dshRemoteHostList>button:hover:not(:disabled) .dshRemoteHostItemIcon{border-color:var(--dsw-alias-brand-primary)}.dshRemoteHostItemText{display:flex;flex-direction:column;gap:3px;min-width:0}.dshRemoteHostItemText strong{font-size:15px;font-weight:600;color:var(--dsw-alias-label-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteHostItemText small{color:var(--dsw-alias-label-secondary);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteHostItemRight{display:flex;align-items:center;gap:8px;flex-shrink:0}.dshRemoteHostStatus{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;line-height:1;flex-shrink:0}.dshRemoteHostStatus.isOnline{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25)}.dshRemoteHostStatus.isOnline::before{content:"";width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 0 2px rgba(16,185,129,.2)}.dshRemoteHostStatus.isOffline{background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-tertiary);border:1px solid var(--dsw-alias-border-l2)}.dshRemoteHostStatus.isOffline::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.dshRemoteHostItemChevron{font-size:18px;color:var(--dsw-alias-label-tertiary);line-height:1;margin-left:2px;transition:transform .18s ease,color .18s ease;flex-shrink:0}.dshRemoteHostList>button:hover:not(:disabled) .dshRemoteHostItemChevron{transform:translateX(2px);color:var(--dsw-alias-label-primary)}',
+      '.dshRemoteHostList{display:flex;flex-direction:column;gap:8px;max-height:310px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:2px 0;border-top:0}.dshRemoteHostList.isCollapsed{max-height:none;overflow-y:visible}.dshRemoteHostList>button{min-height:64px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-2);padding:12px 16px;cursor:pointer;transition:all .18s cubic-bezier(.16,1,.3,1);box-shadow:0 1px 3px rgba(0,0,0,.03)}.dshRemoteHostList>button:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-border-l3);box-shadow:none}.dshRemoteHostList>button:disabled{opacity:.5;cursor:default}.dshRemoteHostList>button[aria-current="true"]{background:var(--dsw-alias-interactive-bg-hover);border-color:var(--dsw-alias-brand-primary);box-shadow:0 0 0 1px var(--dsw-alias-brand-primary)}.dshRemoteHostItemLeft{display:flex;align-items:center;gap:12px;min-width:0;flex:1}.dshRemoteHostItemIcon{width:38px;height:38px;border-radius:10px;background:var(--dsw-alias-bg-layer-3);border:1px solid var(--dsw-alias-border-l2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .18s ease}.dshRemoteHostList>button:hover:not(:disabled) .dshRemoteHostItemIcon{border-color:var(--dsw-alias-brand-primary)}.dshRemoteHostItemText{display:flex;flex-direction:column;gap:3px;min-width:0}.dshRemoteHostItemText strong{font-size:15px;font-weight:600;color:var(--dsw-alias-label-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteHostItemText small{color:var(--dsw-alias-label-secondary);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteHostItemRight{display:flex;align-items:center;gap:8px;flex-shrink:0}.dshRemoteHostStatus{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;line-height:1;flex-shrink:0}.dshRemoteHostStatus.isOnline{background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 12%,transparent);color:var(--dsw-alias-state-success-primary);border:1px solid color-mix(in srgb,var(--dsw-alias-state-success-primary) 26%,transparent)}.dshRemoteHostStatus.isOnline::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 0 2px color-mix(in srgb,var(--dsw-alias-state-success-primary) 18%,transparent)}.dshRemoteHostStatus.isOffline{background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-tertiary);border:1px solid var(--dsw-alias-border-l2)}.dshRemoteHostStatus.isOffline::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.dshRemoteHostItemChevron{font-size:18px;color:var(--dsw-alias-label-tertiary);line-height:1;margin-left:2px;transition:transform .18s ease,color .18s ease;flex-shrink:0}.dshRemoteHostList>button:hover:not(:disabled) .dshRemoteHostItemChevron{transform:translateX(2px);color:var(--dsw-alias-label-primary)}',
       '.dshRemoteConnectedMenu{position:relative;flex:0 0 auto;margin-right:4px}.dshRemoteConnectedCount{appearance:none;display:inline-flex;align-items:center;justify-content:center;height:22px;border:0;border-radius:999px;background:var(--dsw-alias-bg-module-platform);color:var(--dsw-alias-label-secondary);box-shadow:0 1px 2px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.04) inset;padding:0 10px;font:inherit;font-size:11px;font-weight:500;line-height:17px;white-space:nowrap;cursor:default}.dshRemoteConnectedCount.isOnline{color:var(--dsw-alias-state-success-primary)}.dshRemoteConnectedCount.isInteractive{cursor:pointer}.dshRemoteConnectedCount.isInteractive:hover{filter:brightness(1.08)}.dshRemoteConnectedCount:disabled{opacity:1;cursor:default}.dshRemoteConnectedCount:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}.dshRemoteConnectedPanel{position:absolute;top:calc(100% + 8px);right:0;z-index:4;width:min(320px,calc(100vw - 48px));max-height:min(280px,40vh);overflow:auto;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-2);box-shadow:0 10px 28px rgba(0,0,0,.28);padding:10px 12px}.dshRemoteConnectedPanelTitle{display:block;margin:0 0 6px;color:var(--dsw-alias-label-primary);font-size:12px;font-weight:600}.dshRemoteClientList{display:flex;flex-direction:column}.dshRemoteClientRow{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--dsw-alias-border-l2)}.dshRemoteClientRow:last-child{border-bottom:0}.dshRemoteClientRow>span{min-width:0;display:flex;flex-direction:column;gap:2px}.dshRemoteClientRow strong{font-size:13px;font-weight:500}.dshRemoteClientRow small{color:var(--dsw-alias-label-secondary);font-size:11px}.dshRemoteClientOnline{display:inline-flex;align-items:center;gap:6px;color:var(--dsw-alias-state-success-primary)!important}.dshRemoteClientOnline::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}',
       ".dshRemoteConnectedCount{height:auto;border-radius:0;background:transparent;box-shadow:none;padding:0 4px;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 45%,transparent);text-underline-offset:3px}.dshRemoteConnectedCount.isInteractive:hover{filter:none;text-decoration-color:currentColor}.dshRemoteConnectedCount:focus-visible{outline-offset:3px;border-radius:3px}",
       '.dshRemoteProgress{display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:12px 14px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-layer-2)}.dshRemoteProgressHeader{display:flex;align-items:center;justify-content:space-between;gap:12px}.dshRemoteProgressHeader strong{font-size:13px;font-weight:600}.dshRemoteProgressHeader span{color:var(--dsw-alias-label-secondary);font-size:12px}.dshRemoteProgressBar{height:6px;overflow:hidden;border-radius:999px;background:var(--dsw-alias-bg-layer-3)}.dshRemoteProgressBar>span{display:block;width:100%;height:100%;border-radius:inherit;background:var(--dsw-alias-brand-primary);transform-origin:left center;transition:transform .22s ease-out}[dir="rtl"] .dshRemoteProgressBar>span{transform-origin:right center}.dshRemoteProgress p{margin:0;color:var(--dsw-alias-label-secondary);font-size:12px;line-height:1.45}.dshRemoteProgressRoute{font-weight:500}.dshRemoteProgressRoute .isActive{color:var(--dsw-alias-state-success-primary);font-weight:700}.dshRemoteProgressRouteArrow{color:var(--dsw-alias-label-tertiary)}@media(prefers-reduced-motion:reduce){.dshRemoteProgressBar>span{transition:none}}',
@@ -3946,6 +3948,8 @@ If a code was sent, recover the original submission without changing it.`,
       ".dshRemoteLoginHeading{box-sizing:border-box;width:100%;display:flex;align-items:baseline;justify-content:center;overflow:hidden;white-space:nowrap;font-size:14px}.dshRemoteLoginHeading>a{display:inline-flex;align-items:baseline;justify-content:center;gap:10px;min-width:0;color:var(--dsw-alias-label-primary);font-size:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid transparent}.dshRemoteLoginHeading>a:hover{text-decoration:none;border-bottom-color:currentColor}.dshRemoteLoginHeading>a:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px;border-radius:3px}.dshRemoteLoginTitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteLoginHeading>a>span{flex:0 0 auto;color:inherit;font-size:inherit;font-weight:inherit}.dshRemoteLoginTabs{box-sizing:border-box;width:100%;flex-wrap:nowrap;overflow-x:auto}.dshRemoteLoginTabs>button{min-width:max-content;flex:1 0 auto;display:flex;align-items:center;justify-content:center;padding:6px 10px;white-space:nowrap;text-align:center}.dshRemoteLoginTabs>button.isActive::after{right:0;left:0;bottom:0;border-radius:0}.dshRemoteClientLogin,.dshRemoteQrLogin{box-sizing:border-box;width:100%;height:300px;min-height:300px}.dshRemoteClientLogin{align-items:stretch;padding-top:16px}.dshRemoteClientLogin>button{align-self:stretch;width:100%}.dshRemoteQrLogin{padding-top:12px}",
       '.dshRemoteHostControlToggle{display:flex;align-items:center;gap:8px;color:var(--dsw-alias-label-secondary);font-size:12px;line-height:18px;white-space:nowrap;cursor:default}.dshRemoteHostControlToggle>input{appearance:none;box-sizing:border-box;position:relative;width:36px;height:20px;flex:0 0 auto;margin:0;border:1px solid var(--dsw-alias-border-l2);border-radius:999px;background:var(--dsw-alias-bg-layer-3);cursor:pointer;transition:all .18s ease}.dshRemoteHostControlToggle>input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .18s cubic-bezier(.16,1,.3,1)}.dshRemoteHostControlToggle>input:checked{border-color:#10b981;background:#10b981;box-shadow:0 2px 6px rgba(16,185,129,.35)}.dshRemoteHostControlToggle>input:checked::after{transform:translateX(16px);background:#fff}.dshRemoteHostControlToggle>input:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}.dshRemoteHostControlToggle>input:disabled{opacity:.5;cursor:default}@media(prefers-reduced-motion:reduce){.dshRemoteHostControlToggle>input,.dshRemoteHostControlToggle>input::after{transition:none}}',
       ".dshRemoteAccountFooter{display:flex;align-items:center;justify-content:flex-start;gap:12px;border-top:1px solid var(--dsw-alias-border-l2);padding-top:16px;color:var(--dsw-alias-label-secondary);font-size:12px}.dshRemoteHostNameLine{display:inline-flex;align-items:center;gap:8px;padding:3px 10px;border-radius:999px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l2);font-weight:500;color:var(--dsw-alias-label-primary)}.dshRemoteAccountSettings{flex:0 0 auto;border:0;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer;padding:4px 8px;font:inherit;line-height:1.5;white-space:nowrap;border-radius:6px;transition:all .15s ease}.dshRemoteAccountSettings:hover{color:var(--dsw-alias-label-primary);background:var(--dsw-alias-interactive-bg-hover)}.dshRemoteAccountExit{flex:0 0 auto;margin-left:auto;border:0;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer;padding:4px 10px;font-size:12px;line-height:1.5;white-space:nowrap;border-radius:6px;transition:all .15s ease}.dshRemoteAccountExit:hover:not(:disabled){color:#ef4444;background:rgba(239,68,68,.08)}.dshRemoteAccountExit:disabled{opacity:.5;cursor:default;text-decoration:none}",
+      // Footer identity: avatar plus a two-line account block, actions stay right.
+      ".dshRemoteAccountFooter{gap:14px}.dshRemoteAccountIdentity{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}.dshRemoteAccountAvatar{box-sizing:border-box;width:26px;height:26px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:color-mix(in srgb,var(--dsw-alias-brand-primary) 20%,transparent);color:var(--dsw-alias-brand-primary);font-size:11px;font-weight:600;line-height:1}.dshRemoteAccountCopy{display:flex;flex-direction:column;gap:2px;min-width:0}.dshRemoteAccountCopy>strong{font-size:12.5px;font-weight:600;line-height:1.35;color:var(--dsw-alias-label-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteAccountCopy>.dshRemoteServerNotice{font-size:11px;line-height:1.35;color:var(--dsw-alias-label-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dshRemoteAccountFooter>.dshRemoteAccountUpdate{margin-left:auto;flex:0 0 auto}.dshRemoteAccountFooter>.dshRemoteAccountExit{margin-left:0}",
       ".dshRemoteLocalLink{align-self:flex-start;border:0;background:transparent;color:var(--dsw-alias-label-secondary);padding:4px 0;cursor:pointer}.dshRemoteLocalLink:hover{color:var(--dsw-alias-label-primary)}",
       "@keyframes dshRemotePageIn{from{opacity:0;transform:translateY(6px) scale(.99)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.dshRemotePage{animation:none}}@media(max-width:620px){.dshRemoteBackdrop{padding:12px}.dshRemotePage{max-height:calc(100vh - 24px)}.dshRemotePageHeader{gap:8px;padding:12px 16px}.dshRemotePage.hasSelectedHost .dshRemotePageBack{max-width:112px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dshRemoteSectionHeading{align-items:flex-start;flex-direction:column;gap:8px}.dshRemoteWorkspaceHeading{align-items:center;flex-direction:row}.dshRemoteSectionActions{width:100%;justify-content:space-between}.dshRemotePageBody{padding:20px 16px}.dshRemoteOpenBar{align-items:flex-end}.dshRemoteOpenBar>button{min-height:48px}}",
       ".dshRemoteBackdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px;-webkit-app-region:no-drag}",
@@ -4040,10 +4044,35 @@ If a code was sent, recover the original submission without changing it.`,
     return comparePrerelease(parsedLeft.prerelease, parsedRight.prerelease);
   }
 
+  // packages/plugin/src/client/brand.ts
+  var whaleMarkViewBox = "0 0 23.5 17.2", whaleMarkPath = "M22.9168 1.43018c-0.2455-0.12-0.351 0.109-0.4945 0.22501-0.049 0.0375-0.0905 0.0865-0.132 0.1315-0.3586 0.38301-0.7776 0.63452-1.3246 0.60452-0.8-0.045-1.483 0.2065-2.087 0.81852-0.1285-0.75452-0.5551-1.20503-1.2041-1.49404-0.3395-0.15001-0.683-0.30051-0.921-0.62702-0.166-0.23251-0.2115-0.49152-0.2945-0.74702-0.053-0.154-0.1055-0.31151-0.283-0.33801-0.1925-0.03-0.268 0.1315-0.3435 0.26651-0.302 0.55202-0.419 1.16003-0.4075 1.77605 0.0265 1.38554 0.6115 2.48907 1.774 3.2741 0.132 0.09 0.166 0.18 0.1245 0.31151-0.0795 0.2705-0.1735 0.53301-0.2565 0.80352-0.053 0.17251-0.132 0.21051-0.317 0.135-0.638-0.2665-1.189-0.66102-1.6761-1.13753-0.8265-0.79952-1.574-1.68205-2.506-2.37307-0.219-0.16151-0.438-0.31151-0.6646-0.45451-0.951-0.92353 0.1246-1.68206 0.3736-1.77206 0.2605-0.094 0.0905-0.41701-0.7511-0.41301-0.8415 0.0035-1.61151 0.28551-2.59304 0.66102-0.14351 0.0565-0.29451 0.0975-0.44902 0.1315-0.89052-0.169-1.81555-0.2065-2.78158-0.0975-1.81905 0.20251-3.2721 1.06253-4.34013 2.53058-1.28304 1.76455-1.58505 3.76961-1.21553 5.86067 0.38851 2.20408 1.51354 4.02858 3.24209 5.45518 1.79256 1.479 3.85712 2.2041 6.21269 2.065 1.43052-0.0825 3.02312-0.274 4.81962-1.7945 0.453 0.2255 0.9286 0.3155 1.7171 0.383 0.6075 0.0565 1.1925-0.03 1.6455-0.124 0.7095-0.15 0.6605-0.807 0.404-0.9275-2.0795-0.9686-1.623-0.5745-2.038-0.8936 1.0565-1.25 2.6706-3.4721 3.1686-6.49765 0.049-0.33401 0.1115-0.80452 0.104-1.07503-0.004-0.16501 0.034-0.22901 0.2225-0.24801 0.521-0.06 1.0265-0.2025 1.491-0.45801 1.3476-0.73602 1.8911-1.94506 2.0191-3.3941 0.019-0.22151-0.004-0.45052-0.238-0.56702z m-11.7419 13.04342c-2.01554-1.5846-2.99306-2.1061-3.39658-2.0836-0.37751 0.0225-0.30951 0.4545-0.2265 0.736 0.087 0.278 0.2 0.4695 0.35851 0.7136 0.1095 0.1615 0.185 0.4015-0.1095 0.582-0.64902 0.4015-1.77756-0.135-1.83056-0.1615-1.31354-0.7736-2.41157-1.7946-3.1856-3.1911-0.74752-1.34407-1.18153-2.78611-1.25303-4.32516-0.019-0.37151 0.0905-0.50302 0.46051-0.57052 0.48701-0.09 0.98903-0.109 1.47554-0.0375 2.05707 0.30051 3.80812 1.22004 5.27616 2.67708 0.83803 0.82953 1.47205 1.8211 2.12505 2.7896 0.6945 1.0285 1.4416 2.0085 2.3931 2.8121 0.336 0.2815 0.604 0.4955 0.8605 0.6535-0.7735 0.0865-2.0645 0.105-2.9476-0.5935l0-0.001z m0.9661-6.21372c0-0.165 0.132-0.2965 0.298-0.2965 0.0375 0 0.0715 0.0075 0.102 0.0185 0.0415 0.015 0.0795 0.0375 0.1095 0.0715 0.053 0.0525 0.083 0.1275 0.083 0.2065 0 0.16501-0.132 0.29651-0.298 0.29651-0.166 0-0.2945-0.1315-0.2945-0.29651z m3.0005 1.53905c-0.1925 0.079-0.385 0.14651-0.57 0.15401-0.287 0.015-0.6-0.10151-0.77-0.24401-0.264-0.22151-0.453-0.34551-0.532-0.73202-0.034-0.16501-0.015-0.42052 0.015-0.56702 0.068-0.31551-0.0075-0.51802-0.23-0.70202-0.181-0.15001-0.4115-0.19151-0.6645-0.19151-0.0945 0-0.181-0.0415-0.2455-0.075-0.1055-0.0525-0.1926-0.18401-0.1095-0.34551 0.0265-0.0525 0.155-0.18001 0.185-0.20251 0.3435-0.1955 0.7395-0.1315 1.106 0.015 0.3395 0.13901 0.5965 0.39402 0.966 0.75453 0.3775 0.43551 0.4455 0.55551 0.6605 0.88252 0.17 0.25551 0.3245 0.51802 0.4306 0.81853 0.064 0.1875-0.019 0.34101-0.2416 0.43501z";
+
   // packages/plugin/src/client/icons.ts
   var deepSeekWorkspaceIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAACVBMVEUAAADy8vXx8fUsA3vyAAAAAXRSTlMAQObYZgAAAOxJREFUWMPtlsEOwyAMQxP+/6OnTZMGxHGcot3wDYgfhkJbs6urprzveGtu9d1NgEdto8w93GuA7zPS2RFg7ynsCOAokbtAmLr2YaeKgJ6fxpT8jCAC0qSqPyNoO5DXdvyouj4ClFAdYaDxK09uiBDCIYBf6CxLesnR0uF2pG+JmhCqrUb0AOvjjoQaYDTCEAAgMg5grhAeAQIB+/M15IcKlnUIp4CkTCd0AKb4zVsRSJVGYEVzT0agK107IMGMEurvromEpaX4wzk/IKw378kq4LafED6Oowxfk7AP2q8W16EdM3p29Eyvrv6vF0WIBfBziKyCAAAAAElFTkSuQmCC", gptWorkspaceIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAclBMVEX////v7+++wMf////s7O3k5OTExcrX2Ny6vMTv8PPW19yXmqRqboJmaHd3eoaqrLPs7fGMjpfb3eKlpq1eYXOxs7pWWWd+gY5HSVdRVGVub3k+QU74+Pg4OkcvMT1ISlUoKjUiIy4fICueoKkaGyUSFB21Bp+qAAAAAXRSTlMAQObYZgAABChJREFUWMPtl916qjoQhlsdEwIECEgMYCBxx/u/xT1DrFUL1LO1DtY8LSLJvPnmB4gfH//sr7TPDfvdebf/xXZbkE/4zZ0MVhGHd9zJDsv+7F3//Z69tT5wljAu3tXw+TIlzXKJlhflYmJ+5uF5WpWhb54X+C/zZCmT2wJA4dJZwus0UYjIGqWyMhVbEp4yKNRRqlv0opW5PJLJ4rFJXvP4JKDRMqturBZjkMVJFYjR6iHQDQDI4+k2k51wZbWrqwp4mR/1CVYATyko9TFGxBUqL5IvMbXSWt0T8bkGgFLqgqZBI/Uxbx5UAxLaNcCNLBpttM7wbCc1pmJOpWAsDtey68UaQMyrFgb9uxLPjqg3+nGluyKN0XUdWw0BJ0NvTFFqgzpr9J+Dh4w0Ga1qkqBNswagxdRgFPAbgHRQG5jumGWyMxrTIaRRa4AzFs0YrNMXgI4MJWnsKYFhGNMnIh/mBOPsV8CZBFjN9w8ArowxnZzDr5IcvxTaKpxJCVsoI3SWysz1UM4AqQdzlCgho1IKrK+x1mKFzisANtgEU8E7GwHDgOqxe4w9tnM166wbaA2xBMBLrTWcAGYGdCiYVUJUrMCF+7l6gklrW1RwPi8ByjuActANqhKzVWoYrFGcCFzbDgNaBrTWpncFQMcI2DfWoAiDqRCiHcYM/ZdCEKkZqfR8spj4F0CiJjv2gHL6URNoCQDaYacL6O1oFDO2eQDUFP7AKdCRdC4CRDZaNifbjA41l/uYb/SZMAFNTBGzY7sG4J2jTsJgToOzIzXF3HZqBpSOAGduXbkGEKV1OqVGqRJpRxtvwbSw5IqAiUJItwBCOT9R32FCGo3nCkAN3t0UTBRC6zDONcBeOee9pr4T+ASbnDOdc5OmtREwEEB5w8Wqgt4bOV5c7Lt9iiK8zdP/IsBbutUGX4gNwEVCqd3FUt/xYnRWt7BvPBYQjwjAGXa3ASguHVAZ/WXKlA3eZDX1wRegFsr7E2wAlB9xFbx/7MV70kFT8aqNgLL3F8nFBmA3hrn/IJHjKJOK2oj1WI4Z4FzwN/81AOhgYD6v2xbIvaZIurLC9AfvB1WLTYAoXejF1xeBL5cpBIyEbmxkZymIXwDQh1BAfOrhI1lfwtgz8tozF5T4ttf3+32AyxC6klwAgw/YVTHpoK82xYt3wLP/Bw4AAI4D7/01TLKXBj9NEz2wEuGiKpoy68S/FwCLMQAZ3gXhihaCa25vQo6RyToOz9PE6wYjJgGi1YnqZX8qMIK+TDlnargGzSv4NvFjlwXf/nfLLMrAB4O/Xl3BH0d+RIASFgDA8IYMIXgr2+cBsbDdPSwAAHjSZFmb3txETCKIxc0uWwI8rxsLJcTiVndNwyMgKljbbNN2/zcEAja2+4RgIDYN2Bu/WtAOaEodnu2dnzz/7I/Y/w/LaEcX/MdfAAAAAElFTkSuQmCC";
 
   // packages/plugin/src/client/workspaces.ts
+  function hostDeviceGlyph(React, platform) {
+    let mobile = /android|ios|iphone|ipad/i.test(platform);
+    return React.createElement("svg", {
+      viewBox: "0 0 24 24",
+      width: 18,
+      height: 18,
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: 1.6,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": !0,
+      focusable: !1
+    }, mobile ? React.createElement("path", { d: "M9.5 3h5A1.5 1.5 0 0 1 16 4.5v15A1.5 1.5 0 0 1 14.5 21h-5A1.5 1.5 0 0 1 8 19.5v-15A1.5 1.5 0 0 1 9.5 3Zm1.5 15h2" }) : React.createElement("path", { d: "M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 15.5v-9Zm4 12h8" }));
+  }
+  function footerAccountName(status, t) {
+    return status?.target?.name ?? status?.deviceName ?? (status?.host?.account === void 0 ? t("account") : displayRemoteAccount(status.host.account));
+  }
+  function accountInitial(label) {
+    let trimmed = label.trim();
+    return trimmed.length === 0 ? "\xB7" : trimmed.slice(0, 1).toUpperCase();
+  }
   function createRemoteWorkspaceAction(React, portal) {
     let ServerNotice = createServerNotice(React), HostPairingPanel = createHostPairingPanel(React), RemoteProgressView = createRemoteProgressView(React);
     function RemoteAccountEntry(props) {
@@ -4573,13 +4602,32 @@ If a code was sent, recover the original submission without changing it.`,
               React.createElement(
                 "div",
                 { className: "dshRemotePageTitleRow" },
-                React.createElement("strong", null, selectedHost?.name ?? t("remoteTitle")),
-                selectedHost === void 0 ? React.createElement("a", {
-                  className: "dshRemoteStarLink",
-                  href: "https://github.com/liguobao/ds-harness-remote",
-                  target: "_blank",
-                  rel: "noreferrer"
-                }, t("starProject")) : null
+                React.createElement(
+                  "span",
+                  { className: "dshRemoteBrandMark", "aria-hidden": !0 },
+                  React.createElement("svg", {
+                    viewBox: whaleMarkViewBox,
+                    fill: "currentColor",
+                    "aria-hidden": !0,
+                    focusable: !1
+                  }, React.createElement("path", { d: whaleMarkPath }))
+                ),
+                React.createElement(
+                  "div",
+                  { className: "dshRemotePageTitles" },
+                  React.createElement(
+                    "div",
+                    { className: "dshRemotePageEyebrow" },
+                    React.createElement("span", { className: "dshRemotePageEyebrowLabel" }, "DSH Remote"),
+                    selectedHost === void 0 ? React.createElement("a", {
+                      className: "dshRemoteStarLink",
+                      href: "https://github.com/gaolin89898/ds-harness-remote",
+                      target: "_blank",
+                      rel: "noreferrer"
+                    }, t("starProject")) : null
+                  ),
+                  React.createElement("strong", null, selectedHost?.name ?? t("remoteTitle"))
+                )
               ),
               React.createElement("p", null, selectedHostDetails ?? t(status?.host?.pairingHostOnly ? "pairingHostOnly" : "remoteDescription"))
             ),
@@ -4626,7 +4674,7 @@ If a code was sent, recover the original submission without changing it.`,
                   React.createElement(
                     "a",
                     {
-                      href: "https://github.com/liguobao/ds-harness-remote",
+                      href: "https://github.com/gaolin89898/ds-harness-remote",
                       target: "_blank",
                       rel: "noopener noreferrer"
                     },
@@ -4873,16 +4921,32 @@ If a code was sent, recover the original submission without changing it.`,
                     },
                     React.createElement(
                       "span",
-                      null,
-                      React.createElement("strong", null, device.name),
-                      React.createElement("small", null, [
-                        formatPlatform(device.platform),
-                        device.harnessVersion === void 0 ? void 0 : t("harnessVersion", { version: device.harnessVersion }),
-                        device.clientVersion === void 0 ? void 0 : t("pluginVersion", { version: device.clientVersion }),
-                        deviceUpdateAvailable(device) ? t("updateAvailableTag") : void 0
-                      ].filter(Boolean).join(" \xB7 "))
+                      { className: "dshRemoteHostItemLeft" },
+                      React.createElement(
+                        "span",
+                        { className: "dshRemoteHostItemIcon", "aria-hidden": !0 },
+                        hostDeviceGlyph(React, device.platform)
+                      ),
+                      React.createElement(
+                        "span",
+                        { className: "dshRemoteHostItemText" },
+                        React.createElement("strong", null, device.name),
+                        React.createElement("small", null, [
+                          formatPlatform(device.platform),
+                          device.harnessVersion === void 0 ? void 0 : t("harnessVersion", { version: device.harnessVersion }),
+                          device.clientVersion === void 0 ? void 0 : t("pluginVersion", { version: device.clientVersion }),
+                          deviceUpdateAvailable(device) ? t("updateAvailableTag") : void 0
+                        ].filter(Boolean).join(" \xB7 "))
+                      )
                     ),
-                    React.createElement("small", null, t(serverUnavailable ? "unavailable" : device.online ? "online" : "offline"))
+                    React.createElement(
+                      "span",
+                      { className: "dshRemoteHostItemRight" },
+                      React.createElement("small", {
+                        className: `dshRemoteHostStatus${serverUnavailable || !device.online ? " isOffline" : " isOnline"}`
+                      }, t(serverUnavailable ? "unavailable" : device.online ? "online" : "offline")),
+                      React.createElement("span", { className: "dshRemoteHostItemChevron", "aria-hidden": !0 }, "\u203A")
+                    )
                   )))
                 ) : null,
                 React.createElement(RemoteProgressView, { progress, t }),
@@ -4894,19 +4958,28 @@ If a code was sent, recover the original submission without changing it.`,
                     "footer",
                     { className: "dshRemoteAccountFooter" },
                     React.createElement(
-                      "span",
-                      { className: "dshRemoteHostNameLine" },
-                      React.createElement("span", null, status?.target?.name ?? status?.deviceName ?? (status?.host?.account === void 0 ? t("account") : displayRemoteAccount(status.host.account))),
-                      React.createElement(ServerNotice, {
-                        offline: discoveryUnavailable || status?.host?.online === !1 && status.host.reconnecting,
-                        linked: connectedCount > 0 || status?.connected === !0,
-                        expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt,
-                        t
-                      })
+                      "div",
+                      { className: "dshRemoteAccountIdentity" },
+                      React.createElement(
+                        "span",
+                        { className: "dshRemoteAccountAvatar", "aria-hidden": !0 },
+                        accountInitial(footerAccountName(status, t))
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "dshRemoteAccountCopy" },
+                        React.createElement("strong", null, footerAccountName(status, t)),
+                        React.createElement(ServerNotice, {
+                          offline: discoveryUnavailable || status?.host?.online === !1 && status.host.reconnecting,
+                          linked: connectedCount > 0 || status?.connected === !0,
+                          expiresAt: status?.host?.recoveryExpiresAt ?? status?.network?.recoveryExpiresAt,
+                          t
+                        })
+                      )
                     ),
                     updateNotice === void 0 ? null : React.createElement("a", {
                       className: "dshRemoteAccountUpdate",
-                      href: "https://github.com/liguobao/ds-harness-remote/releases",
+                      href: "https://github.com/gaolin89898/ds-harness-remote/releases",
                       target: "_blank",
                       rel: "noreferrer",
                       title: updateNotice

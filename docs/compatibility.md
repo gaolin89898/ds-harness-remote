@@ -1,70 +1,68 @@
-## Compatibility
+## 版本兼容
 
-## Current compatibility targets (2026-11-05)
+## 当前兼容目标（2026-11-05）
 
-The development baseline is `dsh-v0.2.2-rc.1`, retaining `dsh-v0.2.1-rc.5` (and `0.2.0-rc.2`/rc.1) on the official Typert / Session V3 carrier. Peer ranges admit the `0.2.1` and `0.2.2` alpha/beta/RC and stable releases; this round adapts and locally validates the `0.2.2-rc.1` release.
+当前适配基线为 `dsh-v0.2.2-rc.1`，保留上一版 `dsh-v0.2.1-rc.5`（以及 `0.2.0-rc.2`/rc.1）的官方 Typert / Session V3 接入。peer range 明确接纳 `0.2.1` 与 `0.2.2` 的 alpha/beta/RC 和正式版；本版已按 `0.2.2-rc.1` 发布内容完成 runtime 适配与本地验证。
 
-What the 0.2.2 adaptation covers:
+0.2.2 的适配范围：
 
-- The development baseline moves to `0.2.2-rc.1` with Cordis `4.1.0`, Loader `1.1.0`, Include `1.1.0` and Node.js `>=24.9` (the 0.2.2 engine requirement). CI, the private runtime in `scripts/install.sh` and the installation docs move to Node.js 24.9.0.
-- 0.2.2 changes the `session/attachment` request from `attachmentId` to the full `ImageAttachmentRef` (the Host verifies format, byte length and dimensions). Android sends the full reference; the Host bridge normalizes by running Harness version: older Hosts receive the durable id, while a legacy client talking to a 0.2.2 Host is rejected explicitly by the official Gateway because the verified fields cannot be supplied.
-- 0.2.2 changes `session/control` projection updates to `{ seq, changes: [{ key, val }] }`. The CodeX/ACP virtual sessions send both old and new fields so 0.2.0–0.2.2 official clients apply them; the virtual `session/page` result now carries `cursor` and accepts the `session/events` alias.
-- The virtual `session/attachment` request also carries the full reference in 0.2.2; the CodeX/ACP virtual carriers accept both shapes.
-- The fixed Remote Host allowlist adds the endpoints the 0.2.2 official client calls: `toolResults/watch`, `schedule/edit`/`run`/`deleteInactive`/`deliveryLimits`, `pluginManager/listVersions`/`readBundleDetail`/`updateBundle` and `session/events`. `pluginManager/updateBundle` lets trusted devices update third-party bundles but never the Remote plugin itself (or a bundle containing it).
-- The other 0.2.2 Session changes (optional projection summaries, passive `session/follow` `activate`, optional `session/page.throughSeq`) are additive; existing Remote clients and `remote_*` tools keep working.
-- The 0.2.2 Gateway requires a live calling Peer on every local carrier; a peerless `$events` open fails with a `TypeError` and makes Desktop clients reconnect-loop. Host activation now always prepares an owner Peer (official `Peer`/`OperatorPeer` first, then the official Connection service `createPeer`), and peerless local opens use that shared fallback or fail with an actionable error. The same build was verified on a `0.2.1-rc.5` Host with a `0.2.2-rc.1` Client (remote workspace opens); both releases share the same Peer/`createPeer` contract.
+- 开发基线升级到 `0.2.2-rc.1`，随附 Cordis `4.1.0`、Loader `1.1.0`、Include `1.1.0` 与 Node.js `>=24.9`（0.2.2 的 engines 要求）。CI、`scripts/install.sh` 私有 runtime 与安装文档同步升级到 Node.js 24.9.0。
+- 0.2.2 把 `session/attachment` 请求从 `attachmentId` 改为完整 `ImageAttachmentRef`（Host 校验格式、字节数与尺寸）。Android 发送完整引用；Host 桥按运行中 Harness 版本归一：旧 Host 自动降级为 `attachmentId`，旧客户端对新 Host 无法补齐校验字段时由官方 Gateway 显式拒绝。
+- 0.2.2 把 `session/control` 的投影更新帧改为 `{ seq, changes: [{ key, val }] }`。CodeX/ACP 虚拟会话同时发送新旧字段，保证 0.2.0–0.2.2 官方客户端都能应用；虚拟 `session/page` 结果补充 `cursor`，并接受 `session/events` 别名。
+- 0.2.2 的虚拟 `session/attachment` 请求同样携带完整引用，CodeX/ACP 虚拟载体两种形态都接受。
+- Remote Host 固定 allowlist 增加 0.2.2 官方客户端会调用的端点：`toolResults/watch`、`schedule/edit`/`run`/`deleteInactive`/`deliveryLimits`、`pluginManager/listVersions`/`readBundleDetail`/`updateBundle`、`session/events`。`pluginManager/updateBundle` 允许受信任设备更新第三方组合包，但禁止远程更新 Remote 自身或包含它的组合包。
+- 0.2.2 的 Session 投影摘要变为可选、`session/follow` 新增被动 `activate`、`session/page.throughSeq` 变为可选等变化均为向后兼容的加法；既有 Remote 客户端与 `remote_*` 工具继续工作。
+- 0.2.2 的官方 Gateway 要求本地 carrier 携带存活调用 Peer，否则 `$events` 打开会以 `TypeError` 失败并让 Desktop 客户端重连循环。Host 激活时始终准备 owner Peer（官方 `Peer`/`OperatorPeer` 优先，缺失时回退官方 Connection 服务 `createPeer`），无 Peer 的本地 open 使用共享 fallback 或明确错误。`0.2.1-rc.5` 的同类 `<code>$events</code> 契约一致，同一构建已在 0.2.1 Host + 0.2.2 Client 组合上验证远程工作区可用。
 
-Validation: Plugin check, 72 files / 527 tests, production build and DSH bundle verification pass; Android check and 54 files / 520 tests pass. A separate DSH 0.2.2-rc.1 instance with this repository's open-source Server and the installed plugin also passed Host activation, Web UI rendering, control-plane/settings reads and writes, and opening a Remote workspace. Real Desktop/Android APK, encrypted cross-device E2E and the new 0.2.2 UI still lack manual acceptance; Remote copy for the six new official UI languages remains to be added.
+验证：Plugin check、73 文件 / 531 tests、生产构建与 DSH bundle 校验通过；Android check 与 54 文件 / 520 tests 通过。另以独立 DSH 0.2.2-rc.1 + 本仓库开源自部署 Server + 已安装插件完成 Host 激活、Web UI 渲染、控制面/设置读写与远程工作区建立烟测。未做真实 Desktop/Android APK、跨设备加密 E2E 与 0.2.2 新 UI 的人工验收；新增 6 种官方 UI 语言的 Remote 文案仍待补齐。
 
-The Remote Plugin baseline and the dsh-TUI baseline are separate. The current public dsh-TUI `0.17.0` release lists `dsh-v0.2.1-rc.3` as its primary compatibility line, so this repository does not claim dsh-TUI `0.17.0` plus the new Harness baseline as runtime-validated.
+0.6.3 不包含 dsh-TUI 集成，将在后续版本单独适配。当前公开 dsh-TUI `0.17.0` 的主适配线是 `dsh-v0.2.1-rc.3`，因此本仓库不把 dsh-TUI 与当前 Harness 基线的组合宣称为已完成 runtime 验收。
 
-## Current compatibility targets (2026-10-25)
+## 当前兼容目标（2026-10-31）
 
-The development baseline is `dsh-v0.2.1-rc.5`, retaining the previous `dsh-v0.2.0-rc.2` (and rc.1) official Typert / Session V3 carrier. Peer ranges explicitly admit `0.2.1` and `0.2.2` prereleases and stable releases. A future `0.2.2` RC with the same official carrier contract requires no version-only package edit; that future runtime has not been validated.
+当前适配基线为 `dsh-v0.2.1-rc.5`，保留上一版 `dsh-v0.2.0-rc.2`（以及 rc.1）的官方 Typert / Session V3 接入。peer range 明确接纳 `0.2.1` 与 `0.2.2` 的 alpha/beta/RC 和正式版；后续 `0.2.2` RC 在官方 carrier 契约不变时无需仅为版本号改包。未来版本尚未发布，范围接纳不等于已完成其 runtime 验证。 本轮已按官方 `0.2.1-rc.5` 发布内容完成 Plugin check/build、DSH bundle 校验，以及思考内容流转烟测：Android reasoning reducer/自动滚动 18 个测试通过，Plugin ACP/Codex reasoning 投影 30 个测试通过。未做真实 Desktop/Android APK 或跨设备 UI 人工验收。
 
-dsh-TUI integration is not part of release 0.6.3 and is deferred to a later version. The public dsh-TUI `0.17.0` release lists `dsh-v0.2.1-rc.3` as its primary compatibility line, so no dsh-TUI plus current-Harness pairing is claimed as runtime-validated here.
+Remote Plugin 与 dsh-TUI 的适配基线是分开的。当前公开 dsh-TUI `0.17.0` 的主适配线是 `dsh-v0.2.1-rc.3`，因此本仓库不把 `dsh-TUI 0.17.0 + dsh-v0.2.1-rc.5` 宣称为已完成 runtime 验收的组合。
 
-Harness `0.1.1-rc.2` ApiProxy support has been removed from the Host plugin, its bundled Remote client, and Android. Use a Host with the official Typert Remote carrier; ApiProxy-only Hosts and missing capability discovery are rejected. CodeX/ACP keep their independent data planes and use Typert for Desktop projection. This change does not update the standalone VS Code client or the independent Remote Web repository.
+Host 插件、随包 Remote 客户端和 Android 已移除 Harness `0.1.1-rc.2` ApiProxy 兼容。请使用提供官方 Typert Remote carrier 的 Host；仅提供 ApiProxy 或不支持能力发现的旧 Host 会被拒绝，不再降级。CodeX/ACP 保留独立数据面，Desktop 内存投影统一使用 Typert。本轮不改独立 VS Code Client 或独立 Remote Web 仓库。
 
-Timed questions claim `userQuestions/attachWait`, return foreground answers or `ASK_TIMED_OUT` through `$events/result`, and recover late replies only from the official `userQuestions` projection. Late replies use `userQuestions/answer`; disconnect never replays answers. The previous RC's indefinite question flow retains its existing event path.
+新版问答通过固定 `userQuestions/attachWait` stream 认领前台倒计时，通过 `$events/result` 回传窗口内回答或 `ASK_TIMED_OUT`；超时后仅根据官方 `userQuestions` projection 恢复可补答问题，补答走 `userQuestions/answer`，断线不重放输入。上一版 RC 的无限期问答保持原事件路径。
 
-Optional Claude Code Mods expose only `claudeCodeMods/watchBand` / `pressBand`. Remote status SSE uses document-relative URLs like the official RPC carrier, preserving a reverse proxy path prefix. The proxy must still strip that prefix and configure trusted authority as documented by Harness.
+可选 Claude Code Mods 的展示和按钮仅允许 `claudeCodeMods/watchBand` / `pressBand`，不开放动态端点。带路径前缀的 Web 部署中，Remote 状态 SSE 与官方 RPC 都使用文档相对地址；代理仍需按 Harness 文档剥离前缀并配置可信 authority。
 
-Each authenticated Remote connection owns an official RC.1 owner Peer. RPCs, event replies, streams and plugin Fetch routes share that Peer, which is disposed on disconnect; one Peer cannot answer another Peer's event stream. The fixed Remote allowlist remains authoritative and now includes read-only `remoteAccess/follow`.
+RC.1 Gateway 的每条已认证 Remote 连接使用独立的官方 owner Peer；RPC、事件回复、流和插件 Fetch 路由绑定同一 Peer，断线释放，不能借用另一连接的事件流回答审批。现有固定 allowlist 仍先于 Gateway 生效，新增只读 `remoteAccess/follow`。
 
-The native RC.1 `terminal/attach` duplex stream is translated locally to the existing Remote `follow/write/resize` subset, then back to the official Host attach stream. Android and older clients keep their current protocol. Input is bounded and acknowledged only after the Host ack, preserving device ownership, connection input rights and no replay after disconnect. Older Host and CodeX/ACP terminal environments supply the RC.1 input buffer limit. `session/projections` supports the new result discriminator; CodeX/ACP projections read only their own memory/history.
+RC.1 原生终端的 `terminal/attach` 双向流在本地转换为既有 Remote `follow/write/resize` 子集，Host 再对接官方 attach；Android 和旧客户端继续使用既有协议。输入有界排队，收到 Host ack 后才确认，保留设备归属、连接输入权和断线不重放。旧 Host 与 CodeX/ACP 终端为 RC.1 客户端补充输入缓冲上限。`session/projections` 支持新版结果类型标记；CodeX/ACP 的投影仅从各自的内存/历史读取。
 
-Validation covers the actual RC.1 npm Gateway/Peer implementation, core terminal state transitions, workspace type checks, automated tests, production builds (including Android Hermes export) and DSH bundle verification. Desktop UI, Android APK/device, independent Remote Web and encrypted cross-device E2E acceptance remain pending.
+验证覆盖 RC.1 npm 实现的真实 Gateway/Peer 隔离、核心终端状态转换、全仓类型检查、自动化测试、生产构建（含 Android Hermes 导出）与 DSH bundle 校验。Desktop UI、Android APK/原生真机、独立 Remote Web 和加密跨设备 E2E 尚待验收。
 
-2026-10-17 boot compatibility fix: the RC.1 theme reads new font fields directly. A valid `ui-theme` section from a `0.2.0-rc.2` Host lacks those fields, causing `undefined.split` during theme initialization and blocking dependent modules. Remote fills absent display defaults in settings reads and successful write responses, preserving Host schemas, revisions, persistence and write authorization. The older Host may still reject unsupported new font settings. The installed official RC.1 theme bundle reproduced the failure and passed initialization with the corrected view, including validation against the old schema and response preservation checks. Plugin check/build, 20 related Gateway tests and bundle verification passed; actual cross-device boot recovery remains unverified.
+2026-10-17 启动兼容补充：RC.1 主题模块会直接读取新增字体字段，旧 `0.2.0-rc.2` Host 的合法 `ui-theme` 配置缺少这些字段时，会在主题初始化抛出 `undefined.split` 并阻塞依赖模块。Remote 在设置读取及成功写入的返回视图中补齐缺失显示默认值，不修改 Host schema、revision、持久化配置或写入授权。旧 Host 不支持的新字体设置仍可能被其拒绝。已用本机安装的官方 RC.1 主题 bundle 复现异常并验证修复后的初始化、旧 schema 校验与返回结果保真；Plugin check/build、相关 20 个 Gateway 测试和 bundle 校验通过，真实跨设备启动恢复尚未验收。
 
-## Historical implementation (not current maintenance targets)
+## 历史实现记录（不代表当前维护承诺）
 
-**Breaking change notice:** Plugin `0.4.1` removes the earlier experimental
-Remote business RPC surface (`sessions.*`, `session.*`, `permissions.respond`,
-`sync.from`). In that release, Harness session traffic used the official rc.2
-`ApiProxy` or the v0.1.2 Typert Remote Gateway, and this plugin does not provide
-an adapter or wire-format translation for the old RPC surface.
+**破坏性更新声明：** Plugin `0.4.1` 已移除早期实验性的 Remote 业务 RPC
+（`sessions.*`、`session.*`、`permissions.respond`、`sync.from`）。Harness
+该版本的会话流量通过官方 rc.2 `ApiProxy` 或 v0.1.2 Typert Remote Gateway 承载；
+本插件不提供旧 RPC 的适配层或 wire format 翻译。
 
-Plugin `0.5.0` targets DeepSeek Harness `dsh-v0.2.0-rc.2` and retains compatibility with `dsh-v0.1.7-rc.1`, while also supporting `dsh-v0.1.6-alpha.2` and earlier settings hosts. It supports `dsh-v0.1.1-rc.2` through the legacy
-official `ApiProxy`, and `dsh-v0.1.2-alpha.1`–`rc.1` through the
-official Typert Remote Gateway. It also supports
-`dsh-v0.1.5-rc.1`, `dsh-v0.1.6-alpha.1`, and `dsh-v0.2.0-rc.2` Session V3 through the official Typert Remote
-Gateway; a `0.1.6` Host reports patch `6` and therefore selects the same Session V3
-profile with no wire-format adapter. A `0.4.13` Client running rc.2 remains compatible
-with older rc.2 Hosts through the legacy capability fallback. `0.5.0` also reads the
-running Harness version from the 0.2.0 Desktop shell's `@deepseek-ai/dsh-desktop-host`
-entrypoint as well as from the CLI entrypoint, so Hosts started by the current Desktop app
-keep reporting `harnessVersion` and the version-gated workspace compatibility paths
-(legacy `workspaceFiles/changes`, byte-range reads) stay active.
+Plugin `0.5.0` 主要用于兼容 DeepSeek Harness `dsh-v0.2.0-rc.2`，同时保留 `dsh-v0.1.7-rc.1`，并保留
+`dsh-v0.1.6-alpha.2` 及更早版本的 settings 兼容路径；它也兼容 `dsh-v0.1.1-rc.2` 与
+`dsh-v0.1.2-alpha.1`–`rc.1`：rc.2 继续使用官方 legacy `ApiProxy`，v0.1.2 使用官方
+Typert Remote Gateway；另外支持 `dsh-v0.1.5-rc.1`、`dsh-v0.1.6-alpha.1` 与 `dsh-v0.2.0-rc.2` 的 Session V3
+官方 Typert Remote Gateway——`0.1.6` 上报的 patch 为 `6`，会选中同一个 Session V3
+profile，不需要额外的 wire format 适配层。运行 rc.2 的 `0.4.13` Client 仍可通过
+legacy capability 降级连接旧 rc.2 Host。`0.5.0` 还会同时从 CLI 入口与 0.2.0 Desktop
+外壳的 `@deepseek-ai/dsh-desktop-host` 入口读取 Harness 版本，使当前 Desktop 启动的 Host
+继续上报 `harnessVersion`，按版本生效的 Workspace 兼容路径（legacy `workspaceFiles/changes`、
+字节范围读取）不会失效。
 
-Remote Web/Desktop and the Android app also normalize released sessions that
-still report the retired `code` agent preset to `ptc`, so old sessions can
-resume on `dsh-v0.1.5-rc.1` or `dsh-v0.1.6-alpha.1` without changing DeepSeek Harness itself.
+Remote Web/Desktop 和 Android App 还会把已发布旧会话中仍然上报的已退役 `code`
+agent preset 归一为 `ptc`，因此旧会话可以在 `dsh-v0.1.5-rc.1` 或 `dsh-v0.1.6-alpha.1`
+上恢复，而无需修改 DeepSeek Harness 本身。
 
-Desktop endpoints must use a compatible Harness carrier. Plugin `0.5.0` selects the legacy
-ApiProxy path for rc.2 Hosts when that Host exposes it, and Session V3 Desktop clients can open
-legacy v0.1.2 Typert Remote Hosts through Remote-side history and event normalization. Legacy
-Typert clients still reject Session V3 Hosts before switching the native UI or mutating a Workspace.
+Desktop 两端必须使用兼容的 Harness carrier。`0.5.0` 会在 Host 暴露 rc.2 ApiProxy 时
+选择 legacy ApiProxy 路径，Session V3 Desktop Client 也可以通过 Remote 侧的历史与事件归一化
+打开 legacy v0.1.2 Typert Remote Host。legacy Typert Client 仍会在切换原生 UI 或修改 Workspace
+前拒绝 Session V3 Host。
 
-In `0.5.0`, `workspaceTypes` remains an optional addition to the authenticated transport description. Harness and CodeX clients that do not consume this field keep using the existing capabilities. When a Host supplies it, Desktop and Android require a matching negotiated capability and an available type before entering that workspace; declarations cannot enable an unnegotiated API. ACP uses independent Cursor/AGY capabilities and workspace IDs, with no migration of unpublished ACP configurations or workspace identifiers.
+`0.5.0` 的 `workspaceTypes` 仍是加密能力描述中的可选加法字段。未读取该字段的 Harness、CodeX 客户端继续使用既有 capabilities。Host 提供类型列表时，Desktop 与 Android 进入工作区前同时校验对应能力已协商且类型就绪，类型声明不能开启未经协商的 API。ACP 使用独立的 Cursor/AGY capability 和工作区 ID，不迁移未发布使用过的 ACP 配置或工作区标识。

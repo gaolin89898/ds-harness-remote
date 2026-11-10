@@ -1,17 +1,19 @@
-// Enhanced LoginPanel with modern authentication aesthetic, prefix icons, and security badges.
-import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd'
+// Login page laid out like the design: brand panel on the left, account form on
+// the right, single dark appearance (no theme switch).
 import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  DesktopOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   GithubOutlined,
   GlobalOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
   ThunderboltOutlined,
-  UserOutlined,
 } from '@ant-design/icons'
 import { useState } from 'react'
 import { api, type Account } from './api'
-import { ThemeToggle } from './ThemeToggle'
-import { SiteFooter } from './SiteFooter'
 
 export function LoginPanel({
   onAuthSuccess,
@@ -24,17 +26,21 @@ export function LoginPanel({
 }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(initialError ?? '')
-  const [form] = Form.useForm<{ email: string; password: string }>()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [keepSignedIn, setKeepSignedIn] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
 
-  async function submit(values: { email: string; password: string }) {
+  async function submit(event: React.FormEvent) {
+    event.preventDefault()
     setLoading(true)
     setError('')
     try {
       const result = await api<Account>('/auth/login', {
-        email: values.email.trim(),
-        password: values.password,
+        email: email.trim(),
+        password,
       })
-      form.resetFields(['password'])
+      setPassword('')
       onAuthSuccess(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : '登录失败，请重试。')
@@ -44,128 +50,158 @@ export function LoginPanel({
   }
 
   return (
-    <>
-      <main className={`auth-page ${embedded ? 'is-embedded' : ''}`}>
-        <div className="auth-ambient-glow" />
-
-        <div className="auth-language-menu">
-          {!embedded && (
-            <a
-              className="auth-github-link"
-              href="https://github.com/liguobao/ds-harness-remote"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <GithubOutlined /> GitHub
+    <main className={`dx-auth${embedded ? ' is-embedded' : ''}`}>
+      {!embedded && (
+        <aside className="dx-auth-brand">
+          <div className="dx-brand-row">
+            <a className="dx-brand-lockup" href="/" aria-label="DSH Remote 首页">
+              <img src="/brand-whale.webp" alt="" width="26" height="19" />
+              <span>DSH Remote</span>
             </a>
-          )}
-          <ThemeToggle className="auth-theme-toggle" />
-        </div>
-
-        <section className="auth-content">
-          <div className="auth-logo-stack">
-            <a className="auth-home-link" href="/" aria-label="返回首页">
-              <div className="auth-brand-wrapper">
-                <img className="auth-brand-icon" src="/brand-whale.webp" alt="" width="56" height="56" />
-              </div>
-              <Typography.Title level={2} className="auth-app-title">
-                DeepSeek Harness Remote
-              </Typography.Title>
-              <Typography.Paragraph className="auth-app-subtitle" type="secondary">
-                自建安全端到端加密远程访问与控制平台
-              </Typography.Paragraph>
-            </a>
+            <span className="dx-self-badge"><i />SELF-HOSTED</span>
           </div>
 
-          <Card className="auth-panel" bordered={false}>
-            <div className="auth-intro">
-              <Typography.Title level={3} className="auth-title">账号登录</Typography.Title>
-              <Typography.Paragraph type="secondary" className="auth-desc">
-                请输入您的服务管理账号与凭据
-              </Typography.Paragraph>
+          <div className="dx-brand-message">
+            <span className="dx-eyebrow">Welcome back</span>
+            <h1>回到你的<em>工作现场。</em></h1>
+            <p>用同一个账号登录所有客户端，接上那台一直在运行的 Harness。工作区留在原处，只把会话接过来。</p>
+
+            <div className="dx-session">
+              <div className="dx-session-head">
+                <span>Secure session</span>
+                <span className="dx-session-live"><i />ACTIVE</span>
+              </div>
+              <div className="dx-session-row">
+                <DesktopOutlined />
+                <span className="dx-session-copy">
+                  <strong>MacBook Pro</strong>
+                  <small>macOS · Host · 3 workspaces</small>
+                </span>
+                <span className="dx-session-pill">online</span>
+              </div>
+              <div className="dx-session-row">
+                <GlobalOutlined />
+                <span className="dx-session-copy">
+                  <strong>iPhone 15 Pro</strong>
+                  <small>Remote · 已连接 2 分钟</small>
+                </span>
+                <ArrowRightOutlined style={{ color: '#7a818e' }} />
+              </div>
             </div>
 
-            {error && (
-              <Alert
-                className="selfhost-auth-error"
-                type="error"
-                showIcon
-                closable
-                message={error}
-                onClose={() => setError('')}
+            <ul className="dx-features">
+              <li><SafetyCertificateOutlined />端到端加密</li>
+              <li><ThunderboltOutlined />P2P 直连</li>
+              <li><GlobalOutlined />多端同步</li>
+            </ul>
+          </div>
+
+          <div className="dx-brand-foot">
+            <span>DSH REMOTE · SELF-HOSTED</span>
+            <span><i />ALL SYSTEMS NORMAL</span>
+          </div>
+        </aside>
+      )}
+
+      <section className="dx-auth-form">
+        {!embedded && (
+          <div className="dx-form-top">
+            <a href="/"><ArrowLeftOutlined />返回首页</a>
+            <div className="dx-form-top-actions">
+              <a href="https://github.com/gaolin89898/ds-harness-remote" target="_blank" rel="noreferrer">
+                <GithubOutlined />GitHub
+              </a>
+            </div>
+          </div>
+        )}
+
+        <div className="dx-form-wrap">
+          <span className="dx-eyebrow">Account access</span>
+          <h2>账号登录</h2>
+          <p>登录到你的 Remote 实例，管理已授权的 Host 与设备。</p>
+
+          {error && <div className="dx-auth-error" role="alert">{error}</div>}
+
+          <form onSubmit={submit} className="dx-form-fields">
+            <div className="dx-field">
+              <label htmlFor="dx-account">账号 / 邮箱</label>
+              <input
+                id="dx-account"
+                className="dx-input"
+                value={email}
+                autoComplete="username"
+                placeholder="请输入账号 / 邮箱"
+                onChange={event => setEmail(event.target.value)}
               />
-            )}
-
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={submit}
-              requiredMark={false}
-              className="auth-form"
-            >
-              <Form.Item
-                name="email"
-                label="账号 / 邮箱"
-                rules={[
-                  { required: true, whitespace: true, message: '请输入账号' },
-                  { max: 254, message: '账号不能超过 254 个字符' },
-                ]}
-              >
-                <Input
-                  size="large"
-                  prefix={<UserOutlined className="auth-input-icon" />}
-                  placeholder="请输入账号 / 邮箱"
-                  autoComplete="username"
-                  className="auth-input"
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                label="密码"
-                rules={[
-                  { required: true, message: '请输入密码' },
-                  { max: 1024, message: '密码不能超过 1024 个字符' },
-                ]}
-              >
-                <Input.Password
-                  size="large"
-                  prefix={<LockOutlined className="auth-input-icon" />}
-                  placeholder="请输入密码"
-                  autoComplete="current-password"
-                  className="auth-input"
-                />
-              </Form.Item>
-
-              <Form.Item className="auth-submit-item">
-                <Button
-                  loading={loading}
-                  block
-                  type="primary"
-                  size="large"
-                  htmlType="submit"
-                  className="auth-submit-btn"
-                >
-                  {loading ? '正在登录…' : '立即登录'}
-                </Button>
-              </Form.Item>
-            </Form>
-
-            <div className="auth-features-row">
-              <span className="auth-feature-chip">
-                <SafetyCertificateOutlined /> 端到端加密
-              </span>
-              <span className="auth-feature-chip">
-                <ThunderboltOutlined /> P2P 直连
-              </span>
-              <span className="auth-feature-chip">
-                <GlobalOutlined /> 多端同步
-              </span>
             </div>
-          </Card>
-        </section>
-      </main>
-      {!embedded && <SiteFooter />}
-    </>
+
+            <div className="dx-field">
+              <div className="dx-field-head">
+                <label htmlFor="dx-password">密码</label>
+                <small>ENCRYPTED</small>
+              </div>
+              <div className="dx-input-wrap">
+                <input
+                  id="dx-password"
+                  className="dx-input"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  autoComplete="current-password"
+                  placeholder="请输入密码"
+                  onChange={event => setPassword(event.target.value)}
+                />
+                <button
+                  type="button"
+                  className="dx-eye"
+                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                  title={showPassword ? '隐藏密码' : '显示密码'}
+                  onClick={() => setShowPassword(value => !value)}
+                >
+                  {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                </button>
+              </div>
+            </div>
+
+            <div className="dx-field-head">
+              <label className="dx-check">
+                <input
+                  type="checkbox"
+                  checked={keepSignedIn}
+                  onChange={event => setKeepSignedIn(event.target.checked)}
+                />
+                保持登录状态
+              </label>
+              <small>30 DAYS</small>
+            </div>
+
+            <button className="dx-submit" type="submit" disabled={loading}>
+              <LockOutlined />
+              {loading ? '正在登录…' : '登录'}
+              <ArrowRightOutlined />
+            </button>
+          </form>
+
+          <p className="dx-note">
+            <SafetyCertificateOutlined />
+            此页面由你的自建服务提供，凭据不会发送给第三方。
+          </p>
+
+          <p className="dx-alt-action">
+            还没有账号？<a href="https://github.com/gaolin89898/ds-harness-remote#readme" target="_blank" rel="noreferrer">查看自建指南<ArrowRightOutlined /></a>
+          </p>
+        </div>
+
+        {!embedded && (
+          <div className="dx-form-foot">
+            <span>© 2025 DSH REMOTE · SELF-HOSTED</span>
+            <nav>
+              <a href="https://github.com/gaolin89898/ds-harness-remote/blob/main/docs" target="_blank" rel="noreferrer">文档</a>
+              <a href="https://github.com/gaolin89898/ds-harness-remote" target="_blank" rel="noreferrer">GitHub</a>
+              <a href="https://github.com/gaolin89898/ds-harness-remote/issues" target="_blank" rel="noreferrer">问题反馈</a>
+            </nav>
+          </div>
+        )}
+      </section>
+    </main>
   )
 }
