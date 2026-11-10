@@ -99172,6 +99172,8 @@ var HARNESS_REMOTE_ALLOWLIST = [
   "agentPresets/select",
   "commands/execute",
   "commands/list",
+  "cotTranslation/limits",
+  "cotTranslation/translate",
   "credentials/describe",
   "credentials/set",
   "credentials/unset",

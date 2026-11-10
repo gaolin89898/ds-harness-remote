@@ -11,6 +11,29 @@ import type { LocalTypertGateway } from '../src/typert-gateway-contract.js'
 import { MAX_SECURE_MESSAGE_BYTES } from '@dsh-remote/protocol'
 
 describe('HarnessRemoteBridge', () => {
+  it('forwards reasoning translation startup metadata and preserves native translation outcomes', async () => {
+    const limits = {
+      maxTextChars: 5000,
+      preferences: { provider: 'bing', targetLanguage: 'auto' },
+      availableProviders: ['bing'],
+    }
+    const unavailable = { ok: false as const, error: { code: 'translation/unavailable', message: 'Provider unavailable.', details: {} } }
+    const dispatch = vi.fn(async (endpoint: string) => endpoint === 'cotTranslation/limits'
+      ? { ok: true as const, value: limits }
+      : unavailable)
+    const bridge = new HarnessRemoteBridge(gateway({ dispatch }), vi.fn())
+    await expect(bridge.call({ endpoint: 'cotTranslation/limits', payload: { args: {} } }))
+      .resolves.toEqual({ ok: true, value: limits })
+    const args = { request: { sessionId: 's1', text: 'Reasoning', targetLanguage: 'zh', provider: 'bing' } }
+    await expect(bridge.call({ endpoint: 'cotTranslation/translate', payload: { args } })).resolves.toEqual(unavailable)
+    expect(dispatch).toHaveBeenLastCalledWith('cotTranslation/translate', { args }, expect.any(AbortSignal))
+    const calls = dispatch.mock.calls.length
+    for (const endpoint of ['cotTranslation/configure', 'cotTranslation/setProvider', 'translator/translate']) {
+      await expect(bridge.call({ endpoint, payload: { args: {} } })).rejects.toMatchObject({ code: 'METHOD_NOT_ALLOWED' })
+    }
+    expect(dispatch).toHaveBeenCalledTimes(calls)
+  })
+
   it('forwards official plugin configuration and enablement with native outcomes', async () => {
     await runScenarios([
       { endpoint: 'pluginManager/listPlugins', args: {} },
