@@ -162,7 +162,7 @@ export function clientAddress(req: IncomingMessage, trustedProxyIps: ReadonlySet
   return forwarded
 }
 export function createRemoteServer(config: Config) {
-  if (!config.account.trim() || config.password.length < 12) throw new Error('DSH_SERVER_ACCOUNT and DSH_SERVER_PASSWORD (at least 12 characters) are required.')
+  if (!config.account.trim() || config.password.length === 0) throw new Error('DSH_SERVER_ACCOUNT and DSH_SERVER_PASSWORD are required.')
   const url = new URL(config.publicUrl)
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) throw new Error('DSH_SERVER_PUBLIC_URL must be an HTTP(S) origin.')
   const trustedProxyIps = normalizeTrustedProxyIps(config.trustedProxyIps)
