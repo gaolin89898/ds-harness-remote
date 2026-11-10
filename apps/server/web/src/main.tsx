@@ -43,7 +43,7 @@ function App() {
       setAccount(null)
     })
   }, [])
-  // These Ant Design tokens are retained from the upstream App.tsx ConfigProvider.
+
   useEffect(() => {
     if (justLoggedIn.current) { justLoggedIn.current = false; return }
     if (account === null && path === '/app/remote') go('/app/login')
@@ -59,9 +59,37 @@ function App() {
   return <ConfigProvider locale={zhCN} theme={{
     algorithm: dark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
     token: {
-      colorPrimary: '#1677ff', colorInfo: '#1677ff', colorSuccess: dark ? '#49aa68' : '#16a34a', colorWarning: dark ? '#d89614' : '#d97706', colorError: dark ? '#ff7875' : '#cf222e',
-      colorBgLayout: dark ? '#111318' : '#f5f5f7', colorBgContainer: dark ? '#181b22' : '#ffffff', colorBgElevated: dark ? '#20242c' : '#ffffff', colorText: dark ? '#f2f3f5' : '#1d1d1f', colorTextSecondary: dark ? '#b7bcc7' : '#6e6e73', colorTextPlaceholder: dark ? '#8d94a3' : '#6e6e73', colorBorder: dark ? '#3a404c' : '#d9e2ec', colorBorderSecondary: dark ? '#2d323c' : '#e8e8ed', borderRadius: 6, borderRadiusLG: 8, controlHeight: 40, fontSize: 15, wireframe: false,
-    }, components: { Button: { primaryShadow: 'none' }, Table: { headerBg: dark ? '#20242c' : '#f7f7f8', headerColor: dark ? '#c8cdd6' : '#4b5563' } },
+      colorPrimary: dark ? '#3b82f6' : '#1677ff',
+      colorInfo: dark ? '#3b82f6' : '#1677ff',
+      colorSuccess: dark ? '#10b981' : '#059669',
+      colorWarning: dark ? '#f59e0b' : '#d97706',
+      colorError: dark ? '#f87171' : '#dc2626',
+      colorBgLayout: dark ? '#0c0e12' : '#f8fafc',
+      colorBgContainer: dark ? '#151820' : '#ffffff',
+      colorBgElevated: dark ? '#1c202a' : '#ffffff',
+      colorText: dark ? '#f1f5f9' : '#0f172a',
+      colorTextSecondary: dark ? '#94a3b8' : '#64748b',
+      colorTextPlaceholder: dark ? '#64748b' : '#94a3b8',
+      colorBorder: dark ? '#262c38' : '#e2e8f0',
+      colorBorderSecondary: dark ? '#1e232e' : '#f1f5f9',
+      borderRadius: 8,
+      borderRadiusLG: 12,
+      controlHeight: 40,
+      fontSize: 14,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      wireframe: false,
+    },
+    components: {
+      Button: { primaryShadow: '0 4px 12px rgba(22, 119, 255, 0.25)' },
+      Table: {
+        headerBg: dark ? '#1a1e28' : '#f8fafc',
+        headerColor: dark ? '#94a3b8' : '#475569',
+        rowHoverBg: dark ? '#1f2430' : '#f1f5f9',
+      },
+      Card: {
+        headerBg: 'transparent',
+      },
+    },
   }}><Layout className={`${account && (path === '/app/remote' || embedded) ? 'app-shell product-shell' : 'app-shell auth-shell'}${embedded ? ' embedded-shell' : ''}`}>
     {content}
   </Layout></ConfigProvider>
