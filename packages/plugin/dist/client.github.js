@@ -1631,53 +1631,8 @@ Minimum version required to store current data is: ` + bestVersion + `.
     }
   }
 
-  // packages/plugin/src/client/devices-panel.ts
-  var DEVICES_PANEL_ID = "ds-harness-remote-devices";
-  function createDevicesPanel(React) {
-    function DevicesIcon() {
-      return React.createElement(
-        "svg",
-        { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, "aria-hidden": !0 },
-        React.createElement("rect", { x: 2, y: 3, width: 15, height: 12, rx: 2 }),
-        React.createElement("path", { d: "M6 21h7M9.5 15v6" }),
-        React.createElement("rect", { x: 17, y: 9, width: 5, height: 12, rx: 1.3 })
-      );
-    }
-    function DevicesPanel(props) {
-      let [status, setStatus] = React.useState(void 0), [failed, setFailed] = React.useState(!1);
-      React.useEffect(() => {
-        let active = !0, dispose = props.statusFeed.subscribe((next) => {
-          active && (setStatus(next), setFailed(!1));
-        });
-        return props.control("status").then((next) => {
-          active && setStatus(next);
-        }).catch(() => {
-          active && setFailed(!0);
-        }), () => {
-          active = !1, dispose();
-        };
-      }, [props.control, props.statusFeed]);
-      let source;
-      if (status?.serverUrl)
-        try {
-          let url = new URL(status.serverUrl);
-          ["http:", "https:"].includes(url.protocol) && !url.username && !url.password && (source = new URL("/app/embedded/devices", url).href);
-        } catch {
-        }
-      return React.createElement(
-        "section",
-        { className: "dshRemoteDevicesPanel", "aria-label": props.t("myDevices") },
-        source ? React.createElement("iframe", { key: source, src: source, title: props.t("myDevices"), sandbox: "allow-scripts allow-forms allow-same-origin", referrerPolicy: "no-referrer" }) : React.createElement("p", { role: failed ? "alert" : "status" }, props.t(failed ? "devicesPanelUnavailable" : status ? "devicesPanelConfigure" : "loadingSettings"))
-      );
-    }
-    return { DevicesIcon, DevicesPanel };
-  }
-
   // packages/plugin/src/client-locale.ts
   var localeNamespace = "ds-harness-remote", en = {
-    myDevices: "My devices",
-    devicesPanelConfigure: "Save a Server URL in the Remote plugin settings to view your devices.",
-    devicesPanelUnavailable: "Could not load Remote settings. Check that the plugin is running and reopen this page.",
     serverSavedLive: "Server address saved and applied.",
     saveServerBeforeLogin: "Save the Server address before continuing sign-in or pairing.",
     pairingLoginTab: "DSH Go pairing",
@@ -2026,9 +1981,6 @@ If a code was sent, recover the original submission without changing it.`,
     hermesVirtualWorkspace: "Hermes virtual workspace",
     codexVirtualSessions: "Sessions"
   }, zh = {
-    myDevices: "\u6211\u7684\u8BBE\u5907",
-    devicesPanelConfigure: "\u8BF7\u5148\u5728 Remote \u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u4FDD\u5B58\u670D\u52A1\u5730\u5740\u3002",
-    devicesPanelUnavailable: "\u65E0\u6CD5\u52A0\u8F7D Remote \u8BBE\u7F6E\uFF0C\u8BF7\u68C0\u67E5\u63D2\u4EF6\u662F\u5426\u8FD0\u884C\u540E\u91CD\u65B0\u6253\u5F00\u6B64\u9875\u9762\u3002",
     serverSavedLive: "\u670D\u52A1\u5668\u5730\u5740\u5DF2\u4FDD\u5B58\u5E76\u751F\u6548\u3002",
     saveServerBeforeLogin: "\u8BF7\u5148\u4FDD\u5B58\u670D\u52A1\u5668\u5730\u5740\uFF0C\u518D\u7EE7\u7EED\u767B\u5F55\u6216\u914D\u5BF9\u3002",
     pairingLoginTab: "DSH Go \u626B\u7801",
@@ -3862,7 +3814,6 @@ If a code was sent, recover the original submission without changing it.`,
   function installStyle(clientModuleId2) {
     let style = document.createElement("style");
     return style.dataset.plugin = clientModuleId2, style.dataset.pluginCss = "dsh-remote", style.textContent = [
-      ".dshRemoteDevicesPanel{display:flex;flex:1 1 auto;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}.dshRemoteDevicesPanel>iframe{flex:1 1 auto;width:100%;height:100%;border:0;background:var(--dsw-alias-bg-base)}.dshRemoteDevicesPanel>p{margin:auto;padding:24px;color:var(--dsw-alias-label-secondary);text-align:center}",
       ".dshRemoteConnectedPanelHeader{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;margin-bottom:6px}.dshRemoteConnectedPanelHeader .dshRemoteConnectedPanelTitle{margin-bottom:0}",
       ".dshRemoteHostNameLine{display:flex;align-items:center;flex-wrap:wrap;gap:8px}",
       ".dshRemoteServerNotice{font-size:12px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}.dshRemoteServerNotice.isWarning{color:var(--dsw-alias-state-warning-primary,#946200)}.dshRemoteServerNotice.isError{color:var(--dsw-alias-state-error-primary)}.dshRemoteServerNotice.isRestored{color:var(--dsw-alias-state-success-primary)}",
@@ -5871,7 +5822,7 @@ If a code was sent, recover the original submission without changing it.`,
           }
         }, label);
       }
-      let RemoteWorkspaceAction = createRemoteWorkspaceAction(React, portal), { DevicesIcon, DevicesPanel } = createDevicesPanel(React), RemoteProgressView = createRemoteProgressView(React), RemoteSessionHeaderAction = createRemoteSessionHeaderAction(React, portal), openHarnessSettings;
+      let RemoteWorkspaceAction = createRemoteWorkspaceAction(React, portal), RemoteProgressView = createRemoteProgressView(React), RemoteSessionHeaderAction = createRemoteSessionHeaderAction(React, portal), openHarnessSettings;
       function RemoteSettingsLauncher(props) {
         return openHarnessSettings = props.openSettings, null;
       }
@@ -6188,18 +6139,7 @@ If a code was sent, recover the original submission without changing it.`,
               document.removeEventListener("click", stopHostFileOpen, !0), unregister();
             };
           }, "ds-harness-remote: host mention source");
-        }), ctx.effect(() => ctx.locale.register(localeNamespace, { zh, en }), "ds-harness-remote: dictionaries"), ctx.effect(() => installStyle(clientModuleId), "ds-harness-remote: client styles"), ctx.effect(() => installTerminalAvailabilityNotice(statusFeed, t), "ds-harness-remote: terminal availability notice"), ctx.slots.inject("main", () => ctx.slots.register({
-          name: "main",
-          key: DEVICES_PANEL_ID,
-          locale: localeNamespace,
-          inject: () => ({ control, statusFeed })
-        }, DevicesPanel)), ctx.slots.inject("sidebar.panellist", () => ctx.slots.register({
-          name: "sidebar.panellist",
-          id: DEVICES_PANEL_ID,
-          order: 80,
-          label: () => t("myDevices"),
-          locale: localeNamespace
-        }, DevicesIcon)), ctx.slots.inject("shell.overlay", () => ctx.slots.register({
+        }), ctx.effect(() => ctx.locale.register(localeNamespace, { zh, en }), "ds-harness-remote: dictionaries"), ctx.effect(() => installStyle(clientModuleId), "ds-harness-remote: client styles"), ctx.effect(() => installTerminalAvailabilityNotice(statusFeed, t), "ds-harness-remote: terminal availability notice"), ctx.slots.inject("shell.overlay", () => ctx.slots.register({
           name: "shell.overlay",
           id: "ds-harness-remote-global-context",
           order: 20,

@@ -7,7 +7,6 @@ export function installStyle(clientModuleId: string): () => void {
   style.dataset.plugin = clientModuleId
   style.dataset.pluginCss = 'dsh-remote'
   style.textContent = [
-    '.dshRemoteDevicesPanel{display:flex;flex:1 1 auto;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}.dshRemoteDevicesPanel>iframe{flex:1 1 auto;width:100%;height:100%;border:0;background:var(--dsw-alias-bg-base)}.dshRemoteDevicesPanel>p{margin:auto;padding:24px;color:var(--dsw-alias-label-secondary);text-align:center}',
     '.dshRemoteConnectedPanelHeader{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;margin-bottom:6px}.dshRemoteConnectedPanelHeader .dshRemoteConnectedPanelTitle{margin-bottom:0}',
     '.dshRemoteHostNameLine{display:flex;align-items:center;flex-wrap:wrap;gap:8px}',
     '.dshRemoteServerNotice{font-size:12px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}.dshRemoteServerNotice.isWarning{color:var(--dsw-alias-state-warning-primary,#946200)}.dshRemoteServerNotice.isError{color:var(--dsw-alias-state-error-primary)}.dshRemoteServerNotice.isRestored{color:var(--dsw-alias-state-success-primary)}',

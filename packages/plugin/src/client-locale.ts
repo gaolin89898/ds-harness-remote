@@ -2,9 +2,6 @@
 export const localeNamespace = 'ds-harness-remote'
 
 export const en = {
-  myDevices: 'My devices',
-  devicesPanelConfigure: 'Save a Server URL in the Remote plugin settings to view your devices.',
-  devicesPanelUnavailable: 'Could not load Remote settings. Check that the plugin is running and reopen this page.',
   serverSavedLive: 'Server address saved and applied.',
   saveServerBeforeLogin: 'Save the Server address before continuing sign-in or pairing.',
   pairingLoginTab: 'DSH Go pairing',
@@ -355,9 +352,6 @@ export const en = {
 } as const
 
 export const zh: Record<keyof typeof en, string> = {
-  myDevices: '我的设备',
-  devicesPanelConfigure: '请先在 Remote 插件设置中保存服务地址。',
-  devicesPanelUnavailable: '无法加载 Remote 设置，请检查插件是否运行后重新打开此页面。',
   serverSavedLive: '服务器地址已保存并生效。',
   saveServerBeforeLogin: '请先保存服务器地址，再继续登录或配对。',
   pairingLoginTab: 'DSH Go 扫码',
