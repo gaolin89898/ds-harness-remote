@@ -4,7 +4,7 @@ import { fromBase64Url, toBase64Url } from '@dsh-remote/crypto'
 import { deviceTokenPairSchema, type DeviceTokenPair as TokenPair } from '@dsh-remote/protocol'
 import type { RtcIceServer } from '@dsh-remote/webrtc'
 import type { HostIdentity } from './identity-store.js'
-import { ServerCredentialsBusyError, type ServerCredentialStore, type ServerCredentials } from './server-credentials.js'
+import { ServerCredentialsBusyError, ServerCredentialsLockUnsupportedError, type ServerCredentialStore, type ServerCredentials } from './server-credentials.js'
 import { normalizeServerUrl } from './config.js'
 import { PLUGIN_VERSION } from './version.js'
 
@@ -82,8 +82,9 @@ export class HostServerApi {
     private readonly store: ServerCredentialStore,
     private readonly fetchImplementation: FetchImplementation = fetch,
     private readonly role: 'host' | 'client' = 'host',
+    httpServerAllowlist: readonly string[] = [],
   ) {
-    this.baseUrl = normalizeServerUrl(serverUrl)
+    this.baseUrl = normalizeServerUrl(serverUrl, httpServerAllowlist)
   }
 
   bindIdentity(identity: HostIdentity): void { this.identity = identity }
@@ -388,6 +389,9 @@ export class HostServerApi {
       return await this.store.withRefreshLock(operation)
     } catch (error) {
       if (error instanceof ServerCredentialsBusyError) {
+        throw new ServerApiError(error.code, error.message, true)
+      }
+      if (error instanceof ServerCredentialsLockUnsupportedError) {
         throw new ServerApiError(error.code, error.message, false)
       }
       throw error
@@ -651,8 +655,8 @@ function normalizeOAuthScanUrl(value: unknown, baseUrl: string): string | undefi
 }
 
 export class ClientServerApi extends HostServerApi {
-  constructor(serverUrl: string, store: ServerCredentialStore, fetchImplementation: FetchImplementation = fetch) {
-    super(serverUrl, store, fetchImplementation, 'client')
+  constructor(serverUrl: string, store: ServerCredentialStore, fetchImplementation: FetchImplementation = fetch, httpServerAllowlist: readonly string[] = []) {
+    super(serverUrl, store, fetchImplementation, 'client', httpServerAllowlist)
   }
 }
 

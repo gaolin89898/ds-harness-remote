@@ -1578,6 +1578,7 @@ describe('ClientModeRuntime Host account control', () => {
 function config(): ResolvedConfig {
   return {
     terminal: { enabled: false },
+    httpServerAllowlist: [],
     sidebar: { entry: 'standard' },
     loopback: { ports: [] },
     enabled: true,

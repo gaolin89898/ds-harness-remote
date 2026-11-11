@@ -694,7 +694,7 @@ describe('HostServerConnection', () => {
   })
 
   it('recovers retryable refresh failures without spending the handshake retry', async () => {
-    const rows = ['RATE_LIMITED', 'CONNECTION_FAILED'] as const
+    const rows = ['RATE_LIMITED', 'CONNECTION_FAILED', 'SERVER_CREDENTIALS_BUSY'] as const
     await runScenarios(
       rows.map((row, index) => {
         const code = row
@@ -1339,6 +1339,7 @@ function helloAck(connectionSessionId: string) {
 function config(): ResolvedConfig {
   return {
     terminal: { enabled: false },
+    httpServerAllowlist: [],
     sidebar: { entry: 'standard' },
     loopback: { ports: [] },
     enabled: true,

@@ -1,5 +1,15 @@
 # Repository Guide for Agents
 
+## Credential refresh lock and migration scope (PR #384, 2026-11-10)
+
+Plugin 使用 V2 Marker 和独立 Holder 文件串行刷新。默认目录迁移与刷新共用目录外闸门。
+迁移清理确认死亡的 Holder，接受已识别的队列 `.tmp` 文件，拒绝活跃 Holder。
+Linux 单机本地 ext4 和 XFS 为目标支持范围。WSL2 ext4.vhdx 用于开发测试。
+NFS、SMB 共享凭据目录和跨主机锁不在范围内。Windows Host 尚未完成验收。
+升级或降级前必须停止所有 Harness 进程。0.6.3 降级步骤见 `docs/plugin-integration.md`。
+本地 ext4 Plugin 全套 594 tests、类型检查、构建和 bundle 校验通过。
+CI 在 XFS 挂载上完成硬链接检查、凭据锁测试和迁移测试。
+
 ## Embedded account devices in Harness (2026-11-09)
 
 Plugin registers “My devices” through the official sidebar.panellist and keyed
@@ -1183,3 +1193,15 @@ pairing approval was performed.
 ## Pairing sign-in placement (2026-11-08)
 
 DSH-Go pairing lives in the local settings Sign in tab list, alongside existing OAuth/password methods, rather than above general settings. Authorized Hosts retain a pairing shortcut. Provider-loading failures do not reset a manually selected pairing tab; switching/closing the panel does not cancel the Server session or reopen its single attempt.
+
+## 更新后存储迁移与登录回退（2026-11-10）
+
+本次修复来自用户更新后的 macOS 实际故障：Finder 的 `.DS_Store` 导致旧存储归属检查失败；
+可选 OAuth 发现失败后，登录入口显示错误或隐藏默认密码表单。
+归属检查与未配对 Client 自愈仅忽略 `.DS_Store`、`desktop.ini`、`Thumbs.db` 的普通文件，
+保留链接数及大小限制，Windows 元文件匹配兼容大小写。目录、符号链接、硬链接、未知名称
+及任意 `._*` 名称保持原检查；idle 与锁规则保持原样。迁移保留元文件和身份数据。
+两处登录入口在发现失败后保持密码表单与重试入口可见，保留已手选配对方式；
+更换服务地址时清除旧配对能力。密码提交继续显示真实认证及网络错误。
+API 超时与错误契约保持原样；该 UI 修复没有改变 CDN/TLS 连接行为。
+验证记录以 PR 所列平台运行结果为准，避免将 macOS 文件名测试等同于 Windows 实机验证。
