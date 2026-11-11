@@ -160,6 +160,8 @@ export function connectionErrorMessage(code: string, t: Translate): string {
   if (code === 'INVALID_MESSAGE') return t('connectionInvalidResponse')
   if (code === 'CONNECTION_FAILED') return t('serverUnavailableError')
   if (code === 'SERVER_NOT_CONFIGURED') return t('connectionReachability')
+  if (code === 'RESTART_UNSUPPORTED') return t('hostRestartUnsupported')
+  if (code === 'RESTART_DENIED') return t('hostRestartDenied')
   return t('connectionUnexpected')
 }
 

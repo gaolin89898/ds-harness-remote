@@ -41,6 +41,25 @@ describe('RpcRouter', () => {
     expect(unknown).toMatchObject({ type: 'rpc.error', payload: { code: 'METHOD_NOT_FOUND' } })
   })
 
+  it('restarts the Host only through a supported handler and empty params', async () => {
+    const restart = vi.fn(async () => ({ supervisor: 'systemd' }))
+    const router = new RpcRouter(undefined, undefined, undefined, undefined, () => [], undefined, undefined, undefined, undefined, undefined, undefined, { supported: true, restart })
+    const response = await router.handle(createRpcRequest('host.restart', {}))
+    expect(response).toMatchObject({ type: 'rpc.response', payload: { result: { supervisor: 'systemd' } } })
+    expect(restart).toHaveBeenCalledOnce()
+
+    const invalid = await router.handle(createRpcRequest('host.restart', { command: 'shutdown /r' }))
+    expect(invalid).toMatchObject({ type: 'rpc.error', payload: { code: 'INVALID_MESSAGE' } })
+    expect(restart).toHaveBeenCalledOnce()
+
+    const unsupported = new RpcRouter(undefined, undefined, undefined, undefined, () => [], undefined, undefined, undefined, undefined, undefined, undefined, { supported: false, restart: vi.fn() })
+    expect(await unsupported.handle(createRpcRequest('host.restart', {})))
+      .toMatchObject({ type: 'rpc.error', payload: { code: 'RESTART_UNSUPPORTED' } })
+
+    expect(await createRouter({}).handle(createRpcRequest('host.restart', {})))
+      .toMatchObject({ type: 'rpc.error', payload: { code: 'RESTART_UNSUPPORTED' } })
+  })
+
   it('describes only the Host transports available on this encrypted connection', async () => {
     const capabilities = () => ['transport.relay', 'harness.remote.v1']
     const router = createRouter({}, undefined, undefined, capabilities)

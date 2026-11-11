@@ -33,6 +33,8 @@ export interface RemoteHostFeatures {
   acpModelLoadsSession?: boolean
   workspaceTypes?: readonly RemoteWorkspaceTypeDescription[]
   pluginRoute: boolean
+  /** Host can restart itself through its platform supervisor (Host-only). */
+  hostRestart: boolean
 }
 
 export interface CodexLoopbackStream {

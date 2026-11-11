@@ -22,21 +22,58 @@ export const workbenchStyles = `
 .dshRemotePermissionRow>.dshRemoteHostControlToggle { gap:12px; color:var(--dsw-alias-label-primary); font-size:13px; font-weight:500; white-space:normal; }
 .dshRemotePermissionRow>.dshRemoteConnectedMenu { margin-left:auto; }
 .dshRemotePage .dshRemoteHostControlToggle>input:checked { background:var(--dsw-alias-brand-primary); border-color:var(--dsw-alias-brand-primary); box-shadow:none; }
+.dshRemotePage .dshRemoteHostControlToggle>input:checked::after { background:var(--dsw-alias-label-primary-foreground,#fff); }
 .dshRemotePage .dshRemoteConnectedCount { padding:5px 8px; font-size:11px; border-radius:6px; text-decoration:none; background:var(--dsw-alias-bg-layer-3); box-shadow:none; }
 .isWorkbench .dshRemoteSectionHeading { margin:0; flex:none; min-height:28px; }
 .dshRemoteOnlineCount { display:inline-flex; padding:3px 7px; border-radius:4px; color:var(--dsw-alias-state-success-primary); background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 9%,transparent); font-size:11px; line-height:1.4; }
-.dshRemoteHostFilter { box-sizing:border-box; max-width:45%; min-height:30px; border:1px solid var(--dsw-alias-border-l2); border-radius:6px; padding:3px 7px; background:var(--dsw-alias-bg-layer-2); color:var(--dsw-alias-label-secondary); font:inherit; font-size:11px; cursor:pointer; }
-.dshRemoteHostFilter:focus-visible,.dshRemoteWorkspaceSearch:focus-within { outline:2px solid var(--dsw-alias-brand-primary); outline-offset:2px; }
+.dshRemoteHostFilter { position:relative; flex:none; min-width:0; max-width:45%; }
+.dshRemoteHostFilterTrigger { box-sizing:border-box; display:inline-flex; align-items:center; gap:6px; min-height:30px; min-width:0; max-width:100%; padding:0 9px 0 11px; border:1px solid var(--dsw-alias-border-l2); border-radius:6px; background:var(--dsw-alias-bg-layer-2); color:var(--dsw-alias-label-secondary); font:inherit; font-size:11px; white-space:nowrap; cursor:pointer; transition:color .15s,border-color .15s; }
+.dshRemoteHostFilterTrigger:hover:not(:disabled),.dshRemoteHostFilter.isOpen .dshRemoteHostFilterTrigger { color:var(--dsw-alias-label-primary); border-color:color-mix(in srgb,var(--dsw-alias-brand-primary) 30%,var(--dsw-alias-border-l2)); }
+.dshRemoteHostFilterTrigger:disabled { opacity:.55; cursor:default; }
+.dshRemoteHostFilterChevron { width:11px; height:11px; flex:none; color:var(--dsw-alias-label-tertiary); transition:transform .15s,color .15s; }
+.dshRemoteHostFilter.isOpen .dshRemoteHostFilterChevron { transform:rotate(180deg); color:var(--dsw-alias-brand-primary); }
+.dshRemoteHostFilterMenu { position:absolute; top:calc(100% + 5px); right:0; z-index:30; box-sizing:border-box; display:flex; flex-direction:column; gap:2px; min-width:calc(100% + 12px); padding:4px; border:1px solid var(--dsw-alias-border-l2); border-radius:8px; background:var(--dsw-alias-bg-layer-2); box-shadow:0 12px 32px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.05) inset; transform-origin:top right; animation:dshRemoteFilterIn .14s cubic-bezier(.16,1,.3,1); }
+@keyframes dshRemoteFilterIn { from { opacity:0; transform:translateY(-3px) scale(.98); } to { opacity:1; transform:none; } }
+.dshRemoteHostFilterOption { display:flex; align-items:center; justify-content:space-between; gap:12px; box-sizing:border-box; min-height:28px; padding:5px 10px; border:0; border-radius:6px; background:transparent; color:var(--dsw-alias-label-secondary); font:inherit; font-size:11px; text-align:left; white-space:nowrap; cursor:pointer; }
+.dshRemoteHostFilterOption:hover { background:var(--dsw-alias-bg-layer-3); color:var(--dsw-alias-label-primary); }
+.dshRemoteHostFilterOption.isSelected { color:var(--dsw-alias-brand-primary); background:color-mix(in srgb,var(--dsw-alias-brand-primary) 8%,transparent); }
+.dshRemoteHostFilterOption.isSelected::after { content:''; width:5px; height:9px; flex:none; margin-right:2px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg) translateY(-1px); }
+.dshRemoteHostFilterTrigger:focus-visible,.dshRemoteHostFilterOption:focus-visible,.dshRemoteWorkspaceSearch:focus-within { outline:2px solid var(--dsw-alias-brand-primary); outline-offset:2px; }
+.dshRemoteHostFilterOption:focus-visible { outline-offset:-2px; }
+@media(prefers-reduced-motion:reduce) { .dshRemoteHostFilterMenu { animation:none; } .dshRemoteHostFilterChevron { transition:none; } }
+.dshRemoteAccountMenu { position:relative; min-width:0; }
+.dshRemoteAccountTrigger { display:flex; align-items:center; gap:10px; box-sizing:border-box; width:fit-content; max-width:100%; padding:5px 9px; margin:-5px -9px; border:0; border-radius:8px; background:transparent; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.dshRemoteAccountTrigger:hover { background:var(--dsw-alias-bg-layer-2); }
+.dshRemoteAccountTrigger:focus-visible { outline:2px solid var(--dsw-alias-brand-primary); outline-offset:2px; }
+.dshRemoteAccountChevron { width:11px; height:11px; flex:none; color:var(--dsw-alias-label-tertiary); transition:transform .15s,color .15s; }
+.dshRemoteAccountMenu.isOpen .dshRemoteAccountChevron { transform:rotate(180deg); color:var(--dsw-alias-brand-primary); }
+.dshRemoteAccountMenuPanel { position:absolute; bottom:calc(100% + 8px); left:0; z-index:40; box-sizing:border-box; min-width:190px; padding:4px; border:1px solid var(--dsw-alias-border-l2); border-radius:8px; background:var(--dsw-alias-bg-layer-2); box-shadow:0 12px 32px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.05) inset; transform-origin:bottom left; animation:dshRemoteMenuUpIn .14s cubic-bezier(.16,1,.3,1); }
+@keyframes dshRemoteMenuUpIn { from { opacity:0; transform:translateY(3px) scale(.98); } to { opacity:1; transform:none; } }
+.dshRemoteAccountMenuItem { display:flex; align-items:center; gap:9px; box-sizing:border-box; width:100%; min-height:32px; padding:6px 10px; border:0; border-radius:6px; background:transparent; color:var(--dsw-alias-label-secondary); font:inherit; font-size:12px; text-align:left; cursor:pointer; white-space:nowrap; }
+.dshRemoteAccountMenuItem:hover:not(:disabled) { background:var(--dsw-alias-bg-layer-3); color:var(--dsw-alias-label-primary); }
+.dshRemoteAccountMenuItem:disabled { opacity:.5; cursor:default; }
+.dshRemoteAccountMenuItem>svg { width:14px; height:14px; flex:none; }
+.dshRemoteAccountMenuItem:focus-visible { outline:2px solid var(--dsw-alias-brand-primary); outline-offset:-2px; }
+@media(prefers-reduced-motion:reduce) { .dshRemoteAccountMenuPanel { animation:none; } .dshRemoteAccountChevron { transition:none; } }
+.dshRemotePageBody>.dshRemoteNotice,.dshRemotePageBody>.dshRemoteError { box-sizing:border-box; display:flex; align-items:center; gap:9px; margin:14px 0 18px; padding:9px 12px; border:1px solid var(--dsw-alias-border-l2); border-radius:8px; background:var(--dsw-alias-bg-layer-2); font-size:12px; line-height:1.6; }
+.dshRemotePageBody>.dshRemoteNotice { color:var(--dsw-alias-label-secondary); }
+.dshRemotePageBody>.dshRemoteError { color:var(--dsw-alias-state-error-primary); }
+.dshRemotePageBody>.dshRemoteNotice::before,.dshRemotePageBody>.dshRemoteError::before { content:''; width:6px; height:6px; flex:none; border-radius:50%; background:var(--dsw-alias-brand-primary); }
+.dshRemotePageBody>.dshRemoteError::before { background:var(--dsw-alias-state-error-primary); }
 .isWorkbench .dshRemoteHostList { min-height:0; max-height:none; flex:1; gap:10px; padding:0 2px 4px; margin:0 -2px; }
-.isWorkbench .dshRemoteHostList>button { box-sizing:border-box; min-height:72px; border-radius:8px; padding:12px 16px; gap:12px; box-shadow:none; transition:background .15s,border-color .15s; }
+.isWorkbench .dshRemoteHostList>.dshRemoteHostRow { box-sizing:border-box; min-height:72px; border-radius:8px; padding:12px 16px; gap:12px; box-shadow:none; transition:background .15s,border-color .15s; }
 .isWorkbench .dshRemoteHostItemIcon { width:36px; height:36px; border-radius:8px; background:color-mix(in srgb,var(--dsw-alias-brand-primary) 7%,var(--dsw-alias-bg-layer-2)); }
 .isWorkbench .dshRemoteHostItemText strong { font-size:14px; }
 .isWorkbench .dshRemoteHostItemText small { font-size:11px; }
 .isWorkbench .dshRemoteHostStatus { padding:4px 8px; font-size:10px; border:0; }
 .isWorkbench .dshRemoteHostStatus::before { width:5px; height:5px; box-shadow:none; }
+.dshRemoteHostStatus.isRestarting { background:color-mix(in srgb,var(--dsw-alias-state-warn-primary) 12%,transparent); color:var(--dsw-alias-state-warn-primary); border:1px solid color-mix(in srgb,var(--dsw-alias-state-warn-primary) 26%,transparent); }
+.dshRemoteHostStatus.isRestarting::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; box-shadow:0 0 0 2px color-mix(in srgb,var(--dsw-alias-state-warn-primary) 18%,transparent); animation:dshRemoteRestartPulse 1.2s ease-in-out infinite; }
+@keyframes dshRemoteRestartPulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+@media(prefers-reduced-motion:reduce) { .dshRemoteHostStatus.isRestarting::before { animation:none; } }
 .isWorkbench .dshRemoteHostItemChevron { display:flex; margin:0; }
 .dshRemotePageBody>.dshRemoteAccountFooter { flex:none; margin:0 -28px; padding:16px 28px; min-height:64px; box-sizing:border-box; }
-.dshRemotePage .dshRemoteAccountAvatar { width:30px; height:30px; background:var(--dsw-alias-brand-primary); color:#fff; }
+.dshRemotePage .dshRemoteAccountAvatar { width:30px; height:30px; background:var(--dsw-alias-brand-primary); color:var(--dsw-alias-label-primary-foreground,#fff); }
 .dshRemotePage .dshRemoteAccountSettings,.dshRemotePage .dshRemoteAccountExit { min-height:30px; display:inline-flex; justify-content:center; align-items:center; gap:7px; padding:5px 8px; border-radius:6px; }
 .dshRemotePage .dshRemoteAccountSettings { width:30px; padding:0; }
 .dshRemotePage .dshRemoteAccountExit { border:1px solid var(--dsw-alias-border-l2); }
@@ -90,11 +127,11 @@ export const workbenchStyles = `
 .dshRemoteWorkspaceLists .dshRemoteWorkspaceMore { min-height:30px; font-size:16px; border:0; }
 .dshRemotePickerLayout .dshRemoteOpenBar { box-sizing:border-box; margin:0 -24px; padding:14px 24px; gap:12px; min-height:66px; }
 .dshRemoteOpenBar>.dshRemoteOpenActions { margin-left:auto; display:flex; flex-direction:row; gap:8px; align-items:center; flex:none; }
-.dshRemoteOpenActions>button { min-height:36px; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:8px 14px; border:0; border-radius:6px; background:var(--dsw-alias-brand-primary); color:#fff; font-size:12px; line-height:1.4; cursor:pointer; }
+.dshRemoteOpenActions>button { min-height:36px; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:8px 14px; border:0; border-radius:6px; background:var(--dsw-alias-brand-primary); color:var(--dsw-alias-label-primary-foreground,#fff); font-size:12px; line-height:1.4; cursor:pointer; }
 .dshRemoteOpenActions>button>svg { width:15px; height:15px; flex:none; }
 .dshRemoteOpenActions>.dshRemotePickerCancel { color:var(--dsw-alias-label-secondary); background:transparent; }
 .dshRemoteOpenActions>button:hover:not(:disabled) { filter:brightness(1.08); }
-.dshRemoteOpenActions>button:disabled { opacity:.4; cursor:default; }
+.dshRemoteOpenActions>button:disabled { opacity:1; background:color-mix(in srgb,var(--dsw-alias-label-primary) 10%,transparent); color:var(--dsw-alias-label-secondary); cursor:default; }
 .dshRemoteOpenBar .dshRemoteConnectedPanel { top:auto; bottom:calc(100% + 8px); left:0; right:auto; }
 .dshRemotePage.hasSelectedHost .dshRemotePageBody>p { padding:8px 24px; margin:0; }
 .dshRemotePickerLayout .dshRemoteFolderBrowser { margin:0; }
@@ -118,7 +155,7 @@ export const workbenchStyles = `
   .isWorkbench .dshRemotePermissionRow { padding:10px; gap:9px; }
   .dshRemotePermissionRow>.dshRemoteHostControlToggle { gap:8px; font-size:12px; }
   .dshRemotePermissionIcon { display:none; }
-  .isWorkbench .dshRemoteHostList>button { padding:12px; gap:8px; }
+  .isWorkbench .dshRemoteHostList>.dshRemoteHostRow { padding:12px; gap:8px; }
   .isWorkbench .dshRemoteHostItemLeft { gap:10px; }
   .dshRemotePageBody>.dshRemoteAccountFooter { margin:0 -16px; padding:14px 16px; gap:8px; flex-wrap:wrap; }
   .dshRemoteAccountFooter>.dshRemoteAccountUpdate { white-space:normal; }
@@ -144,6 +181,6 @@ export const workbenchStyles = `
   .isWorkbench .dshRemoteHostItemText small { font-size:10px; }
 }
 @media(prefers-reduced-motion:reduce) {
-  .isWorkbench .dshRemoteHostList>button { transition:none; }
+  .isWorkbench .dshRemoteHostList>.dshRemoteHostRow { transition:none; }
 }
 `

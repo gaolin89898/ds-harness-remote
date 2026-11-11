@@ -64636,7 +64636,8 @@ var rpcMethods = [
   "acp.session.respond_permission",
   "acp.session.cancel",
   "acp.session.set_mode",
-  "plugin.route.call"
+  "plugin.route.call",
+  "host.restart"
 ];
 var errorCodes = [
   // Protocol / Version
@@ -70915,7 +70916,8 @@ function remoteHostFeatures(clientVersion) {
     cursor: false,
     antigravity: false,
     opencode: false,
-    pluginRoute: false
+    pluginRoute: false,
+    hostRestart: false
   };
 }
 async function probeRemoteHostFeatures(client, clientVersion) {
@@ -70967,7 +70969,8 @@ async function probeRemoteHostFeatures(client, clientVersion) {
     ...hermes ? { hermes: true } : {},
     ...capabilities.has("agent.acp.antigravity.model-load.v1") ? { acpModelLoadsSession: true } : {},
     ...workspaceTypes === void 0 ? {} : { workspaceTypes },
-    pluginRoute: capabilities.has("plugin.route.v1")
+    pluginRoute: capabilities.has("plugin.route.v1"),
+    hostRestart: capabilities.has("host.restart.v1")
   };
 }
 
@@ -79273,6 +79276,12 @@ var ClientControl = class {
         if (typeof value.targetDeviceId !== "string") throw new ClientModeError("INVALID_MESSAGE", "A Host is required.");
         return ok(await this.context.listRemoteWorkspaces(value.targetDeviceId, signal));
       }
+      if (endpoint === "host.restart") {
+        const value = record3(payload);
+        if (typeof value.targetDeviceId !== "string") throw new ClientModeError("INVALID_MESSAGE", "A Host is required.");
+        await this.context.restartRemoteHost(value.targetDeviceId, signal);
+        return ok({ accepted: true });
+      }
       if (endpoint === "codex.workspaces.list") {
         const value = record3(payload);
         if (typeof value.targetDeviceId !== "string") throw new ClientModeError("INVALID_MESSAGE", "A Host is required.");
@@ -87466,6 +87475,7 @@ var ClientModeRuntime = class {
       },
       listRemoteDirectory: (...args) => owner.listRemoteDirectory(...args),
       listRemoteWorkspaces: (...args) => owner.listRemoteWorkspaces(...args),
+      restartRemoteHost: (...args) => owner.restartRemoteHost(...args),
       listCodexWorkspaces: (...args) => owner.listCodexWorkspaces(...args),
       openRemoteWorkspace: (...args) => owner.openRemoteWorkspace(...args),
       openCodexWorkspace: (...args) => owner.openCodexWorkspace(...args),
@@ -87851,6 +87861,22 @@ var ClientModeRuntime = class {
   async listRemoteWorkspaces(targetDeviceId, signal) {
     const remote = await this.ensureConnected(targetDeviceId, signal);
     return readRemoteWorkspaceBaseline(new RemoteTypertGateway2(remote.client), signal);
+  }
+  /**
+   * Ask a Host to restart itself through its own platform supervisor. The
+   * Host answers before it goes away, so a successful call means "accepted",
+   * not "back online"; callers re-read presence afterwards. A restart is a
+   * one-off control RPC on a temporary carrier like tool discovery, never the
+   * UI selection carrier: the Host stops right after the ack, and a UI
+   * carrier dying with it must not read as a lost link in the workbench.
+   */
+  async restartRemoteHost(targetDeviceId, signal) {
+    await this.withToolRemote(targetDeviceId, signal ?? this.remoteLifetime.signal, async (remote, activeSignal) => {
+      if (!remote.features.hostRestart) {
+        throw new ClientModeError("RESTART_UNSUPPORTED", "This Host cannot restart itself from Remote.");
+      }
+      await remote.client.rpc("host.restart", {}, activeSignal);
+    });
   }
   /** Read-only Agent discovery owns a temporary carrier, never the UI selection. */
   async discoverToolWorkspaces(targetDeviceId, signal) {
@@ -92812,9 +92838,9 @@ var RemoteTerminalState = class {
   }
 };
 var RemoteTerminalController = class {
-  constructor(shared, spawn7, enabled, scopeError) {
+  constructor(shared, spawn8, enabled, scopeError) {
     this.shared = shared;
-    this.spawn = spawn7;
+    this.spawn = spawn8;
     this.enabled = enabled;
     this.scopeError = scopeError;
   }
@@ -98931,7 +98957,8 @@ var apiMethods = /* @__PURE__ */ new Set([
   "workspace.upload.open",
   "workspace.upload.chunk",
   "workspace.upload.commit",
-  "workspace.upload.abort"
+  "workspace.upload.abort",
+  "host.restart"
 ]);
 var HOST_CAPABILITIES = [
   "harness.remote.v1",
@@ -98944,7 +98971,7 @@ var HOST_CAPABILITIES = [
   "agent.acp.transfer.v1"
 ];
 var RpcRouter = class {
-  constructor(maxPending = 128, logger2, fileViewer, harnessRemote, capabilities = () => HOST_CAPABILITIES, codex, acp, loopback, workspaceTypes, pluginRoute, workspaceUpload) {
+  constructor(maxPending = 128, logger2, fileViewer, harnessRemote, capabilities = () => HOST_CAPABILITIES, codex, acp, loopback, workspaceTypes, pluginRoute, workspaceUpload, hostRestart) {
     this.maxPending = maxPending;
     this.logger = logger2;
     this.fileViewer = fileViewer;
@@ -98956,6 +98983,7 @@ var RpcRouter = class {
     this.workspaceTypes = workspaceTypes;
     this.pluginRoute = pluginRoute;
     this.workspaceUpload = workspaceUpload;
+    this.hostRestart = hostRestart;
   }
   active = 0;
   async closePeerStreams() {
@@ -99106,6 +99134,13 @@ var RpcRouter = class {
       }
       case "plugin.route.call":
         return this.requirePluginRoute().call(params);
+      case "host.restart": {
+        emptyParamsSchema.parse(params);
+        if (this.hostRestart === void 0 || !this.hostRestart.supported) {
+          throw new RpcError("RESTART_UNSUPPORTED", "This Host cannot restart itself on its platform.");
+        }
+        return this.hostRestart.restart();
+      }
       default:
         throw new RpcError("METHOD_NOT_FOUND", "The requested method does not exist.");
     }
@@ -101807,7 +101842,93 @@ function remoteOwnedBundleRow(row, plugin) {
 
 // packages/plugin/src/service.ts
 import { execFileSync as execFileSync3 } from "node:child_process";
-import { existsSync as existsSync5 } from "node:fs";
+import { existsSync as existsSync6 } from "node:fs";
+
+// packages/plugin/src/host-restart.ts
+import { spawn as spawn7 } from "node:child_process";
+import { existsSync as existsSync5, readFileSync as readFileSync2 } from "node:fs";
+var HostRestartError = class extends Error {
+  constructor(code, message) {
+    super(message);
+    this.code = code;
+    this.name = "HostRestartError";
+  }
+};
+var SYSTEMD_SERVICE_UNIT = /\/system\.slice\/([A-Za-z0-9:_.@-]+\.service)(?:\/|\s|$)/;
+function systemdUnitFromCgroup(cgroup) {
+  return SYSTEMD_SERVICE_UNIT.exec(cgroup)?.[1];
+}
+function createHostRestartController(options = {}) {
+  const platform3 = options.platform ?? process.platform;
+  const readFile4 = options.readFile ?? ((path) => {
+    try {
+      return readFileSync2(path, "utf8");
+    } catch {
+      return void 0;
+    }
+  });
+  const pathExists = options.pathExists ?? existsSync5;
+  const spawnProcess = options.spawnProcess ?? ((command, args) => {
+    const child = spawn7(command, [...args], { detached: true, stdio: "ignore", windowsHide: true });
+    child.unref();
+  });
+  const setTimer = options.setTimer ?? ((callback, ms) => setTimeout(callback, ms));
+  const armDelayMs = options.armDelayMs ?? 1500;
+  const supervisor = detectSupervisor({
+    platform: platform3,
+    execPath: options.execPath ?? process.execPath,
+    parentPid: options.parentPid ?? process.ppid,
+    electronVersion: options.electronVersion ?? process.versions.electron,
+    processType: options.processType ?? process.type,
+    readFile: readFile4,
+    pathExists,
+    spawnProcess
+  });
+  if (supervisor === void 0) {
+    return {
+      supported: false,
+      restart: async () => {
+        throw new HostRestartError(
+          "RESTART_UNSUPPORTED",
+          platform3 === "linux" ? "This Host is not managed by a systemd service, so it cannot restart itself." : platform3 === "win32" ? "This Host is not the DSH Desktop app, so it cannot relaunch itself." : "Restarting the Harness is not supported on this platform."
+        );
+      }
+    };
+  }
+  return {
+    supported: true,
+    async restart() {
+      setTimer(() => {
+        try {
+          supervisor.restart();
+        } catch {
+        }
+      }, armDelayMs);
+      return { supervisor: supervisor.kind };
+    }
+  };
+}
+function detectSupervisor(input4) {
+  if (input4.platform === "linux") {
+    if (!input4.pathExists("/run/systemd/system")) return void 0;
+    const unit = systemdUnitFromCgroup(input4.readFile("/proc/self/cgroup") ?? "");
+    if (unit === void 0) return void 0;
+    return { kind: "systemd", restart: () => input4.spawnProcess("systemctl", ["restart", unit]) };
+  }
+  if (input4.platform === "win32") {
+    if (input4.electronVersion === void 0 || input4.processType !== void 0) return void 0;
+    if (!/\.exe$/i.test(input4.execPath)) return void 0;
+    if (!Number.isSafeInteger(input4.parentPid) || input4.parentPid <= 0) return void 0;
+    const command = [
+      "timeout /t 2 /nobreak >nul",
+      `taskkill /PID ${String(input4.parentPid)} /F >nul 2>&1`,
+      "ping -n 4 127.0.0.1 >nul",
+      `start "" "${input4.execPath}"`
+    ].join(" & ");
+    return { kind: "desktop", restart: () => input4.spawnProcess("cmd.exe", ["/d", "/s", "/c", command]) };
+  }
+  return void 0;
+}
 
 // packages/plugin/src/codex-workspace-bridge.ts
 var CodexWorkspaceBridge = class extends WorkspaceBridge {
@@ -101894,7 +102015,8 @@ var HostPluginRuntime = class {
           () => harnessSessionGeneration(this.harnessVersion) === "v3",
           (threadId) => this.codex.resolveThreadWorkspace(context.connectionId, threadId),
           (sessionId) => this.acp.resolveUploadWorkspace(context.connectionId, sessionId)
-        ), void 0, context.transportMode)
+        ), void 0, context.transportMode),
+        this.hostRestartHandler()
       );
     }, this.logger);
     if (config2.serverUrl !== void 0) {
@@ -101915,6 +102037,7 @@ var HostPluginRuntime = class {
   codex;
   acp;
   codexWorkspaceState = new WorkspaceBridgeState((key) => TerminalPolicy.releaseOwner(this.terminalOwners, key));
+  hostRestart = createHostRestartController();
   localCodexPeer;
   localCodexPublish = async () => void 0;
   localAcpPeer;
@@ -102242,6 +102365,22 @@ var HostPluginRuntime = class {
     if (version2 === void 0) this.logger.warn("Harness version is unavailable");
     return version2;
   }
+  hostRestartHandler() {
+    return {
+      supported: this.hostRestart.supported && this.config.hostControl?.enabled !== false,
+      restart: async () => {
+        if (this.config.hostControl?.enabled === false) {
+          throw new RpcError("RESTART_DENIED", "Remote host control is disabled on this Host.");
+        }
+        try {
+          return await this.hostRestart.restart();
+        } catch (error62) {
+          if (error62 instanceof HostRestartError) throw new RpcError(error62.code, error62.message);
+          throw error62;
+        }
+      }
+    };
+  }
   hostCapabilities() {
     const capabilities = ["workspace.upload.v1"];
     if (this.loopbackPorts.length > 0) capabilities.push("loopback.http-ws.v1");
@@ -102254,6 +102393,7 @@ var HostPluginRuntime = class {
     if (this.localGateway?.supportsCarrier && this.terminalEnabled) capabilities.push("harness.terminal.v1");
     if (this.fileViewerHost?.() !== void 0) capabilities.push("fileviewer.read.v1");
     if (this.pluginRoutes?.() !== void 0) capabilities.push("plugin.route.v1");
+    if (this.hostRestart.supported && this.config.hostControl?.enabled !== false) capabilities.push("host.restart.v1");
     if (this.codex.isAvailable()) capabilities.push("codex.appserver.v1", "codex.appserver.transfer.v1");
     if (this.acp.enabledBackends().length > 0) {
       capabilities.push("agent.acp.v1", "agent.acp.transfer.v1", "agent.acp.workspace-files.v1");
@@ -102290,7 +102430,7 @@ var HostPluginRuntime = class {
   acpAvailable(command) {
     if (command === "opencode") {
       try {
-        if (existsSync5("/usr/local/bin/opencode") || existsSync5("/var/lib/dsh/.opencode/bin/opencode")) return true;
+        if (existsSync6("/usr/local/bin/opencode") || existsSync6("/var/lib/dsh/.opencode/bin/opencode")) return true;
       } catch {
       }
     }

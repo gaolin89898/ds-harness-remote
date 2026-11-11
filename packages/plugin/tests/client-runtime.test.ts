@@ -247,6 +247,7 @@ describe('ClientModeRuntime Host account control', () => {
               remoteGateway: false,
               codex: false,
               pluginRoute: false,
+              hostRestart: false,
               cursor: false,
               antigravity: false,
               opencode: false,
@@ -279,6 +280,7 @@ describe('ClientModeRuntime Host account control', () => {
               remoteGateway: true,
               codex: true,
               pluginRoute: false,
+              hostRestart: false,
               cursor: false,
               antigravity: false,
               opencode: false,
@@ -297,6 +299,7 @@ describe('ClientModeRuntime Host account control', () => {
               sessionFormat: 3,
               codex: false,
               pluginRoute: false,
+              hostRestart: false,
               cursor: false,
               antigravity: false,
               opencode: false,
@@ -314,6 +317,7 @@ describe('ClientModeRuntime Host account control', () => {
               remoteGateway: false,
               codex: true,
               pluginRoute: false,
+              hostRestart: false,
               cursor: false,
               antigravity: false,
               opencode: false,
@@ -326,6 +330,17 @@ describe('ClientModeRuntime Host account control', () => {
               }),
             }
             await expect(probeRemoteHostFeatures(legacyClient as never, '0.3.17')).rejects.toMatchObject({ code: 'FEATURE_NOT_SUPPORTED' })
+          },
+        },
+        {
+          name: 'advertises Host restart only when the Host offers it',
+          run: async () => {
+            const client = {
+              rpc: vi.fn(async () => ({ capabilities: ['harness.remote.v1', 'host.restart.v1'] })),
+            }
+            await expect(probeRemoteHostFeatures(client as never)).resolves.toMatchObject({ hostRestart: true })
+            client.rpc.mockResolvedValueOnce({ capabilities: ['harness.remote.v1'] })
+            await expect(probeRemoteHostFeatures(client as never)).resolves.toMatchObject({ hostRestart: false })
           },
         },
         {

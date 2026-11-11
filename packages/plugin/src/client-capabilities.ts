@@ -15,6 +15,7 @@ export function remoteHostFeatures(clientVersion?: string): RemoteHostFeatures {
     antigravity: false,
     opencode: false,
     pluginRoute: false,
+    hostRestart: false,
   }
 }
 
@@ -73,5 +74,6 @@ export async function probeRemoteHostFeatures(
     ...(capabilities.has('agent.acp.antigravity.model-load.v1') ? { acpModelLoadsSession: true } : {}),
     ...(workspaceTypes === undefined ? {} : { workspaceTypes }),
     pluginRoute: capabilities.has('plugin.route.v1'),
+    hostRestart: capabilities.has('host.restart.v1'),
   }
 }

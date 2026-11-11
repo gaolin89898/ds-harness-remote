@@ -197,6 +197,7 @@ export const rpcMethods = [
   'acp.session.cancel',
   'acp.session.set_mode',
   'plugin.route.call',
+  'host.restart',
 ] as const
 
 export const remoteEvents = [

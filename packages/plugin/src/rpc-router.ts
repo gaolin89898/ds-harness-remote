@@ -59,6 +59,7 @@ const apiMethods = new Set([
   'workspace.upload.chunk',
   'workspace.upload.commit',
   'workspace.upload.abort',
+  'host.restart',
 ])
 
 export const HOST_CAPABILITIES = [
@@ -71,6 +72,12 @@ export const HOST_CAPABILITIES = [
   'agent.acp.v1',
   'agent.acp.transfer.v1',
 ] as const
+
+/** Host-side restart surface; the Client only sees it through `host.restart`. */
+export interface HostRestartHandler {
+  readonly supported: boolean
+  restart(): Promise<unknown>
+}
 
 export class RpcRouter {
   private active = 0
@@ -87,6 +94,7 @@ export class RpcRouter {
     private readonly workspaceTypes?: () => readonly RemoteWorkspaceTypeDescription[],
     private readonly pluginRoute?: PluginRouteBridge,
     private readonly workspaceUpload?: WorkspaceUploadHost,
+    private readonly hostRestart?: HostRestartHandler,
   ) {}
 
   async closePeerStreams(): Promise<void> {
@@ -215,6 +223,13 @@ export class RpcRouter {
         return this.workspaceUpload.call(method, params)
       }
       case 'plugin.route.call': return this.requirePluginRoute().call(params)
+      case 'host.restart': {
+        emptyParamsSchema.parse(params)
+        if (this.hostRestart === undefined || !this.hostRestart.supported) {
+          throw new RpcError('RESTART_UNSUPPORTED', 'This Host cannot restart itself on its platform.')
+        }
+        return this.hostRestart.restart()
+      }
       default: throw new RpcError('METHOD_NOT_FOUND', 'The requested method does not exist.')
     }
   }

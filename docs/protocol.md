@@ -909,6 +909,33 @@ catalog、Host 未注册 `api/bot`（404）、Host carrier 不可用（503）及
 Host 的 Bot/Agent 界面模式仅为页面本地偏好，不影响 `api/bot` 的注册；Host 需在连接的
 同一 DSH 实例/profile 中启用 `ds-bot`。
 
+### 16.5 host.restart
+
+`host.restart`（capability `host.restart.v1`）让已认证的 Client 请求 Host 重启自身运行的
+Harness 进程，用于让插件包更新或需要进程重启的配置生效。Params 必须为空对象；
+Result 为 `{ "supervisor": "systemd" | "desktop" }`，只表示重启已交给 Host 自身的
+监管程序，不表示进程已经重新上线。
+
+- Host 只在自身平台存在固定、可验证的重启路径时宣告 `host.restart.v1`：Linux 下必须
+  由 systemd `.service` 单元监管（单元名只从 `/proc/self/cgroup` 解析，以
+  `systemctl restart <unit>` 重启）；Windows 下必须是由 DSH Desktop 启动的 Host
+  子进程（关闭 Desktop 外壳后重新拉起同一可执行文件）。其他平台、容器内无 systemd
+  单元、终端里直接运行的 `dsh` 不宣告该能力。
+- 命令、参数与目标完全由 Host 决定，Client 不能传路径、单元名、命令或参数；该入口
+  不是通用 exec、关机、重启整机或任意服务管理入口。
+- Host 配置 `hostControl.enabled: false`（Remote 设置中的「允许控制本机」）时不宣告
+  该能力；调用仍返回 `RESTART_DENIED`。
+- Host 先返回成功响应再安排重启（当前约 1.5 秒延迟）。Client 收到成功即视为已接受，
+  随后重新读取 Host 在线状态；不得重试该 mutation，也不得把连接断开当作调用失败后重发。
+- 未宣告能力却收到调用返回 `RESTART_UNSUPPORTED`；Params 非空返回 `INVALID_MESSAGE`。
+- 重启会中断该 Host 上的会话连接与正在运行的 Agent 操作，Client 必须在用户确认后
+  才调用。Host 不保存待发送请求，也不重放。
+
+```json
+"params": {}
+"result": { "supervisor": "systemd" }
+```
+
 ## 17. Capability
 
 Host handshake 的 capability 例子：
@@ -959,6 +986,10 @@ Host 已启用且实现该后端协议，不代表 CLI 已初始化完成。ACP 
 `harness.transport.describe` 结果确认该能力；它不表示任意目录可写，也不扩展原生
 附件、图片 transfer 或只读预览 allowlist。协议详见 [Workspace upload](#workspace-upload)。
 未声明该能力时不调用上传 RPC；旧 Host 的入口保持禁用。
+
+`host.restart.v1` 声明 Host 能在自身平台监管下重启 Harness 进程，固定方法为
+`host.restart`。它不表示可重启整机或任意服务；未声明该能力时 Client 必须隐藏重启入口，
+不得调用（协议见 §16.5）。
 
 ### 17.1 工作区类型能力声明（workspaceTypes）
 

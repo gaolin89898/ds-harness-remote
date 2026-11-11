@@ -165,6 +165,7 @@ export class ClientModeRuntime {
       set preview(value) { owner.preview = value },
       listRemoteDirectory: (...args) => owner.listRemoteDirectory(...args),
       listRemoteWorkspaces: (...args) => owner.listRemoteWorkspaces(...args),
+      restartRemoteHost: (...args) => owner.restartRemoteHost(...args),
       listCodexWorkspaces: (...args) => owner.listCodexWorkspaces(...args),
       openRemoteWorkspace: (...args) => owner.openRemoteWorkspace(...args),
       openCodexWorkspace: (...args) => owner.openCodexWorkspace(...args),
@@ -509,6 +510,23 @@ export class ClientModeRuntime {
   async listRemoteWorkspaces(targetDeviceId: string, signal?: AbortSignal): Promise<RemoteWorkspaceView[]> {
     const remote = await this.ensureConnected(targetDeviceId, signal)
     return readRemoteWorkspaceBaseline(new RemoteTypertGateway(remote.client), signal)
+  }
+
+  /**
+   * Ask a Host to restart itself through its own platform supervisor. The
+   * Host answers before it goes away, so a successful call means "accepted",
+   * not "back online"; callers re-read presence afterwards. A restart is a
+   * one-off control RPC on a temporary carrier like tool discovery, never the
+   * UI selection carrier: the Host stops right after the ack, and a UI
+   * carrier dying with it must not read as a lost link in the workbench.
+   */
+  async restartRemoteHost(targetDeviceId: string, signal?: AbortSignal): Promise<void> {
+    await this.withToolRemote(targetDeviceId, signal ?? this.remoteLifetime.signal, async (remote, activeSignal) => {
+      if (!remote.features.hostRestart) {
+        throw new ClientModeError('RESTART_UNSUPPORTED', 'This Host cannot restart itself from Remote.')
+      }
+      await remote.client.rpc('host.restart', {}, activeSignal)
+    })
   }
 
   /** Read-only Agent discovery owns a temporary carrier, never the UI selection. */

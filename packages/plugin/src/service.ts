@@ -13,7 +13,7 @@ import {
   readHarnessDistributionVersion,
 } from './harness-version.js'
 import type { SafeLogger } from './logging.js'
-import { RpcRouter } from './rpc-router.js'
+import { RpcRouter, type HostRestartHandler } from './rpc-router.js'
 import { RemoteFileViewerBridge, type FileViewerHostServiceLike } from './file-viewer-bridge.js'
 import {
   HostServerApi,
@@ -40,6 +40,7 @@ import type { CodexPeerBridge, PublishCodexFrame } from './codex/peer-bridge.js'
 import { AcpRemoteGateway } from './acp/gateway.js'
 import type { AcpPeerBridge, PublishAcpFrame } from './acp/peer-bridge.js'
 import { RpcError } from './safe-error.js'
+import { createHostRestartController, HostRestartError } from './host-restart.js'
 import { CodexWorkspaceBridge, CodexWorkspaceState, type RemoteTerminalSpawner } from './codex-workspace-bridge.js'
 
 export interface HostConnectedClient {
@@ -79,6 +80,7 @@ export class HostPluginRuntime {
   private readonly codex: CodexRemoteDomain
   private readonly acp: AcpRemoteGateway
   private readonly codexWorkspaceState = new CodexWorkspaceState(key => TerminalPolicy.releaseOwner(this.terminalOwners, key))
+  private readonly hostRestart = createHostRestartController()
   private localCodexPeer?: CodexPeerBridge
   private localCodexPublish: PublishCodexFrame = async () => undefined
   private localAcpPeer?: AcpPeerBridge
@@ -159,6 +161,7 @@ export class HostPluginRuntime {
           threadId => this.codex.resolveThreadWorkspace(context.connectionId, threadId),
           sessionId => this.acp.resolveUploadWorkspace(context.connectionId, sessionId),
         ), undefined, context.transportMode),
+        this.hostRestartHandler(),
       )
     }, this.logger)
     if (config.serverUrl !== undefined) {
@@ -522,6 +525,23 @@ export class HostPluginRuntime {
     return version
   }
 
+  private hostRestartHandler(): HostRestartHandler {
+    return {
+      supported: this.hostRestart.supported && this.config.hostControl?.enabled !== false,
+      restart: async () => {
+        if (this.config.hostControl?.enabled === false) {
+          throw new RpcError('RESTART_DENIED', 'Remote host control is disabled on this Host.')
+        }
+        try {
+          return await this.hostRestart.restart()
+        } catch (error) {
+          if (error instanceof HostRestartError) throw new RpcError(error.code, error.message)
+          throw error
+        }
+      },
+    }
+  }
+
   private hostCapabilities(): string[] {
     const capabilities: string[] = ['workspace.upload.v1']
     if (this.loopbackPorts.length > 0) capabilities.push('loopback.http-ws.v1')
@@ -534,6 +554,7 @@ export class HostPluginRuntime {
     if (this.localGateway?.supportsCarrier && this.terminalEnabled) capabilities.push('harness.terminal.v1')
     if (this.fileViewerHost?.() !== undefined) capabilities.push('fileviewer.read.v1')
     if (this.pluginRoutes?.() !== undefined) capabilities.push('plugin.route.v1')
+    if (this.hostRestart.supported && this.config.hostControl?.enabled !== false) capabilities.push('host.restart.v1')
     if (this.codex.isAvailable()) capabilities.push('codex.appserver.v1', 'codex.appserver.transfer.v1')
     // Protocol support is stable during background warmup; workspaceTypes reports readiness.
     if (this.acp.enabledBackends().length > 0) {

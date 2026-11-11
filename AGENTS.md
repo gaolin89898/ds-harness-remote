@@ -1,5 +1,64 @@
 # Repository Guide for Agents
 
+## Restart UX, picker redesign and account menu (2026-11-11)
+
+在 Host restart 功能之上完成四项 Remote 客户端界面改动：
+
+- 主机筛选：原生 `<select>` 换成自绘下拉（bg-layer-2 面板、品牌色选中态、140ms 缓动、
+  prefers-reduced-motion 降级），Escape 只关菜单、外点关闭、方向键/Home/End 导航，
+  新增 `hostFilterLabel` 中英文案。
+- 重启体验：重启中的行立即显示「重启中…」琥珀徽章并禁用点击；`restartRemoteHost`
+  改走与工具发现相同的临时载体（`withToolRemote`），不再借用 UI 会话载体，footer 不把
+  重启误报为断链；重启后设备刷新失败重试一次；移除重启页面级提示与 `hostRestarting`
+  文案；重启三处文案引号改为“”。
+- 选择工作区页按新设计稿重做目录浏览区：标题+副标题+目录数徽章；路径栏固定主机名段
+  （接口面包屑缺 home 段时不再丢主机名）+ 12px SVG 箭头分隔；目录行单击选中（蓝底+对勾，
+  左栏已选目录同步）再点同一条目进入；空目录提示加内边距；「取消」与面板关闭
+  （✕/Escape/遮罩）都退回主机选择页。
+- 账号区：退出按钮并入账号名下拉菜单（footer 在页面底部故向上弹出，外点/Escape 关闭，
+  打开时焦点入菜单）；移除 footer 粘性「连接已断开」通知（真实不可用仍由主机行徽章、
+  0 台在线与已连接面板倒计时表达）；修复 shell.ts `.dshRemoteNotice` 全局 `flex:1`
+  选择器泄漏（本意仅设置页 footer）。
+
+验证：多轮 Plugin check/build、`verify-dsh-plugin`、`git diff --check` 通过；restart
+相关 3 个测试文件 38 tests 通过；用真实 shell/workbench CSS 在隔离浏览器静态预览核对
+筛选下拉、目录浏览器与账号菜单。client bundle 多轮更新到本地 Desktop profile 与服务器
+web profile + local-plugins（旧 bundle 备份 `*.bak-20261111-*`），多次重启 dsh-cloud 均
+active/HTTP 200；restart 临时载体一轮同时更新了 Host bundle（`ad2e202a`）。本轮未跑
+完整 Plugin 套件，未做真实跨设备 E2E，未发布。
+
+## Remote Host restart (2026-11-11)
+
+主机列表的每个在线主机行新增按平台执行的「重启」图标按钮（Power），位于在线徽标左侧。
+Client 先 `window.confirm`，再经本机控制接口 `host.restart` 调用远端 Host 的加密
+RPC `host.restart`（capability `host.restart.v1`，Params 必须为空）；Host 先回包，
+约 1.5 秒后重启，Client 不重试 mutation，8 秒后重读设备列表。
+
+Host 只在自身平台存在固定、可验证的监管路径时宣告能力：Linux 仅限
+`/system.slice/<unit>.service`（单元名只从 `/proc/self/cgroup` 解析，执行
+`systemctl restart <unit>`；用户级 unit 与容器拒绝）；Windows 仅限 DSH Desktop 启动的
+Host 子进程（`taskkill /PID <父进程>` 关闭外壳，延迟后 `start` 同一 `process.execPath`）。
+其他平台、终端直跑的 `dsh` 返回 `RESTART_UNSUPPORTED`，该入口不实现通用 exec、
+关机或整机重启。`hostControl.enabled: false`（允许控制本机）时不宣告能力，调用返回
+`RESTART_DENIED`。主机行由 `<button>` 改为带 button 语义的 `<div role="button">`，
+避免重启按钮形成嵌套 button；行内点击仍打开工作区，重启按钮 stopPropagation。
+
+验证：Plugin check、协议 build、host-restart 5 tests、rpc-router 11 tests、
+client-runtime 22 tests 通过；完整 Plugin 套件 76 文件 / 646 tests 中 7 个失败
+（codex-domain 路径假设、werift 原生后端超时、workspace-upload rename EPERM），均为
+本机已记录的既有 Windows/原生环境失败，与本次改动无关。Plugin 生产 build 与两份
+bundle 重建通过，`git diff --check` 通过。
+
+已用真实环境核对检测输入：Desktop 的 Electron 44.7.0 `ELECTRON_RUN_AS_NODE` 子进程
+（`process.type` 未定义、execPath 为 `DeepSeek Harness.exe`）判定 `supported: true`；
+服务器的 dsh-cloud 进程 cgroup 为 `0::/system.slice/dsh-cloud.service` 且
+`/run/systemd/system` 存在，单元名可解析。新 host/client bundle 已安装到本机
+Desktop profile（旧文件备份为 `*.bak-20261111-restart`）与服务器
+`/opt/dsh/local-plugins` + web profile node_modules（备份
+`/opt/dsh-remote-server/backups/plugin-before-restart-20261111/`），服务器已重启
+dsh-cloud 并确认下发的新 client bundle 含重启 UI。Windows 端仍需重启 Desktop 一次
+才会加载新的 Host bundle 与按钮。未在真实跨设备场景触发重启，未发布。
+
 ## In-repo Android app removed (2026-11-11)
 
 移动端改由外部项目 [DSH Go](https://github.com/ccch1mneyyy/dsh-go) 提供，`apps/android`

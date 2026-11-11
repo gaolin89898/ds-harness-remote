@@ -32,6 +32,7 @@ export interface ClientControlContext {
   preview: LoopbackPreview | undefined
   readonly listRemoteDirectory: (targetDeviceId: string, path?: string, signal?: AbortSignal) => Promise<RemoteDirectoryListing>
   readonly listRemoteWorkspaces: (targetDeviceId: string, signal?: AbortSignal) => Promise<RemoteWorkspaceView[]>
+  readonly restartRemoteHost: (targetDeviceId: string, signal?: AbortSignal) => Promise<void>
   readonly listCodexWorkspaces: (targetDeviceId: string, signal?: AbortSignal) => Promise<CodexVirtualWorkspaceView[]>
   readonly openRemoteWorkspace: (targetDeviceId: string, path: string, signal?: AbortSignal) => Promise<Record<string, unknown>>
   readonly openCodexWorkspace: (targetDeviceId: string, workspaceId: string, signal?: AbortSignal) => Promise<Record<string, unknown>>
@@ -105,6 +106,14 @@ export class ClientControl {
         const value = record(payload)
         if (typeof value.targetDeviceId !== 'string') throw new ClientModeError('INVALID_MESSAGE', 'A Host is required.')
         return ok(await this.context.listRemoteWorkspaces(value.targetDeviceId, signal))
+      }
+      if (endpoint === 'host.restart') {
+        const value = record(payload)
+        if (typeof value.targetDeviceId !== 'string') throw new ClientModeError('INVALID_MESSAGE', 'A Host is required.')
+        await this.context.restartRemoteHost(value.targetDeviceId, signal)
+        // The Host stops right after acknowledging; "accepted" is the whole
+        // contract, the caller re-reads presence to see it come back.
+        return ok({ accepted: true })
       }
       if (endpoint === 'codex.workspaces.list') {
         const value = record(payload)
