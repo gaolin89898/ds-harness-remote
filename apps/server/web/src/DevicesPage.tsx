@@ -139,13 +139,6 @@ export function DevicesPage({ account, onSignedOut, embedded = false }: { accoun
             <span>CONSOLE</span>
           </div>
 
-          <nav className="dx-nav" aria-label="控制台导航">
-            <a className="is-active" href="/app/remote" onClick={event => { event.preventDefault() }} aria-current="page"><i />设备</a>
-            <span className="is-soon" aria-disabled="true" title="暂未开放">会话</span>
-            <span className="is-soon" aria-disabled="true" title="暂未开放">工作区</span>
-            <span className="is-soon" aria-disabled="true" title="暂未开放">活动</span>
-          </nav>
-
           <div className="dx-topbar-actions">
             <span className="dx-sys"><i />系统正常</span>
             <i />

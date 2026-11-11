@@ -452,24 +452,6 @@
 .dx-topbar-brand i { width: 1px; height: 16px; background: #2c323e; }
 .dx-topbar-brand span { color: var(--dx-dim); font-size: 9px; letter-spacing: 0.16em; }
 
-.dx-nav { display: flex; align-items: center; gap: 4px; }
-
-.dx-nav a,
-.dx-nav span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
-  border-radius: 7px;
-  color: var(--dx-dim);
-  font-size: 12.5px;
-}
-
-.dx-nav a:hover { color: var(--dx-ink); background: #20242d; }
-.dx-nav .is-active { color: var(--dx-ink); }
-.dx-nav .is-active i { width: 5px; height: 5px; border-radius: 50%; background: var(--dx-accent); }
-.dx-nav .is-soon { opacity: 0.55; cursor: default; }
-
 .dx-topbar-actions { display: flex; align-items: center; gap: 16px; }
 
 .dx-sys {
@@ -890,7 +872,6 @@
 
 @media (max-width: 720px) {
   .dx-topbar { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
-  .dx-nav { order: 3; width: 100%; overflow-x: auto; }
   .dx-main { width: calc(100vw - 32px); padding: 24px 0 32px; }
   .dx-page-head { flex-direction: column; align-items: flex-start; gap: 14px; }
   .dx-page-head h1 { font-size: 30px; }
