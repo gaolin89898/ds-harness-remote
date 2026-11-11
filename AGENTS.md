@@ -1,5 +1,27 @@
 # Repository Guide for Agents
 
+## In-repo Android app removed (2026-11-11)
+
+移动端改由外部项目 [DSH Go](https://github.com/ccch1mneyyy/dsh-go) 提供，`apps/android`
+（284 个文件）与仅为它存在的内容已移除：`packages/plugin/tests/android-browse-subscription.test.mjs`、
+`examples/mock-host/smoke-client.ts`（直接 import Android 源码）、三个 Android 截图、
+`docs/intelligent-ui-android.md` 与 `docs/official-menu-icons.md`。CI 删除 Android 变更检测与
+APK 构建 job，`release.yml` 删除 APK 发布 job 与 tag 校验中的 Android 版本号比较。
+`pnpm-lock.yaml` 重新生成；插件 bundle 重建无差异。
+
+保留：`packages/{protocol,crypto,webrtc,client-core}`、DSH Go 配对契约
+（`docs/device-pairing-v1.md`、`docs/dsh-go-pairing-integration.md`）、设备行使用的
+`android` platform 标签、`docs/CHANGELOG.md` 与 `docs/archive/` 的历史记录。
+文档改为面向"外部移动客户端"表述，不再引用 `apps/android`。
+
+验证：`pnpm install --frozen-lockfile`、`pnpm -r check`（11 个项目）、
+`--filter './packages/**' -r build`、`NODE_ENV=production pnpm --workspace-concurrency=1 -r build`、
+`verify-dsh-plugin.mjs`、`git diff --check` 与两个 workflow 的 YAML lint 通过。
+测试：protocol 94、webrtc 61、client-core 52、server 65、crypto 8、vscode 8、browser 1 全通过；
+Plugin 串行 632 passed / 5 failed，失败仍是既有的 Windows 平台项（codex-domain 路径假设、
+werift `lan` 分类、workspace-upload 目录 rename EPERM），与上游基线一致，非本次改动引入。
+未在真实 Desktop 或 DSH Go 上做验收。
+
 ## Credential refresh lock and migration scope (PR #384, 2026-11-10)
 
 Plugin 使用 V2 Marker 和独立 Holder 文件串行刷新。默认目录迁移与刷新共用目录外闸门。
