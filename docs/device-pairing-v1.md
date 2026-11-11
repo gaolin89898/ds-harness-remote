@@ -334,4 +334,4 @@ Content-Type: application/json
 
 fragment 不进入 HTTP 请求 URL；但 ticket 依旧是秘密，不得进入日志、分析、崩溃上报、剪贴板或外部浏览器历史。POST 请求体也必须在代理和客户端日志中脱敏。GET `/pair` 仅返回无脚本/外部资源的引导文案，不解析、不 claim；设置 no-store、no-referrer 和严格 CSP，通用相机打开页面不会绑定设备。
 
-DSH Go 实现顺序：识别短格式并确认 origin → resolve → 校验并固定会话/Host 信息 → 展示 Host 并由手机用户确认 → 复用原 claim/验证码/轮询/安全存储/自动连接流程。同时保留下面的旧 JSON 扫码解析，用于旧服务和已显示二维码；未知格式明确拒绝，不猜测协议。Dart/Android 实现和真机扫码尚未完成。
+DSH Go 实现顺序：识别短格式并确认 origin → resolve → 校验并固定会话/Host 信息 → 展示 Host 并由手机用户确认 → 复用原 claim/验证码/轮询/安全存储/自动连接流程。同时保留下面的旧 JSON 扫码解析，用于旧服务和已显示二维码；未知格式明确拒绝，不猜测协议。Dart 移动端实现和真机扫码尚未完成（由 DSH Go 维护）。

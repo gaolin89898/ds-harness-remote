@@ -5,7 +5,7 @@
 ## 1. 定位与入口
 
 CodeX 保留在 Remote Plugin 的 `packages/plugin/src/codex/` 独立领域，Host 使用 stdio App Server，Remote 使用 `codex.app.*`。
-Desktop 通过临时 Typert carrier 复用原生 Workspace / Session / Conversation / Composer；Android 直接消费同一领域并在内存中投影。
+Desktop 通过临时 Typert carrier 复用原生 Workspace / Session / Conversation / Composer；移动客户端可直接消费同一领域并在内存中投影。
 VS Code 当前不增加 CodeX 会话入口。完整 Remote Web runtime 仍在独立 Server 仓库；本仓库最小 Server 只转发加密数据。
 
 用户从 Remote Host 的工作区选择器进入 CodeX Project / Workspace，可选择既有目录或注册 Host 现存目录。
@@ -28,7 +28,7 @@ ID 只是映射，不能单独授权访问路径、Thread 或文件。
 ## 3. 数据流
 
 ```text
-Desktop 原生 UI / Android Workspace、Session、Chat
+Desktop 原生 UI / 移动端 Workspace、Session、Chat
   -> Client 内存展示投影
   -> CodexRemoteClient
   -> membership + pinned identity + Noise channel
@@ -97,5 +97,5 @@ Host 配置热更新只重启变化后端；其他后端保留。工具和审批
 日志不包含 token、私钥、Prompt、历史、源码或工具输出。
 
 核心验证保护 authority、allowlist、History/live 顺序、RPC、审批、恢复和文件/终端隔离；纯展示不新增测试。
-已有 CodeX Desktop/Android 主链路验收不等于 Project 新建、最新工具、Windows 与长连接全部通过。
+已有 CodeX Desktop 主链路验收不等于 Project 新建、最新工具、Windows 与长连接全部通过。
 剩余验收见[TODO](../TODO.md)，使用与边界见[CodeX 技术说明](../codex-remote.md)，实现约束见 [AGENTS](../../AGENTS.md)。

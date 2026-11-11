@@ -46,7 +46,7 @@ WebSocket: wss://{serverHost}/ws/v1/connect
 “我的设备”入口通过官方 `sidebar.panellist` 与 `main` 插槽打开已保存 Server 的
 `/app/embedded/devices`，仅接受无用户名密码的 HTTP(S) 地址，不向 iframe 传递设备凭据。
 自部署 Server 须配置 `DSH_SERVER_FRAME_ANCESTORS` 放行精确 Harness origin：Desktop 为
-`dsh-app://app`，公网 Harness 网页版为对应 HTTPS origin，Android dsh-go「网页模式」为
+`dsh-app://app`，公网 Harness 网页版为对应 HTTPS origin，dsh-go「网页模式」为
 `http://127.0.0.1:3080`（缺失时该页被 CSP frame-ancestors 拦下，WebView 报
 `net::ERR_BLOCKED_BY_RESPONSE`），见
 [Server 配置](../apps/server/README.md#在-harness-内嵌设备页)。首次内嵌网页登录独立于
@@ -117,7 +117,7 @@ GET /api/v1/auth/oauth/providers
 `qrStartUrl` 缺省或为 `null` 表示不支持扫码，桌面插件只显示支持扫码的条目。
 
 Web 登录打开 `startUrl` 并添加 `return_to=/app`。授权后回到同源
-`/app?token=<accountToken>`。Android 可使用固定 App scheme `dshremote://oauth`；其他
+`/app?token=<accountToken>`。移动客户端可使用固定 App scheme `dshremote://oauth`；其他
 外部 URL 或自定义 scheme 会被规范化为 `/app`，避免开放重定向。
 
 桌面插件向所选条目的 `qrStartUrl` 发起 `POST`，Server 返回
@@ -477,7 +477,7 @@ Authorization: Bearer <accountToken>
 该接口用于插件登录后的设备恢复/展示，不替代本机私钥。若 Server 返回某个 Host，
 但本机没有对应私钥，插件不能冒充或自动认领该设备，应创建新的 device identity。
 
-完整 hosted Server 的网页管理和 Android 使用以下接口修改账号拥有的 Host 名称：
+完整 hosted Server 的网页管理和移动客户端使用以下接口修改账号拥有的 Host 名称：
 
 ```http
 PATCH /api/v1/account/devices/{deviceId}
@@ -489,9 +489,9 @@ Content-Type: application/json
 
 请求名称去除首尾空白，长度为 1–128 个字符；成功响应包含服务端保存的 `name`。
 Host 在线或离线均可修改名称，设备 ID、身份密钥和 membership 保持原值。
-Android 使用已授权的 Client device token，不保存账号 token 或重新注册 Host；
+客户端使用已授权的 Client device token，不保存账号 token 或重新注册 Host；
 服务端仍负责检查账号设备归属。此接口尚未在本仓库的最小自部署 Server 中实现，
-不支持的 Server 会返回错误，Android 保留编辑内容供重试。
+不支持的 Server 会返回错误，客户端保留编辑内容供重试。
 
 ## 10. 最小状态机
 

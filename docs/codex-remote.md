@@ -15,11 +15,11 @@ App Server 管理；Remote 不导入、不复制，也不另建一套 Codex 数�
 ## 用户界面
 
 连接 Host 后，Remote 工作区选择器可以展示 Codex 工作区。用户选择后继续使用现有 Harness 或
-Android 会话界面：
+移动端会话界面（由外部客户端提供）：
 
 - Desktop 复用 Harness 原生 Workspace、Session、Conversation、Composer、工具卡片和审批控件。
-- Android 复用移动端已有 Workspace、Session、Chat、模型、权限、图片、停止和审批控件。
-- Desktop Remote 选择器和 Android Workspace 页面都可选择 Host 上的真实目录并新增 Codex 项目。
+- 移动客户端复用自身已有 Workspace、Session、Chat、模型、权限、图片、停止和审批控件。
+- Desktop Remote 选择器可选择 Host 上的真实目录并新增 Codex 项目。
 - 不增加独立 Codex 页面、本地模式入口或第二套 Thread 导航。
 
 虚拟 Workspace 和 Session 只存在于内存展示层。退出 Codex 模式、切换 Host 或断开连接时，对应
@@ -40,7 +40,7 @@ Host 可以使用 `thread/list` 已返回的绝对 `cwd` 精确生成只读后�
 ## 数据映射
 
 Desktop 端会把 Codex Thread 映射成临时 DSH Session，把 History 和实时 frame 映射成原生 Session
-事件。Android 端直接消费同一 Codex 领域，并只在移动端内存中生成展示投影。
+事件。移动客户端可直接消费同一 Codex 领域，并只在自身内存中生成展示投影。
 
 实时投影覆盖 assistant、reasoning、plan、命令输出、文件输出、文件变更摘要、MCP progress、
 Thread 状态和模型切换。Web Search、Subagent、Image、Compaction 和 Review Mode 复用原生工具卡片。
@@ -61,7 +61,7 @@ Web 与 Desktop Remote 的审批模式按 Thread 显示 Host 已确认的设置�
 普通发送和 fork 不重放缓存的 preset，新 Thread 使用 `workspace-write`。纯查看只读取 Host 的
 内存快照，不恢复会话；Host 重启后，尚未再次获知的模式回到未知状态。
 
-Codex 支持文本 Prompt，以及 Desktop 剪贴板粘贴或 Android 系统图片选择器提供的 PNG、JPEG、WebP、
+Codex 支持文本 Prompt，以及 Desktop 剪贴板粘贴或移动端图片选择器提供的 PNG、JPEG、WebP、
 GIF 图片 Prompt。图片走受限的加密分块传输；通用文件附件、外部 URL、Host path 直接引用和目录写入
 不开放。
 
@@ -88,6 +88,6 @@ ds-harness-remote:
 
 ## 当前验证状态
 
-Codex Remote 已完成 Desktop 跨机、Android 真机、Web → Host、多客户端观察、大 History、Prompt、
+Codex Remote 已完成 Desktop 跨机、Web → Host、多客户端观察、大 History、Prompt、
 approval、interrupt 和图片分块的真实设备验证，但仍以实验功能发布。后续恢复策略、跨平台矩阵和
 长期稳定性以 [TODO](TODO.md) 为准；不应把 TODO 中的目标能力描述为已完成。

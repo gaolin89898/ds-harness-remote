@@ -1,12 +1,9 @@
 ## 中文
 
-**v0.6.4 · Android build 71**
+**v0.6.4**
 
-### Android 与 DS Bot
+### 远程工作区
 
-- 对齐 DS Bot 0.3.0，支持多会话分段、本地 Agent 标识、队列过滤和关闭状态留存。
-- 新增 DS Bot 详情页、浏览器页、13 项全局设置、设置子页与日程联动。
-- 新增 Bot 会话、群聊、成员管理和引用对话，未安装 DS Bot 时显示电脑端安装指引。
 - 支持离线会话秒开、主机离线时读取缓存历史、会话抽屉直接创建工作区和远程主机切换。
 - 改进 Codex 会话标题、空会话重连提示、聊天活动展示、侧栏导航和工作区层级。
 - 新增设备发现诊断日志、连接日志导出、错误横幅和设置诊断页。
@@ -45,13 +42,10 @@
 
 ## English
 
-**v0.6.4 · Android build 71**
+**v0.6.4**
 
-### Android and DS Bot
+### Remote workspaces
 
-- Align with DS Bot 0.3.0 with segmented multi-session views, local Agent badges, queue filtering and retained closed states.
-- Add DS Bot profile and browser pages, 13 global settings, settings subpages and schedule integration.
-- Add Bot conversations, group chats, member management and referenced conversations, with desktop installation guidance when DS Bot is unavailable.
 - Add offline session instant-open, cached history while a Host is offline, direct workspace creation from the session drawer and remote Host switching.
 - Refine Codex titles, empty-session reconnect prompts, chat activity, sidebar navigation and workspace hierarchy.
 - Add device discovery diagnostics, connection-log export, error banners and a diagnostics settings page.

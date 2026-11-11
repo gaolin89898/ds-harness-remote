@@ -2,7 +2,7 @@
 
 Continue DeepSeek Harness sessions and experimental Codex, Cursor, and Antigravity workspaces from another device over an end-to-end encrypted connection.
 
-[GitHub](https://github.com/gaolin89898/ds-harness-remote) · [Full guide](https://github.com/gaolin89898/ds-harness-remote/blob/main/README.md) · [中文说明](https://github.com/gaolin89898/ds-harness-remote/blob/main/README.md) · [Remote Web](https://dsh.r2049.cn/app) · [Android](https://github.com/gaolin89898/ds-harness-remote/releases/latest)
+[GitHub](https://github.com/gaolin89898/ds-harness-remote) · [Full guide](https://github.com/gaolin89898/ds-harness-remote/blob/main/README.md) · [中文说明](https://github.com/gaolin89898/ds-harness-remote/blob/main/README.md) · [Remote Web](https://dsh.r2049.cn/app) · [DSH Go](https://github.com/ccch1mneyyy/dsh-go)
 
 `ds-harness-remote` is the Remote Host and workspace plugin for DeepSeek Harness. Harness keeps running on your work computer with its existing workspaces, tools, and permission controls; Remote gives authorized devices another window into that environment.
 
@@ -63,7 +63,7 @@ dsh plugin --profile web add -w ds-harness-remote@0.6.4
 
 ## Highlights
 
-- Continue active Harness sessions and review progress from another computer, the web, or Android.
+- Continue active Harness sessions and review progress from another computer, the web, or a mobile client.
 - Send text and image prompts, answer questions, and handle permission requests.
 - Open workspaces on another authorized computer without replacing the native Harness interface.
 - Use the official workspace file tree and bounded read-only previews on supported Harness versions.
@@ -78,7 +78,7 @@ The development baseline is DeepSeek Harness `dsh-v0.2.2-rc.1`, retaining the of
 
 `0.5.19` removes Harness `0.1.1-rc.2` ApiProxy support from the Host and bundled Remote client. ApiProxy-only Hosts and missing capability discovery are rejected. CodeX/ACP Desktop projection also uses Typert only.
 
-The same package feature-detects the older settings registry and the `0.1.7-rc.1` and `0.2.0-rc.2` Volatile settings entry. Remote Web/Desktop and Android normalize released sessions that still report the retired `code` agent preset to `ptc`. The Host reads the running Harness version from the CLI entrypoint, or from the 0.2.0 Desktop shell's `@deepseek-ai/dsh-desktop-host` entrypoint when the Harness CLI package is only a sibling of that entrypoint inside `app.asar`.
+The same package feature-detects the older settings registry and the `0.1.7-rc.1` and `0.2.0-rc.2` Volatile settings entry. Remote Web/Desktop normalize released sessions that still report the retired `code` agent preset to `ptc`. The Host reads the running Harness version from the CLI entrypoint, or from the 0.2.0 Desktop shell's `@deepseek-ai/dsh-desktop-host` entrypoint when the Harness CLI package is only a sibling of that entrypoint inside `app.asar`.
 
 ## Self-hosted Server
 

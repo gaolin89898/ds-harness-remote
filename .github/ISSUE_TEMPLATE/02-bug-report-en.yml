@@ -12,7 +12,7 @@ body:
         **Security & Privacy Notice (Important)**:
         - **Do not post security vulnerabilities or sensitive data here.**
         - Please redact credentials, auth tokens, pairing QR codes, session keys, agent prompts/conversations, and private local paths from logs and screenshots.
-        - This issue tracker covers the Android app, Web client, self-hosted relay/signaling server, desktop plugin, core connection protocols, and integration compatibility with companion plugins (such as dsh-go, ds-bot, deepseek-harness-intelligent-ui).
+        - This issue tracker covers the Web client, self-hosted relay/signaling server, desktop plugin, core connection protocols, and integration compatibility with companion plugins (such as dsh-go, ds-bot, deepseek-harness-intelligent-ui).
 
   - type: dropdown
     id: area
@@ -20,7 +20,6 @@ body:
       label: Affected area
       description: Which part or component is affected?
       options:
-        - "Android App (apps/android)"
         - "Web Client / Browser (apps/browser)"
         - "Server / Relay / Signaling (apps/server)"
         - "VS Code Extension (apps/vscode)"
@@ -37,7 +36,7 @@ body:
     attributes:
       label: Installation / Client method
       options:
-        - "Android APK (GitHub Release / Pre-release)"
+        - "DSH Go mobile client (dsh-go)"
         - "DSH Desktop Plugin (Marketplace)"
         - "Hosted Web Client (dsh.r2049.cn/app)"
         - "Self-hosted Docker Server"
@@ -60,8 +59,8 @@ body:
     id: os
     attributes:
       label: Operating system & environment
-      description: OS version and CPU architecture (include phone model and Android version if applicable).
-      placeholder: "Example: Android 14 (Pixel 8), Windows 11 x64, macOS 15.0 arm64, Ubuntu 24.04 x64"
+      description: OS version and CPU architecture (include phone model and Android version for DSH Go).
+      placeholder: "Example: Windows 11 x64, macOS 15.0 arm64, Ubuntu 24.04 x64, Android 14 (DSH Go)"
     validations:
       required: true
 

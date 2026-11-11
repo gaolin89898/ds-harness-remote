@@ -5,7 +5,6 @@
 本仓库只实现以下内容：
 
 - DeepSeek Harness Plugin（常驻 Host + 本地 Remote 工作区入口，无用户可见的 Client 模式）
-- Android Client（账号授权 + Adaptive transport + Typert Remote 数据面 + 可选 Codex Remote）
 - VS Code Client（账号授权 + Host 信任固定 + rc.2 ApiProxy / v0.1.2 Typert Remote 会话/Prompt）
 - Browser Chrome/Edge MV3 入口（独立设备凭据、在线 Host 列表、打开 Remote Web）
 - `protocol`、`crypto`、`webrtc`、`client-core` 等共享包

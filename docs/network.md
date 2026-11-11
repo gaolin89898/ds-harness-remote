@@ -226,13 +226,13 @@ Client 可以把当前模式显示为 `LAN`、`P2P`、`TURN`、`Relay` 或 `Disc
 - Protocol v1 Control/Relay 与 capability 协商；
 - WebRTC offer/answer/ICE、STUN/TURN 短期 credential 接入；
 - LAN/P2P/TURN 路径识别、DataChannel chunking 与 Relay fallback；
-- Desktop Plugin、Android 和 VS Code Client 的 Adaptive transport 接入；
+- Desktop Plugin 和 VS Code Client 的 Adaptive transport 接入；
 - 所有路径上的 Noise E2EE 与按 connection 隔离。
 
 仍需完成或扩大验证：
 
 - rc.2/alpha.1/alpha.2 真实 Harness 双机与跨网 E2E；
-- Android `react-native-webrtc` 与 Host WebRTC runtime 的真机 P2P/TURN 互操作；
+- 移动端 `react-native-webrtc` 与 Host WebRTC runtime 的真机 P2P/TURN 互操作（外部客户端维护）；
 - 网络切换、休眠/唤醒、长期稳定性和代理环境；
 - control heartbeat、RTT、错误分类和重连后的 stream/history 恢复；
 - 与独立 Server 仓库共享 conformance fixtures。

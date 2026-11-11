@@ -15,7 +15,6 @@ body:
       label: 涉及模块 (Affected area)
       description: 该功能主要改进哪个部分？
       options:
-        - "Android App (apps/android)"
         - "Web 客户端 / 浏览器端 (apps/browser)"
         - "中继 / 信令服务端 (apps/server)"
         - "VS Code 插件 (apps/vscode)"

@@ -6,8 +6,7 @@
 <p align="center">
   <a href="docs/README.md"><img src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-blue?logo=googledocs&amp;logoColor=white" alt="文档"></a>
   <a href="https://dsh.r2049.cn/app"><img src="https://img.shields.io/badge/Web-4D6BFE?logo=googlechrome&amp;logoColor=white" alt="Web"></a>
-  <a href="https://github.com/gaolin89898/ds-harness-remote/releases/latest"><img src="https://img.shields.io/badge/Android-3DDC84?logo=android&amp;logoColor=white" alt="Android"></a>
-  <a href="https://github.com/gaolin89898/ds-harness-remote/issues/20"><img src="https://img.shields.io/badge/iOS-000000?logo=apple&amp;logoColor=white" alt="iOS"></a>
+  <a href="https://github.com/ccch1mneyyy/dsh-go"><img src="https://img.shields.io/badge/Android-3DDC84?logo=android&amp;logoColor=white" alt="Android"></a>
 </p>
 
 <p align="center">
@@ -38,7 +37,7 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 - 通过 Harness 原生侧栏提供工作区文件、只读预览、远程终端和已授权本机开发服务预览。
 - Remote Tool 上下文注入，支持 发现主机与工作区、创建和管理 Harness 会话、读取历史、等待执行、请求中断及传输获准文件。[详情](packages/plugin/README.md#remote-agent-tools)
 - 除了支持DeepSeek Harness，同时通过ACP协议支持 Codex、Cursor、Google Antigravity、Pi、OpenCode、Claude Code、Harness Agent等工具的原生工作区，远程文件浏览、终端均可使用。
-- Android、iOS、Web、原生DSH 都有对应客户端，全平台可用。
+- Web、原生DSH 都有对应客户端；移动端可使用 [DSH Go](https://github.com/ccch1mneyyy/dsh-go)。
 - 多个客户端可以同时连接同一个 Harness Host，RPC 与数据流按连接隔离。
 
 ## 支持的客户端
@@ -47,9 +46,7 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 | --- | --- | --- | --- |
 | DSH&nbsp;Desktop&nbsp;插件 | Remote 侧栏 | 已支持 | 装 `ds-harness-remote@0.6.4`；Host 也可以就是这台电脑 |
 | Web | 浏览器页面 | 已支持 | 打开 [https://dsh.r2049.cn](https://dsh.r2049.cn)，复用 Harness 原生界面 |
-| Android | 原生 App | 已支持 | 从 [Releases](https://github.com/gaolin89898/ds-harness-remote/releases/latest) 下载 APK，见 [Android 说明](apps/android/README.md) |
-| DSH Go | C佬精品 | 已支持 | 详情见：[ccch1mneyyy/dsh-go: DeepSeek Harness 的 Android 客户端。手机上直接跑，也能遥控你电脑上的 DSH。](https://github.com/ccch1mneyyy/dsh-go)
-| iOS | TestFlight 内测 | 内测 | 未公开上架，入口见 [issue #20](https://github.com/gaolin89898/ds-harness-remote/issues/20) |
+| DSH Go | C佬精品 | 已支持 | 移动端客户端，详情见：[ccch1mneyyy/dsh-go: DeepSeek Harness 的 Android 客户端。手机上直接跑，也能遥控你电脑上的 DSH。](https://github.com/ccch1mneyyy/dsh-go) |
 | 浏览器扩展 | Chrome | 仅入口 | 读取已登录 Web 的授权换取独立设备凭据、列出在线 Host、打开同源 Remote Web，不承载会话界面 |
 | dsh-TUI | 纯终端 CLI | 计划中 | 本版本不包含该集成，将在后续版本单独提供；安装脚本不会为它自动创建 Web 服务 |
 | Linux  | 云服务器  | 已支持 | [官网](https://dsh.r2049.cn/)登录后一键安装。
@@ -73,11 +70,9 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
 
 见官网首页[https://dsh.r2049.cn](https://dsh.r2049.cn/)，登陆后获取一键安装授权码安装即可。
 
-### 原生Android 客户端
+### 移动端客户端
 
-支持同时使用多工作区连接对话，同时创造性加入了 「Bot 模式」（ Power by [Fei2411/DS-Bot](https://github.com/Fei2411/DS-Bot)）
-
-从 [GitHub Releases](https://github.com/gaolin89898/ds-harness-remote/releases/latest) 下载最新 APK，登录同一账号即可看到主机。
+移动端使用 [DSH Go](https://github.com/ccch1mneyyy/dsh-go)（已内置 ds-harness-remote 协议）。
 
 ## DSH Go - DeepSeek Harness 装进口袋：手机本机运行，也能遥控你的电脑。
 
@@ -85,15 +80,11 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
 
 在手机端DSH Go安装 ds-harness-remote 插件后，电脑端、Web端一样可以远程到手机上的DSH，丝滑使用Mobile Use.
 
-### iOS 客户端
-
-- [内测招募](https://github.com/gaolin89898/ds-harness-remote/issues/20)
-
 ## 快速开始
 
 1. 从 DeepSeek Harness 侧边栏打开 **Remote** 入口。
 2. 按需选择登录方式：「知乎」、「Github」、[Google ] 授权登录均已支持，账号密码登录（使用邀请码注册，可邮件本仓库作者申请）
-3. 在另一台设备上使用 DeepSeek Harness安装同样插件，根据1、2完成同样方式的登录。也可以按需使用Remote Web、iOS、Android、DSH Go等客户端，即开即用，无需安装任何插件。
+3. 在另一台设备上使用 DeepSeek Harness安装同样插件，根据1、2完成同样方式的登录。也可以按需使用Remote Web、DSH Go等客户端，即开即用，无需安装任何插件。
 4. 选择在线 Host，再选择已有 Workspace 或浏览远端目录后打开。
 
 默认使用本项目提供的[https://dsh.r2049.cn](https://dsh.r2049.cn)托管 Remote Server。
@@ -114,24 +105,10 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
 
 注意：如果想关闭当前电脑远控其他主机功能，可在[https://dsh.r2049.cn/](https://dsh.r2049.cn/) 「主机列表」中，打开「仅被控」开关，开启「仅被控」后当前设备无法看到账号下其他设备，Web端、其他客户端依旧可以远程当前设备。
 
-### Android
-
-支持文字/图片 Prompt、模型切换，以及可用工作区的文件和终端。
-
-<p align="center">
-  <img src="docs/images/mobile-list.jpg" alt="Android 客户端中的在线和离线设备列表" width="30%">
-  <img src="docs/images/image-msg.jpg" alt="从 Android 客户端发送图片 Prompt" width="30%">
-  <img src="docs/images/image-result.jpg" alt="在 Android 客户端中查看图片理解结果" width="30%">
-</p>
-
-移动端设置提供默认关闭的全局「会话精简模式」，下次打开会话生效。
-
-支持该能力的 Host 缩减历史工具详情，保留正文和工具状态，关闭此设置后重新打开会话可加载完整历史。
-
 ## 工作方式
 
 ```text
-DSH Desktop / Remote Web / Android
+DSH Desktop / Remote Web / DSH Go
   ↔ 已认证的端到端加密通道
 Host 上的 Remote 插件
   ↔ 支持的 Harness 能力或可选 Codex 工作区支持
@@ -162,7 +139,7 @@ Claude 和 Hermes 均支持直接 Files/Terminal 访问，复用 Host 的工作�
 
 配置与后端适配开发见 [Agent 工作区接入指南](docs/acp-integration.md)。
 
-Desktop/Android 的 Cursor、Claude、Hermes、Pi、OpenCode、AGY 模型选择使用 Host 实际模型目录，由Agent ACP决定
+Desktop 的 Cursor、Claude、Hermes、Pi、OpenCode、AGY 模型选择使用 Host 实际模型目录，由Agent ACP决定
 
 思考强度选项以上游实际提供为准。Cursor 每个会话使用独立进程，切换模型不会影响其他会话。
 
@@ -223,7 +200,7 @@ WebRTC 不可用或连接失败时，会降级到加密的 WebSocket Relay。
 
 当前基线为 `dsh-v0.2.2-rc.1`；`dsh-v0.2.1-rc.5` 与 `0.2.0` rc.2 / rc.1 在同一官方 carrier 上继续兼容，详见[兼容性说明](docs/compatibility.md)。
 
-Host 插件、随包 Remote 客户端和 Android 已移除 Harness `0.1.1-rc.2` ApiProxy 兼容。请使用提供官方 Typert Remote carrier 的 Host；
+Host 插件与随包 Remote 客户端已移除 Harness `0.1.1-rc.2` ApiProxy 兼容。请使用提供官方 Typert Remote carrier 的 Host；
 
 仅提供 ApiProxy 或不支持能力发现的旧 Host 会被拒绝，不再降级。
 
@@ -232,10 +209,6 @@ CodeX/ACP 保留独立数据面，Desktop 内存投影统一使用 Typert。
 **Linux 安装为什么要求 root？**
 
 安装脚本要配置 systemd 系统服务；Host、Agent 工具与远程终端因此具备 root 权限，只应对可信账号开放。
-
-**iOS 可以直接装吗？**
-
-目前是 TestFlight 内测，未公开上架，入口见 [issue #20](https://github.com/gaolin89898/ds-harness-remote/issues/20)。
 
 **和 frp、内网穿透或远程桌面有什么不同？**
 
@@ -254,7 +227,7 @@ Tailscale 、 CF Turn 、UU远程都是非常优秀的解决方案，大家按�
 ### Intelligent UI
 
 [Intelligent UI](https://github.com/dreamfarer-space/deepseek-harness-intelligent-ui) 让模型用卡片、表格、图表和表单作答。
-Android 客户端可原生渲染这些内容，并在 **插件 → Remote 适配** 中列出该插件，可直接开关和修改实时设置。
+Remote 客户端可原生渲染这些内容，并在 **插件 → Remote 适配** 中列出该插件，可直接开关和修改实时设置。
 
 ### [Fei2411/DS-Bot](https://github.com/Fei2411/DS-Bot)
 
@@ -273,7 +246,6 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 - [开发进度与路线图](docs/TODO.md)
 - [更新记录](docs/CHANGELOG.md)
 - [隐私说明](docs/PRIVACY.md)
-- [Android 说明](apps/android/README.md)
 - 当前开发适配基线为 `dsh-v0.2.2-rc.1`，验证范围见[兼容性说明](docs/compatibility.md)。
 
 ## 友情链接
@@ -301,7 +273,7 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 
 - **提交 Issue**：发现异常、有新功能设想，或对使用体验有更好的建议？欢迎随时发起讨论。
 - **文档与多语言**：完善使用指南、修正表述细节，或协助保持中文、英文与日文文档同步。
-- **测试与多端体验**：在你的实际环境中（Desktop / Web / Android）体验运行，反馈真实场景下的表现。
+- **测试与多端体验**：在你的实际环境中（Desktop / Web）体验运行，反馈真实场景下的表现。
 - **代码与代码审查**：认领待办事项、修复缺陷、实现新特性，或是协助 Review 社区的 Pull Request。
 
 <p align="center">
@@ -319,8 +291,6 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 本项目是独立的社区项目，不是 DeepSeek 官方产品。DeepSeek 及相关名称和商标归其各自权利人所有。
 
 ## 连接问题排查
-
-Android：复现问题后打开 **设置 → 诊断 → 导出连接日志**，选择文件夹保存 `.txt`。日志保留本次 App 进程启动以来最近 500 条连接诊断；重启 App 后清空，不包含凭据和会话内容。
 
 Host：在 **插件 → Remote 设置** 开启 **Debug 日志**，立即生效并持久保存；排查完成后关闭（恢复 `info` 级别）。日志带 `[ds-harness-remote]` 前缀，Desktop 可在 `desktop.log` 查找。手动配置可设置 `logLevel: debug`。
 

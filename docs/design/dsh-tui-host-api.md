@@ -1,12 +1,12 @@
 # dsh-TUI Remote Host API plan
 
-Status: WSL Host smoke test complete. Android acceptance remains open for [issue #290](https://github.com/gaolin89898/ds-harness-remote/issues/290).
+Status: WSL Host smoke test complete. Mobile client acceptance remains with the external client project.
 
 ## Problem
 
 The dsh-TUI profile can load the Remote Host entry without the Host Remote API suite.
 Relay and Noise then connect, but Harness RPC calls cannot complete.
-The Android client retries the connection.
+The mobile client retries the connection.
 
 Issue #290 reports a working manual profile patch.
 The patch adds the Host Remote API packages to the dsh-TUI composition.
@@ -36,11 +36,11 @@ The 0.2.2 package graph may require a different list or load order.
 
 - A clean dsh-TUI profile loads the package without manual patch edits.
 - Host status reports the Remote API as available only when the API suite is active.
-- Android opens a Harness workspace, session, and event stream over an encrypted connection.
+- A mobile client opens a Harness workspace, session, and event stream over an encrypted connection.
 - Prompt, approval, disconnect, and reconnect work with one Host process.
 - A missing Host API package produces a clear startup error.
 - The browser and Desktop Host still load one Remote entry.
-- The test report records Harness, Plugin, dsh-TUI, Android, Node.js, and transport versions.
+- The test report records Harness, Plugin, dsh-TUI, Node.js, and transport versions.
 
 ## WSL Host validation (2026-11-09)
 
@@ -66,5 +66,5 @@ This test did not use that CLI for local account authorization or status.
 The TUI profile also warned about two missing optional TUI tool entries.
 Those entries were `tool-ralph` and `tool-subagent-list-agents`.
 
-Android workspace, session, event, prompt, approval, and reconnect checks remain open.
+Mobile workspace, session, event, prompt, approval, and reconnect checks remain open in the external client project.
 The separate TUI package also needs a release path.

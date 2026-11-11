@@ -1,6 +1,6 @@
 # DSH Remote Protocol v1
 
-2026-10-25 实现边界：Host 插件、随包 Remote 客户端和 Android 已移除 Harness `0.1.1-rc.2` ApiProxy 兼容。请使用提供官方 Typert Remote carrier 的 Host；仅提供 ApiProxy 或不支持能力发现的旧 Host 会被拒绝，不再降级。CodeX/ACP 保留独立数据面，Desktop 内存投影统一使用 Typert。本轮不改独立 VS Code Client 或独立 Remote Web 仓库。
+2026-10-25 实现边界：Host 插件与随包 Remote 客户端已移除 Harness `0.1.1-rc.2` ApiProxy 兼容。请使用提供官方 Typert Remote carrier 的 Host；仅提供 ApiProxy 或不支持能力发现的旧 Host 会被拒绝，不再降级。CodeX/ACP 保留独立数据面，Desktop 内存投影统一使用 Typert。本轮不改独立 VS Code Client 或独立 Remote Web 仓库。
 `harness.api.*` 方法/事件/capability 的以下定义仅保留为历史线协议与旧 Client 类型契约；当前 Host 不注册这些方法，调用返回 `METHOD_NOT_FOUND`。
 
 状态：Draft v0.2（首版发布前，不保留旧业务 RPC 兼容）
@@ -10,7 +10,7 @@
 
 ### Claude ACP Host 实验性接入（Issue #125）
 
-`claude` 是独立 ACP backend ID，默认关闭，只使用现有加密 `agent.acp.*` 数据面及固定方法 allowlist；`initialize`、`session/new`、`session/prompt` 的 backend 可显式选择 `claude`。不得按命令名称猜测后端或在其不可用时回退到 Cursor。Host 使用本机预授权的 `claude-agent-acp` stdio adapter，不发送 Cursor `authenticate(cursor_login)`。权限响应仍仅允许现有单次允许/拒绝契约。Host 通过固定 `dsh/workspaceList` / `dsh/sessionList` 使用上游 ACP `session/list` 的分页目录与 Session authority；只接受 Host realpath 验证的真实 cwd。Claude `session/load` 必须显式指定 backend，并由 Host catalog 或本机已创建的 Session 确认 cwd，不能接受 Client 自报路径；活动回复期间禁止重新 load，独立 history 读取不受此限制。`dsh/sessionHistory` 可使用 `claude:<native-session-id>`，前缀必须匹配 backend；历史只经独立临时 ACP process 的 `session/load` replay 获取，不读本机 transcript 文件，最多 8 MiB / 10,000 更新，超限显式失败，读取失败不得返回成功的部分历史或伪造空历史。保留最多 30 个 live/loading Session，以及一个临时 history process；重复 load 不重放污染 live stream。`session/cancel` 使用标准无请求 ID 的 notification；Gateway 同步撤销该会话待审批句柄并隔离迟到权限请求，其他会话/后端不受影响，最终完成状态由上游 `cancelled` 确认，不伪造停止成功。Claude Desktop/Android 使用 `claude:cwd:` 工作区与 `claude:` 会话前缀，仅作客户端内存投影。模型目录与切换复用下述固定 `dsh/sessionModels` / `dsh/selectModel`，Claude 图片输入暂不支持；直接 Files/Terminal 复用 Host 共享工作区桥接及路径、连接和终端归属校验。恢复会话发送 Prompt 前，Host 必须使用可信 cwd 加载；准备期间取消不启动迟到回复，也不清除后续重试。加密跨设备及原生设备验收仍待完成。
+`claude` 是独立 ACP backend ID，默认关闭，只使用现有加密 `agent.acp.*` 数据面及固定方法 allowlist；`initialize`、`session/new`、`session/prompt` 的 backend 可显式选择 `claude`。不得按命令名称猜测后端或在其不可用时回退到 Cursor。Host 使用本机预授权的 `claude-agent-acp` stdio adapter，不发送 Cursor `authenticate(cursor_login)`。权限响应仍仅允许现有单次允许/拒绝契约。Host 通过固定 `dsh/workspaceList` / `dsh/sessionList` 使用上游 ACP `session/list` 的分页目录与 Session authority；只接受 Host realpath 验证的真实 cwd。Claude `session/load` 必须显式指定 backend，并由 Host catalog 或本机已创建的 Session 确认 cwd，不能接受 Client 自报路径；活动回复期间禁止重新 load，独立 history 读取不受此限制。`dsh/sessionHistory` 可使用 `claude:<native-session-id>`，前缀必须匹配 backend；历史只经独立临时 ACP process 的 `session/load` replay 获取，不读本机 transcript 文件，最多 8 MiB / 10,000 更新，超限显式失败，读取失败不得返回成功的部分历史或伪造空历史。保留最多 30 个 live/loading Session，以及一个临时 history process；重复 load 不重放污染 live stream。`session/cancel` 使用标准无请求 ID 的 notification；Gateway 同步撤销该会话待审批句柄并隔离迟到权限请求，其他会话/后端不受影响，最终完成状态由上游 `cancelled` 确认，不伪造停止成功。Desktop 与移动客户端使用 `claude:cwd:` 工作区与 `claude:` 会话前缀，仅作客户端内存投影。模型目录与切换复用下述固定 `dsh/sessionModels` / `dsh/selectModel`，Claude 图片输入暂不支持；直接 Files/Terminal 复用 Host 共享工作区桥接及路径、连接和终端归属校验。恢复会话发送 Prompt 前，Host 必须使用可信 cwd 加载；准备期间取消不启动迟到回复，也不清除后续重试。加密跨设备及原生设备验收仍待完成。
 
 ## 0. 文档地位与仓库边界（规范性）
 
@@ -25,7 +25,7 @@
 `apps/server` 实现本文的单账号注册/刷新、设备发现、Control、WebRTC signaling/TURN credential 与 Relay 子集；范围见 [最小 Server](../apps/server/README.md)。其余多账号、主机匹配码、Browser 授权、独立 Relay attach/resume 与 Admin 能力仍属于独立 Server，不得把未实现的能力声明为可用。
 
 任何与本文不一致的示例代码都视为未完成实现，不能反向修改协议语义。当前尚未发布，
-旧 Android 业务 RPC 明确不兼容；首版发布后破坏兼容性的变更必须提升协议版本。
+旧移动端业务 RPC 明确不兼容；首版发布后破坏兼容性的变更必须提升协议版本。
 
 ## 1. 范围
 
@@ -38,7 +38,7 @@ DSH Remote Protocol 定义 Host Plugin、DSH Remote Server 和 Remote Client 之
 - WebSocket authentication
 - WebRTC signaling 与 Relay routing
 - Host/Client 端到端安全通道
-- 历史 rc.2 ApiProxy 线协议定义（当前 Host / Android 已移除）
+- 历史 rc.2 ApiProxy 线协议定义（当前 Host 与客户端均已移除）
 - v0.1.2 alpha.1–rc.1 与 v0.1.5 rc.1 Session V3 Typert Remote 的 unary、stream 与 `$events` 双向事件 carrier
 - reconnect 与原生 stream 重建
 - capability 与版本协商
@@ -51,7 +51,7 @@ Admin API 不属于 E2EE Remote Protocol。它是同站点的独立 HTTPS API，
 本文的“必须”“禁止”“应该”“可以”是规范性要求。
 
 - **Host**：运行 DeepSeek Harness 与 `@dsh-remote/plugin` 的设备。
-- **Client**：通过 Remote transport 控制 Host 的 Desktop Harness、VS Code、Android 或 Remote Web；
+- **Client**：通过 Remote transport 控制 Host 的 Desktop Harness、VS Code 或 Remote Web；
   Browser Launcher 只注册 `role=client` device 以发现 Host，本身不是 Remote Client runtime。
 - **Server**：负责账号授权、presence、signaling 和 opaque Relay 的协调服务。
 - **Device**：具有随机 deviceId 和本地 identity key 的 Host 或 Client。
@@ -772,13 +772,13 @@ Plugin Host 的 Harness 业务路由只接受 capability 对应的官方 Typert 
 文件预览使用 `fileviewer.read.v1` capability 下的 `fileviewer.call`。可选 Codex 领域仍属于同一个 Remote Plugin，
 但在线上仍使用独立的 `codex.appserver.v1` / `codex.appserver.transfer.v1` capability、
 `codex.app.*` RPC 和 event namespace；只有认证 Client Plugin 内的临时展示 target 可以把它包装成
-原生 Harness Session carrier，Android Client 则只能在本机内存中投影到已有移动端状态。Host、Server
-与 Android 都不得伪造或持久化第二份 Harness/CodeX Session。
+原生 Harness Session carrier，移动客户端则只能在本机内存中投影到已有移动端状态。Host、Server
+与移动客户端都不得伪造或持久化第二份 Harness/CodeX Session。
 工作区根目录写入只通过独立 `workspace.upload.v1` 的四个固定 RPC，
 不得将其加入 Harness / CodeX / ACP 的任意方法透传。参见 [Workspace upload](#workspace-upload)。
 旧 `system.info`、`workspace.get`、`sessions.*`、`session.*`、
 `permissions.respond`、`connection.ping` 与 `sync.from` 已退出 Plugin 协议，Host 必须返回
-`METHOD_NOT_FOUND`。Android 旧原型不是兼容目标。
+`METHOD_NOT_FOUND`。旧移动端原型不是兼容目标。
 
 ### 16.1 Request
 
@@ -862,11 +862,11 @@ handler 校验；Remote 保留既有认证、消息大小与超时边界，不�
 
 DS Bot 0.2.1 旁问：`btw { sessionId, text }` 返回卡片 ID，`btw-cancel { sessionId, id }`
 只取消该旁问；不调用 Harness interrupt。答案通过 `state.btwCards[botId]` 刷新，旧分段
-由 `earlier.btw` 返回，均不投影为 Harness 对话事件或写入本机历史。Android 在普通 `send`
+由 `earlier.btw` 返回，均不投影为 Harness 对话事件或写入本机历史。移动客户端在普通 `send`
 前识别精确的 `/btw` 命令；空问题、群聊或旧 Bot 不支持时保留草稿并拒绝，不降级为普通 Prompt。
-`room-continue { roomId }` 由原生 Host 恢复达到接力上限的群聊，Android 依据 `room.paused`
+`room-continue { roomId }` 由原生 Host 恢复达到接力上限的群聊，客户端依据 `room.paused`
 展示继续入口；不在 Client 实现接力计数或重放。所有 mutation 继续遵循原有不自动重试规则。
-Android 卡片使用固定 0.2.1 schema 和受限表达式解释器，支持本地计算与 SVG 图表；
+移动端卡片使用固定 0.2.1 schema 和受限表达式解释器，支持本地计算与 SVG 图表；
 HTML 仅展示摘要和主机打开提示，不执行 HTML/脚本，不增加网络访问或通用 RPC。
 
 `approval-answer` 只接受 DS Bot 的 `allow`（单次）或 `reject`，不开放 session-wide 审批（0.3.0 起同时覆盖群聊与 Bot 自有会话审批）。
@@ -928,12 +928,12 @@ Host handshake 的 capability 例子：
 ]
 ```
 
-建立 Noise channel 后，Desktop/Web/Android Client 必须先调用 `harness.transport.describe`，Params 为
+建立 Noise channel 后，Desktop/Web/移动端 Client 必须先调用 `harness.transport.describe`，Params 为
 空对象，Result 为 `{ "capabilities": string[], "workspaceTypes"?: RemoteWorkspaceTypeDescription[] }`。当前 Host 按实际注入服务动态返回
 `harness.remote.v1` 或 `harness.remote.v3`，不得宣告不存在的 carrier。
 Typert Host 必须只宣告与本机 Session wire 对应的一项：v0.1.2 使用
 `harness.remote.v1`，v0.1.5 rc.1 使用 `harness.remote.v3`；禁止同时宣告两项。旧 Host 返回
-`METHOD_NOT_FOUND` 时，当前 Plugin Client 与 Android 必须拒绝连接，不得按版本号推测 ApiProxy 能力。
+`METHOD_NOT_FOUND` 时，当前 Plugin Client 与移动客户端必须拒绝连接，不得按版本号推测 ApiProxy 能力。
 
 支持 `remote.history.compact.v1` 的 Host 接受加密 RPC `remote.history.configure`，
 Params 为严格的 `{ "compact": boolean }`，Result 回显 `{ "compact": boolean }`。
@@ -1028,7 +1028,7 @@ rc.2 ApiProxy 已明确移除。当前实现不翻译 rc.2 与 Typert 的完整 
 carrier 或 Session 代际不一致时，Desktop Client 必须在选择目标、创建 Workspace 或其它 mutation 前
 返回 `HARNESS_VERSION_INCOMPATIBLE`。
 
-当前 Plugin Client / Android Harness 兼容矩阵：
+当前 Plugin Client / 移动客户端 Harness 兼容矩阵：
 
 | Host Plugin / Harness | 业务 carrier | Remote Workspace / Session | File Viewer | 图片分块 |
 | --- | --- | --- | --- | --- |
@@ -1038,11 +1038,11 @@ carrier 或 Session 代际不一致时，Desktop Client 必须在选择目标、
 | `0.4.x` / v0.1.2 alpha.1–rc.1 | capability 探测返回 `harness.remote.v1` | 支持 | provider 存在时支持 | `harness.remote.transfer.v1` |
 | `0.4.12+` / v0.1.5 rc.1 与 v0.1.6 alpha.1 | capability 探测返回 `harness.remote.v3` | 支持 | provider 存在时支持 | `harness.remote.transfer.v1` |
 
-当前 Plugin Client 与 Android 必须使用加密通道上的 capability 探测，不从 `clientVersion` 推测或降级到旧 ApiProxy。
+当前 Plugin Client 与移动客户端必须使用加密通道上的 capability 探测，不从 `clientVersion` 推测或降级到旧 ApiProxy。
 
 ## 18. 历史数据结构（已废弃）
 
-§18.1–18.6 是冻结 Android 原型的旧投影，已在代码中清除，不是 Plugin Host 可接受或
+§18.1–18.6 是冻结移动端原型的旧投影，已在代码中清除，不是 Plugin Host 可接受或
 发出的结构。当前业务结构以官方 Typert Remote contract 为准；rc.2 的以下定义仅作历史记录。
 
 原结构包括：SystemInfo、WorkspaceInfo、SessionSummary（含 status/createdAt/lastSeq）、
@@ -1145,7 +1145,7 @@ Session 业务语义：V3 使用 `SessionWireHeader.version = 3` 与 `isSeeded`�
 operation 使用 `{ op: "replace", startSeq, endSeq }`，实时 Assistant 输出使用
 `assistant-stream` frame，并要求最终 `assistant/message.data.stream`。v0.1.2 的 replacement 使用
 `{ op: "replace", start, end }`。Desktop Client 不在 v0.1.2 与 V3 格式之间翻译，只允许相同代际互连；
-Android 与 VS Code 可直接消费各自已声明支持的 Host 格式。
+移动客户端与 VS Code 可直接消费各自已声明支持的 Host 格式。
 
 #### `harness.remote.call`
 
@@ -1196,7 +1196,7 @@ Harness `0.2.1` 增加固定官方端点 `userQuestions/answer`（call）、`use
 
 限时问答事件保留官方 `wait.callId` 与 `wait.timed`；Client 先打开 `attachWait`，根据 Host 返回的 `remainingMs` 计时，窗口内回答沿用 `$events/result`，到期回传具备 `name: UserQuestionError`、`code: ASK_TIMED_OUT` 的拒绝结果。断线释放 claim 并取消本地计时，禁止重放回复。只有 Host 的 `userQuestions.active` projection 标记 `continued` 后，才可调用 `answer` 补答；`answer` 接受回复仅表示已排队，Client 不将其提前标记为已回答；`settled` 确认问题已结束。投影序号落后时不得恢复旧问题。上一版 RC 没有 `wait.timed` 的问答保持旧事件流程。
 
-当前兼容维护目标为 Typert Session V3 `0.2.x`；前述 ApiProxy 章节仅保留历史线协议，当前 Host 不再实现其路由，Plugin Client 与 Android 不再连接该 carrier。
+当前兼容维护目标为 Typert Session V3 `0.2.x`；前述 ApiProxy 章节仅保留历史线协议，当前 Host 不再实现其路由，Plugin Client 与移动客户端不再连接该 carrier。
 
 #### `harness.remote.stream.open` / `harness.remote.stream.close`
 
@@ -1265,7 +1265,7 @@ Host 固定 allowlist 仅增加该只读 endpoint；预设切换继续使用官�
 ### Native sidebar: read-only files and Host-configurable terminal
 
 Harness `0.1.6-alpha.2` 原生侧栏通过现有 `harness.remote.*` carrier 传输；不新增 Harness wire format。
-Android 用户可显式下载工作区原文件到系统目录选择器授权的手机目录（每文件最多 100 MiB，包含恰好 100 MiB；独立于移动端预览上限：PDF 16 MiB、图片 8 MiB）。复用下述 `stat` / `readBytes` 分块读取及路径、版本、大小和取消校验，不新增 download RPC，不写 Host 文件；Office 下载保存原文件，转换后的 PDF 仅用于预览。
+移动端用户可显式下载工作区原文件到系统目录选择器授权的手机目录（每文件最多 100 MiB，包含恰好 100 MiB；独立于移动端预览上限：PDF 16 MiB、图片 8 MiB）。复用下述 `stat` / `readBytes` 分块读取及路径、版本、大小和取消校验，不新增 download RPC，不写 Host 文件；Office 下载保存原文件，转换后的 PDF 仅用于预览。
 
 固定只读 allowlist：`workspaceFiles/list|stat|read|readBytes|readAll|readRelated|changes`，以及
 `officeToPdf/generation|render`。Host 官方 Session lookup、组合文件系统、分页与大小限制继续生效。
@@ -1332,7 +1332,7 @@ HTTP 请求/响应和 WS 消息在端到端加密通道中传输，Relay 只处�
 
 第一版入口是 Desktop / 浏览器连接本机 Harness 时的 Remote Header「预览服务」，输入授权端口后
 打开原生 Browser tab；相对资源路径与使用当前 origin 的 HMR WebSocket 可正常转发。
-硬编码远端 localhost 地址、外部重定向、HTTPS upstream、远程 Web preview gateway、Android/VS Code
+硬编码远端 localhost 地址、外部重定向、HTTPS upstream、远程 Web preview gateway、移动端/VS Code
 预览 UI 不在本版范围。浏览器必须支持 `.localhost` 的 loopback 解析；预览域名是临时访问凭据，
 退出 Remote 或断线关闭监听器。普通公网网页仍由原生侧栏浏览器直接访问。
 
@@ -1403,7 +1403,7 @@ Host 以可信 catalog / realpath 和原生返回的 ID/目录确认会话归属
 加载、Prompt 准备/执行、模型写入、待审批与归档互斥；冲突返回 `ACP_SESSION_BUSY`。
 归档后写操作返回 `ACP_SESSION_ARCHIVED`；只读历史仍不要求 live owner。空闲会话允许其他
 受信任同账号连接归档。原生失败或响应未确认返回 `OPENCODE_ARCHIVE_UNAVAILABLE`，后端
-关闭或替换不能返回迟到成功。Desktop/Android 在成功确认后更新内存，失败保留原状态。
+关闭或替换不能返回迟到成功。Desktop 与移动客户端在成功确认后更新内存，失败保留原状态。
 其他 ACP 后端无此能力，禁止仅移除本地投影并返回归档成功。具体进程隔离与验证边界见
 [OpenCode 原生归档设计](design/acp-session-archive.md)。
 
@@ -1459,9 +1459,9 @@ carrier 包装成临时 Typert target。该 target 只在内存中把 CodeX 工�
 Thread、History/live frame 映射为 DSH 原生 Workspace/Session/Event，使原生 Conversation Renderer
 和 Composer 可以消费；它不是新的线协议，也不得把虚拟记录写入 DSH SessionStore、Workspace
 数据库或 Harness 日志。退出 CodeX 模式或连接关闭时必须销毁 target 和全部 stream。
-Android Client 可在相同 capability 探测后直接消费该 `codex.app.*` carrier，并只在 Android 内存中
+移动客户端可在相同 capability 探测后直接消费该 `codex.app.*` carrier，并只在自身内存中
 把 Workspace catalog、Thread 与 History/live frame 投影到已有 Workspace/Session/Chat 状态；不得据此
-恢复冻结的旧 Android `sessions.*`/`session.*` RPC，也不得持久化第二份 CodeX 数据。
+恢复冻结的旧移动端 `sessions.*`/`session.*` RPC，也不得持久化第二份 CodeX 数据。
 
 业务 RPC 固定为：
 
@@ -1478,10 +1478,10 @@ Android Client 可在相同 capability 探测后直接消费该 `codex.app.*` ca
 `command/*`、`process/*`、`config/*`、登录写接口和未显式列出的实验 API 一律返回 `METHOD_NOT_ALLOWED`。
 
 CodeX App Server 的 `project/list` 是虚拟 Workspace 的首选来源。只要它返回至少一个带绝对根目录的
-有效项目，Client Plugin 与 Android Client 就只投影这些项目，`thread/list` 里不能归属到任一 project id
+有效项目，Client Plugin 与移动客户端就只投影这些项目，`thread/list` 里不能归属到任一 project id
 或 project root 的 Thread 不得返回为可见 Session。当 `project/list` 返回空列表、全部项目均无有效根
 目录，或该方法不可用时，Host 才可把 App Server 自己通过 `thread/list` 返回的绝对 `cwd` 作为精确
-Workspace authority；Client Plugin、Remote Web 与 Android Client 可为这些 `cwd` 生成只读后备
+Workspace authority；Client Plugin、Remote Web 与移动客户端可为这些 `cwd` 生成只读后备
 Workspace。不得从多个 `cwd` 推测或提升到共同父目录。没有绝对 `cwd` 的 Thread 在后备模式下不可见。
 
 `project/create` 只允许 `{ name, roots: [{ path }], idempotencyKey }`：`name` 为 1..256 字符，
@@ -1513,7 +1513,7 @@ preset，Host 仍必须重新映射为 canonical 策略，不能接受 Client �
 CodeX App Server 可把 `turn/start` 的部分配置覆盖作为同一 Thread 后续 turn 的默认值；Remote 可从
 `thread/start|resume|fork` 响应或 `thread/settings/updated` 事件里的有效 `approvalPolicy` 与
 `sandbox/sandboxPolicy` 反推上述两个固定 preset。`thread/list` / `thread/read` 的 `Thread` 元数据本身
-不携带该设置，所以 Android Client 仍可以把用户显式选择的 CodeX preset 作为本地 UI 偏好，按 Host
+不携带该设置，所以客户端仍可以把用户显式选择的 CodeX preset 作为本地 UI 偏好，按 Host
 设备与 Thread 维度保存，并在之后需要显式覆盖时继续提交同一个 preset。
 
 Web 与 Desktop Remote 的审批控件按 Thread 回显 Host 已确认的 preset，不能把客户端默认值或
@@ -1530,7 +1530,7 @@ Client 未获知策略时显示沿用 Host 设置，发送与 fork 默认省略 
 不扩大 Remote method allowlist。另一连接持有 active writer 时拒绝权限切换；成功后同步同 Thread
 观察者，并在后续只读 History 中回显。
 
-CodeX 虚拟 Session 接受文本，以及 Desktop Composer 从剪贴板或 Android 系统图片选择器产生的
+CodeX 虚拟 Session 接受文本，以及 Desktop Composer 从剪贴板或移动端图片选择器产生的
 PNG、JPEG、WebP、GIF 图片 Prompt。
 Client 只能把原生 `{ type: "image", mediaType, data }` 转为 CodeX 领域的同形受限 input，并在存在
 图片时使用 `codex.appserver.transfer.v1`；Host 必须验证 MIME、canonical base64、part 数量与
@@ -1556,7 +1556,7 @@ handle，并以 `failed` 结束全部旧 Codex stream。Host 按 `1s -> 2s -> 4s
 重启 App Server；重启只重新执行 initialize/account probe，禁止重放任何 call/mutation。Desktop
 Client 必须重新探测 capability，重新打开 stream，并以 Host 分页 `dsh/sessionHistory` 替换本地
 baseline 后继续归并 live event；旧 Host 不支持分页扩展时才回退到 `thread/read(includeTurns:true)`。
-Android Client 同样必须重新探测 capability、重开 stream，并以
+移动客户端同样必须重新探测 capability、重开 stream，并以
 Host 分页 `dsh/sessionHistory` 替换移动端 baseline；若分页基线包含仍在运行的 Turn，Host 必须保留
 open step/turn 语义并返回顶层 `activeTurnId`，以便同一连接或同一设备的替换连接可以发起
 `turn/interrupt`。任何一端都不得自动重放不确定的 mutation。
@@ -1702,7 +1702,7 @@ Plugin 按 Harness 代际发送 `harness.api.frame` / `harness.api.stream.closed
 `harness.remote.frame` / `harness.remote.stream.closed`。可选 Codex 领域发送
 `codex.app.frame` / `codex.app.stream.closed`。
 
-冻结 Android 原型事件（`session.created`、`session.updated`、`message.created`、
+冻结移动端原型事件（`session.created`、`session.updated`、`message.created`、
 `message.delta`、`tool.started`、`tool.updated`、`tool.finished`、
 `permission.requested`、`permission.resolved`、`agent.status`、`connection.stats`）
 已退出协议，Host 不得发送，Client 不得依赖。历史类型概览见 §18。
@@ -1949,7 +1949,7 @@ pong 回显 nonce。Heartbeat 不能携带业务数据。
 12. 日志禁止记录 token、code 明文、key、prompt、source、workspace 和 tool output。
 13. Admin 无法从数据库或 API 获取 E2EE conversation。
 14. 未协商 capability 的功能不得调用或展示为可用。
-15. Codex Thread 继续归 Codex App Server 所有；Remote 可在 Client Plugin 内临时伪装为原生 Workspace/Session/Event，也可在 Android 内存中投影为已有移动端 Workspace/Session/Chat 供展示与操作，但不得写入 DSH SessionStore、Workspace 数据库、Harness 日志或另建 CodeX 数据存储。
+15. Codex Thread 继续归 Codex App Server 所有；Remote 可在 Client Plugin 内临时伪装为原生 Workspace/Session/Event，也可在移动客户端内存中投影为已有移动端 Workspace/Session/Chat 供展示与操作，但不得写入 DSH SessionStore、Workspace 数据库、Harness 日志或另建 CodeX 数据存储。
 
 ## 26. Conformance 测试
 
@@ -2055,7 +2055,7 @@ settings retries that cleanup. Unchanged backends remain usable.
 
 `agent.acp.call` 内的 `dsh/sessionList` Params 新增可选布尔字段 `prewarm`，默认 `true`。
 `false` 仅关闭该次列表读取触发的空闲 CLI 预热，不改变后端选择、身份/权限校验或 catalog
-来源；Android 批量读取各目录时使用它，防止为每个目录启动一个进程。此字段不扩展 method
+来源；移动客户端批量读取各目录时使用它，防止为每个目录启动一个进程。此字段不扩展 method
 allowlist，也不提供文件写入能力。
 
 ### ACP shared workspace tools and live AGY models

@@ -11,7 +11,7 @@
 | `webrtc` | Relay / LAN / P2P / TURN 和自适应传输状态 |
 | `client-core` | RPC 关联、流/事件分发、Harness / CodeX / ACP Client |
 | `plugin` | Host/本地 Remote、账号设备接入、信任、各领域 allowlist 与内存 UI carrier |
-| Android / VS Code | 各自 Client 生命周期、凭据与平台 UI |
+| VS Code | 自身 Client 生命周期、凭据与 UI |
 | Browser | 独立凭据授权与在线 Host Launcher，不建立 Remote transport |
 | 最小 Server | 单账号、设备凭据文件持久化、Control/握手转发和 opaque Relay |
 
@@ -36,7 +36,7 @@ Noise IK 绑定双方 identity、Host/Client、connectionId；业务只进入认
 AEAD counter、target、连接状态和消息限额共同执行 fail-closed 校验。
 Server 可见路由与设备/连接元数据，不读取 Relay 业务明文。最小 Server 可配置 WebRTC signaling/TURN credential 与加密 Relay，不实现独立 Relay attach/resume。
 
-完整 transport 选路使用 LAN / P2P / TURN / Relay；STUN/TURN、ICE、signaling 和 werift/Android 原生互操作已有验证。
+完整 transport 选路使用 LAN / P2P / TURN / Relay；STUN/TURN、ICE、signaling 和 werift 原生互操作已有验证。
 网络切换、代理、休眠唤醒、rekey 与长期稳定性仍有独立待办，不能由基础互操作推断全部环境可用。
 
 ## 独立业务域
@@ -63,7 +63,7 @@ Server 可见路由与设备/连接元数据，不读取 Relay 业务明文。�
 断线关闭连接所属 pending RPC、stream、transfer 和审批句柄；Desktop Harness 回落 Local。
 CodeX / ACP 虚拟载体只存在 Client 内存，不进入 DSH SessionStore、Workspace 数据库或 Harness 日志。
 恢复重新认证、打开流、获取历史 baseline，丢弃迟到结果，不自动重放 mutation 或终端输入。
-Android 已有后端专属恢复行为；共享 pending call/stream 的完整恢复与长期稳定性仍按 TODO 跟踪。
+客户端恢复行为按各自实现维护；共享 pending call/stream 的完整恢复与长期稳定性仍按 TODO 跟踪。
 
 ## 安全与测试
 
@@ -72,5 +72,5 @@ AGY 私有图片 tmp 是有界、按会话隔离的例外，不允许项目写�
 未知 method、错误 connection/target、越权会话、identity mismatch、篡改、重放和无效权限回答均拒绝。
 
 核心测试保护 protocol schema、身份加密、账号授权、allowlist、RPC/stream、隔离、恢复与 transport 状态机。
-共享 fixture 由所属包验证，跨端验证在真实 runtime 执行；不以 Node 重跑共享代码冒充 Android 原生验收。
+共享 fixture 由所属包验证，跨端验证在真实 runtime 执行；不以 Node 重跑共享代码冒充原生验收。
 待验证项见[TODO](../TODO.md)，协议对齐过程见[Schema 对齐](protocol-schema-alignment.md)。

@@ -8,5 +8,5 @@
     "declarationMap": false,
     "rootDir": "../.."
   },
-  "include": ["index.ts", "smoke-client.ts"]
+  "include": ["index.ts"]
 }

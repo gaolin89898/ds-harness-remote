@@ -96,9 +96,7 @@ jobs:
           const root = await readJson('package.json')
           const plugin = await readJson('packages/plugin/package.json')
           const tui = await readJson('packages/tui/package.json')
-          const androidPackage = await readJson('apps/android/package.json')
-          const androidApp = await readJson('apps/android/app.json')
-          const versions = new Set([root.version, plugin.version, tui.version, androidPackage.version, androidApp.expo?.version])
+          const versions = new Set([root.version, plugin.version, tui.version])
           if (tui.dependencies['ds-harness-remote'] !== `workspace:${plugin.version}`) {
             throw new Error('TUI must depend on the matching Remote workspace version.')
           }
@@ -106,11 +104,6 @@ jobs:
 
           if (versions.size !== 1) {
             throw new Error(`Release versions do not match: ${[...versions].join(', ')}`)
-          }
-          const androidBuild = androidApp.expo?.android?.versionCode
-          const iosBuild = androidApp.expo?.ios?.buildNumber
-          if (androidBuild === undefined || iosBuild === undefined || String(androidBuild) !== String(iosBuild)) {
-            throw new Error('Android versionCode and iOS buildNumber must match for a release.')
           }
           if (process.env.GITHUB_REF_NAME !== expectedTag) {
             throw new Error(`Expected tag ${expectedTag}, received ${process.env.GITHUB_REF_NAME}`)
@@ -128,8 +121,6 @@ jobs:
       - name: Run tests
         run: pnpm -r test
 
-      # Android prebuild recompiles shared packages. Serialize workspace builds
-      # so Plugin bundling cannot read dist files while tsc rewrites them.
       - name: Build workspace
         run: NODE_ENV=production pnpm --workspace-concurrency=1 -r build
 
@@ -179,7 +170,7 @@ jobs:
 
       - name: Report npm publish failure
         if: steps.npm-publish.outcome == 'failure'
-        run: echo '::warning::npm publish failed; GitHub Packages, GitHub Release, and Android APK publication will continue. Retry this tag after refreshing npm registry credentials.'
+        run: echo '::warning::npm publish failed; GitHub Packages and the GitHub Release will continue. Retry this tag after refreshing npm registry credentials.'
 
       - name: Publish npm TUI
         run: |
@@ -243,90 +234,3 @@ jobs:
           fail_on_unmatched_files: true
           body_path: .github/release-notes.md
           generate_release_notes: false
-
-  android-apk:
-    name: Build and attach Android APK
-    needs: release
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 9.15.4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24.9.0
-          cache: pnpm
-
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build workspace packages
-        run: pnpm --filter './packages/**' -r build
-
-      - name: Check out Intelligent UI renderer source
-        uses: actions/checkout@v7
-        with:
-          repository: dreamfarer-space/deepseek-harness-intelligent-ui
-          # Pinned upstream PR #82 merge commit; update only after auditing the new artifact.
-          ref: f3735efffd823f8c34817f4e8554743ac3276225
-          path: .deps/deepseek-harness-intelligent-ui
-
-      - name: Verify pinned Intelligent UI renderer
-        run: |
-          test "$(git -C .deps/deepseek-harness-intelligent-ui rev-parse HEAD)" = "f3735efffd823f8c34817f4e8554743ac3276225" || { echo '::error::Unexpected renderer source commit'; exit 1; }
-          test "$(git -C .deps/deepseek-harness-intelligent-ui hash-object renderer/renderer.js)" = "ebac4a4c2199383458d4e1fa2121be0e6043c5c0" || { echo '::error::Unexpected renderer file content'; exit 1; }
-
-      - name: Bundle local Android renderers
-        env:
-          DSH_INTELLIGENT_UI_RENDERER_BUNDLE: ${{ github.workspace }}/.deps/deepseek-harness-intelligent-ui/renderer/renderer.js
-          DSH_REQUIRE_INTELLIGENT_UI: 'true'
-        run: pnpm --dir apps/android run build:renderers
-
-      - name: Verify bundled Android renderers
-        env:
-          DSH_REQUIRE_INTELLIGENT_UI: 'true'
-        run: node apps/android/scripts/verify-intelligent-ui-renderer.mjs
-
-      - name: Generate Android project
-        run: pnpm --dir apps/android exec expo prebuild --platform android --no-install
-
-      - name: Build release APK
-        env:
-          NODE_ENV: production
-        run: |
-          chmod +x apps/android/android/gradlew
-          apps/android/android/gradlew \
-            -p apps/android/android \
-            :app:assembleRelease \
-            --no-daemon \
-            --build-cache \
-            -PreactNativeArchitectures=armeabi-v7a,arm64-v8a
-
-      - name: Stage APK
-        run: |
-          mkdir -p artifacts/android
-          cp apps/android/android/app/build/outputs/apk/release/app-release.apk \
-            "artifacts/android/dsh-remote-android-${{ github.ref_name }}.apk"
-
-      - name: Attach APK to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: artifacts/android/dsh-remote-android-${{ github.ref_name }}.apk
-          fail_on_unmatched_files: true

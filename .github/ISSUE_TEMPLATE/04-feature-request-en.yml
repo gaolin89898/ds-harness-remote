@@ -15,7 +15,6 @@ body:
       label: Affected area
       description: Which part of the project would this feature improve?
       options:
-        - "Android App (apps/android)"
         - "Web Client / Browser (apps/browser)"
         - "Server / Relay / Signaling (apps/server)"
         - "VS Code Extension (apps/vscode)"

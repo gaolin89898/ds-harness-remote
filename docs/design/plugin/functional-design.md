@@ -70,15 +70,15 @@ ACP 工具使用独立 `dsh/toolCall` 与有 tool 参数的 stream，限编译�
 断线保留可恢复的终端状态但不重放输入；领域关闭结束其进程。Host subprocess 服务可用时使用 PTY，否则回退 pipe；
 共享桥由 Host xterm headless 保存有界屏幕并序列化重连快照，再跟随有序输出，不回放整段原始日志。
 
-Android 图片最大 8 MiB、PDF 最大 16 MiB、Office 源文件最大 50 MiB；本地打包 PDF.js/xterm 渲染器，生成源文件不提交。
-PDF 预览不执行脚本或打开外链，普通预览不创建明文文件缓存。Android 另有显式“保存到手机”操作，使用有界临时缓存并在完成或取消后清理，详见 [Android 说明](../../../apps/android/README.md)。真机与跨设备效果另行验收。
+移动端图片最大 8 MiB、PDF 最大 16 MiB、Office 源文件最大 50 MiB；本地打包 PDF.js/xterm 渲染器，生成源文件不提交。
+PDF 预览不执行脚本或打开外链，普通预览不创建明文文件缓存。移动端可提供显式“保存到手机”操作，使用有界临时缓存并在完成或取消后清理；该实现由外部客户端维护，不在本仓库范围内。
 
 ## 5. Loopback 预览
 
 `loopback.http-ws.v1` / `loopback.call` 只访问 `127.0.0.1` 的 Host 白名单端口；默认未授权。
 Host 只出站连接，禁止 CONNECT、任意主机和通用 TCP 转发。
 Desktop Client 随机本机监听端口承载独立 preview origin；Header 提供「预览服务」。
-本机预览 URL 不能当作 Remote Web、Android 或 VS Code 的可用地址，复杂 HMR、Cookie/CSP 与网络条件仍需回归。
+本机预览 URL 不能当作 Remote Web、移动端或 VS Code 的可用地址，复杂 HMR、Cookie/CSP 与网络条件仍需回归。
 
 ## 6. CodeX 与 ACP
 
@@ -106,7 +106,7 @@ Server membership、Host 本地信任、pinned identity、Noise transcript 与�
 
 Harness 保持官方审批关联；CodeX / ACP 保持独立、按连接隔离的审批句柄。Remote 决策只允许单次允许或拒绝。
 断线、后端关闭、撤销或替换使相关 stream、transfer、待审批状态失效，不自动重放 Prompt 或终端输入。
-Android 对支持的后端重开 stream 并读取 history baseline；通用 pending call 恢复和长期稳定性仍按 TODO 跟踪。
+客户端对支持的后端重开 stream 并读取 history baseline；通用 pending call 恢复和长期稳定性仍按 TODO 跟踪。
 
 Host status 通过本机 SSE 首帧完整快照、变化推送和空闲保活更新；旧 Host 不支持 SSE 时保留 unary status 降级。
 连接建立进度与二维码登录属于独立交互流程，不等于常态 status 轮询。

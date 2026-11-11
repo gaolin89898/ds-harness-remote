@@ -11,7 +11,7 @@
 | 文档 | 内容 |
 | --- | --- |
 | [产品定位](PRODUCT.md) | 用户、产品目标、仓库边界与设计原则 |
-| [界面设计系统](DESIGN.md) | 当前 Android 主题、导航、会话工具与交互规则 |
+| [界面设计系统](DESIGN.md) | Desktop / Web 侧界面与交互规则 |
 | [Plugin 产品设计](plugin/product-design.md) | Host、Remote 工作区入口、领域与用户路径 |
 | [Plugin 功能设计](plugin/functional-design.md) | 生命周期、数据面、allowlist、工具与恢复 |
 | [共享基础](shared-foundation.md) | 身份、授权、加密、传输和共享包职责 |
@@ -25,7 +25,6 @@
 
 - Plugin：常驻 Host 与本地 Remote 工作区入口同时存在，不提供用户可见的 Client 模式。
 - Desktop / 连接本机 Harness 的浏览器：复用官方 Harness UI，提供远程 Header、Files、Terminal 和受限开发服务预览。
-- Android：账号授权、Host / Workspace / Session / Chat、图片 Prompt、历史恢复、工作区快捷入口，以及按后端能力接入的会话工具。
 - VS Code：账号授权、Host 信任固定、Harness 工作区/会话导航、Prompt 与基础审批；实时更新和恢复仍有待办。
 - Browser 扩展：只换取独立设备凭据、显示在线 Host、打开同源 Remote Web。
 - `apps/server`：可自部署的单账号、文件持久化 Server，支持可配置的 WebRTC LAN/P2P/TURN 与加密 Relay，提供登录与设备状态页和 Docker 部署入口。
@@ -35,11 +34,11 @@
 
 | 领域 | Host 接入 | Client 展示 | 边界 |
 | --- | --- | --- | --- |
-| Harness | 官方 Typert Remote Gateway（rc.2 ApiProxy 已移除） | Desktop 原生 UI、Android / VS Code Client | 原生会话契约，固定 endpoint allowlist |
-| CodeX | stdio App Server，`codex.app.*` | Desktop 内存载体、Android 内存投影 | 不写 DSH 存储；Project / Thread authority |
-| Cursor / AGY / Pi / OpenCode / Claude | ACP gateway，`agent.acp.*` | 浏览器可用的 Desktop 内存载体、Android 投影 | 独立后端 capability、工作区 ID 与会话归属 |
+| Harness | 官方 Typert Remote Gateway（rc.2 ApiProxy 已移除） | Desktop 原生 UI、VS Code Client、移动客户端 | 原生会话契约，固定 endpoint allowlist |
+| CodeX | stdio App Server，`codex.app.*` | Desktop 内存载体、移动端内存投影 | 不写 DSH 存储；Project / Thread authority |
+| Cursor / AGY / Pi / OpenCode / Claude | ACP gateway，`agent.acp.*` | 浏览器可用的 Desktop 内存载体、移动端投影 | 独立后端 capability、工作区 ID 与会话归属 |
 
-当前兼容范围见[兼容说明](../compatibility.md)：开发基线 `0.2.1-rc.1`，保留 `0.2.0-rc.2` / rc.1，并接纳后续 `0.2.2` RC 版本。Host / Android legacy ApiProxy 实现已移除。Client 按加密 capability 与 `workspaceTypes.available` 判断协议支持及实际就绪；未来版本范围接纳不代表 runtime 已验收。
+当前兼容范围见[兼容说明](../compatibility.md)：开发基线 `0.2.1-rc.1`，保留 `0.2.0-rc.2` / rc.1，并接纳后续 `0.2.2` RC 版本。Host legacy ApiProxy 实现已移除。Client 按加密 capability 与 `workspaceTypes.available` 判断协议支持及实际就绪；未来版本范围接纳不代表 runtime 已验收。
 
 ## 主路径
 
@@ -59,5 +58,5 @@
 
 ## 验证边界
 
-已有 Harness / CodeX Desktop、Android 主链路和 WebRTC 互操作验证；后续新增工具、模型选择、AGY 加密跨设备链路、Windows、原生 APK、长连接及复杂 HMR 需按 TODO 单独验收。
+已有 Harness / CodeX Desktop 主链路和 WebRTC 互操作验证；后续新增工具、模型选择、AGY 加密跨设备链路、Windows、原生运行时、长连接及复杂 HMR 需按 TODO 单独验收。
 本次文档同步不增加运行时验收记录。

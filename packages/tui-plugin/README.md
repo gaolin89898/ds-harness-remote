@@ -21,4 +21,4 @@ pnpm --filter ds-harness-remote-tui test
 ```
 
 The test checks the built bundle and its profile patch.
-It does not replace a real dsh-TUI and Android connection test.
+It does not replace a real dsh-TUI connection test.

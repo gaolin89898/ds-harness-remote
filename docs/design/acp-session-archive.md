@@ -63,7 +63,7 @@ Host 经 catalog、backend binding 和 realpath 校验解析 authority，并核�
 - 上游失败、目录不匹配、响应未确认、后端替换或关闭均不能返回归档成功。
   冲突为 `ACP_SESSION_BUSY`，原生接口异常为 `OPENCODE_ARCHIVE_UNAVAILABLE`。
   不确定结果由刷新确认，不自动重放其他操作。
-- Desktop 内存投影和 Android 均等待原生确认，再移除默认目录成员；失败保留原状态。
+- Desktop 内存投影等待原生确认，再移除默认目录成员；失败保留原状态。
   当前连接收到归档事件时同步目录。历史记录保留，未写 DSH SessionStore 或 Workspace 数据库。
   旧 Host 无 capability 时明确报不可用，其他 ACP 后端不再伪造本地归档成功。
 

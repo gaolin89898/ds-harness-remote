@@ -12,7 +12,7 @@ body:
         **安全与隐私注意（重要）**：
         - 请勿在此公开发布安全漏洞或未经脱敏的敏感信息。
         - 提报前请务必抹去日志和截图中的 **Token、私钥、配对二维码、Agent 对话与提示词（Prompt）、本地绝对路径** 等敏感内容。
-        - 本 Issue 追踪器涵盖 Android 端、Web 端、自部署 Server、桌面插件、核心通信协议，以及与 dsh-go、ds-bot、intelligent ui 等生态插件的联动兼容性。
+        - 本 Issue 追踪器涵盖 Web 端、自部署 Server、桌面插件、核心通信协议，以及与 dsh-go、ds-bot、intelligent ui 等生态插件的联动兼容性。
 
   - type: dropdown
     id: area
@@ -20,7 +20,6 @@ body:
       label: 受影响模块 (Affected area)
       description: 哪个组件或模块出现了问题？
       options:
-        - "Android App (apps/android)"
         - "Web 客户端 / 浏览器端 (apps/browser)"
         - "中继 / 信令服务端 (apps/server)"
         - "VS Code 插件 (apps/vscode)"
@@ -37,7 +36,7 @@ body:
     attributes:
       label: 客户端 / 部署方式 (Installation method)
       options:
-        - "Android APK (GitHub Release / Pre-release)"
+        - "DSH Go 移动端 (dsh-go)"
         - "DSH 桌面插件 (插件市场)"
         - "官方托管 Web 端 (dsh.r2049.cn/app)"
         - "自建 Docker 服务端 (Self-hosted Server)"
@@ -60,8 +59,8 @@ body:
     id: os
     attributes:
       label: 运行环境与操作系统 (Operating system)
-      description: 操作系统版本及 CPU 架构（如涉及 Android 请包含手机机型与系统版本）。
-      placeholder: "例如: Android 14 (HyperOS / Pixel), Windows 11 x64, macOS 15.0 arm64"
+      description: 操作系统版本及 CPU 架构（如涉及 DSH Go 请包含手机机型与系统版本）。
+      placeholder: "例如: Windows 11 x64, macOS 15.0 arm64, Android 14 (DSH Go)"
     validations:
       required: true
 

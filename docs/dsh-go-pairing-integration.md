@@ -1,6 +1,6 @@
 # DSH Go 接入扫码配对
 
-服务端与 Remote 插件已实现。DSH-Go 需要实现本文的手机侧流程，尚未完成 Dart / Android 真机验收。
+服务端与 Remote 插件已实现。DSH-Go 需要实现本文的手机侧流程，尚未完成 Dart / 真机验收。
 
 权威协议：[device-pairing-v1.md](device-pairing-v1.md)。先执行该协议的固定密钥证明向量，再接入界面和自动连接；不要自行改动 API、状态名称或证明字节编码。
 
@@ -68,7 +68,7 @@ Content-Type: application/json
 
 fragment 不进入 HTTP 请求 URL；但 ticket 依旧是秘密，不得进入日志、分析、崩溃上报、剪贴板或外部浏览器历史。POST 请求体也必须在代理和客户端日志中脱敏。GET `/pair` 仅返回无脚本/外部资源的引导文案，不解析、不 claim；设置 no-store、no-referrer 和严格 CSP，通用相机打开页面不会绑定设备。
 
-DSH Go 实现顺序：识别短格式并确认 origin → resolve → 校验并固定会话/Host 信息 → 展示 Host 并由手机用户确认 → 复用原 claim/验证码/轮询/安全存储/自动连接流程。同时保留下面的旧 JSON 扫码解析，用于旧服务和已显示二维码；未知格式明确拒绝，不猜测协议。Dart/Android 实现和真机扫码尚未完成。
+DSH Go 实现顺序：识别短格式并确认 origin → resolve → 校验并固定会话/Host 信息 → 展示 Host 并由手机用户确认 → 复用原 claim/验证码/轮询/安全存储/自动连接流程。同时保留下面的旧 JSON 扫码解析，用于旧服务和已显示二维码；未知格式明确拒绝，不猜测协议。Dart 实现和真机扫码尚未完成。
 
 旧格式（兼容保留）：
 
@@ -222,7 +222,7 @@ completed 响应的 credentials：
 7. 凭证存储失败可在窗口内恢复；已刷新的凭证不被旧结果覆盖。
 8. Host 公钥替换、错误会话、错误手机身份、撤销及账号冲突均 fail closed。
 9. 正常账号原有密码/OAuth 登录、恢复和连接保持兼容。
-10. Android 真机执行完整流程及原有 E2EE/P2P/Relay 回归。Node 模拟手机的通过不等同于 Dart 或真机验收。
+10. 真机执行完整流程及原有 E2EE/P2P/Relay 回归。Node 模拟手机的通过不等同于 Dart 或真机验收。
 
 ## 已完成的跨仓库验证
 

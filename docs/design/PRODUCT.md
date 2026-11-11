@@ -8,7 +8,7 @@
 Host 保留工作目录、Agent 运行环境与会话数据，Client 提供安全入口和操作界面；会话不迁移到 Client。
 
 Remote Plugin 同时提供常驻 Host 和本地 Remote 工作区入口。用户选择同账号 Host、后端和工作区后继续会话，无需切换 Client 模式。
-Desktop 复用 Harness 原生 UI；Android 提供适合移动端的工作区、会话、聊天和工具界面。
+Desktop 复用 Harness 原生 UI；移动端界面由外部客户端（如 DSH Go）提供。
 
 ## 产品能力
 
@@ -16,7 +16,6 @@ Desktop 复用 Harness 原生 UI；Android 提供适合移动端的工作区、�
 - Harness 官方会话、文字/图片 Prompt、历史、模型、权限与审批。
 - 可选 CodeX App Server 和 Cursor / AGY / Pi / OpenCode / Claude ACP 后端，通过独立数据面展示其会话。
 - 后端支持范围内的只读工作区文件与交互终端；明确授权的本机开发服务预览。
-- Android 工作区收藏、最近会话快捷入口、跟随系统及英、简中、繁中、日、西、德、法语言与浅色/深色主题。
 - 终端二维码授权通过独立 CLI 提供；dsh-TUI Host 的原生 `/remote` 集成计划在后续版本单独提供。
 - 后端设置保存后热更新，工作区可用性由实际就绪状态决定。
 
@@ -25,7 +24,7 @@ CodeX 默认开启、Cursor 默认关闭；其他 ACP 后端以 Host 配置和�
 
 ## 仓库边界
 
-本仓库实现 Plugin、Android、VS Code、Browser Launcher、共享包、最小自部署 Server 和互操作工具。
+本仓库实现 Plugin、VS Code、Browser Launcher、共享包、最小自部署 Server 和互操作工具；移动端客户端不在本仓库。
 最小 Server 是单账号、文件持久化实现，可配置 WebRTC LAN/P2P/TURN 与加密 Relay，不提供 Remote Web 会话界面、独立 Relay attach/resume 或多账号。
 完整多账号 Server、Remote Web、Admin 与其基础设施在独立仓库维护。
 
@@ -45,18 +44,9 @@ CodeX 和 ACP 只在 Client 内存中投影 Workspace / Session / Chat，不写 
 
 界面采用清晰的文字层级、蓝色主要操作、克制的状态颜色和浅色/深色主题，具体 token 见[设计系统](DESIGN.md)。
 连接和权限状态同时使用文字、图标或选中标记，不仅靠颜色。提供按钮名称、焦点反馈、系统字体缩放和键盘适配；
-TalkBack、IME、大字体和原生设备效果仍需实际验证，不能将设计目标写成已达成的可访问性认证。
+键盘导航、焦点顺序和大字体仍需实际验证，不能将设计目标写成已达成的可访问性认证。
 
 ## 当前状态依据
 
 功能和使用见[README](../../README.md)，安全边界见[协议](../protocol.md)，验收缺口见[TODO](../TODO.md)。
 实验性后端和已实现的工具入口仍需各自的跨设备与长期稳定性验收。
-
-
-### Android Bot 模式（2026-10-22）
-
-主机工作区标题栏「＋」左侧为 Bot 入口，Bot 模式右上角三点菜单左侧为工作区切换图标，首页三点按钮复用首页操作菜单（设备、设置、关于、检查更新），新建 Bot / 群聊通过对应分区旁的「＋」进入。Bot 模式使用独立的原生
-团队页和对话页：主 Bot 卡片、团队与群聊列表，以及 Bot/群聊创建和管理。对话保留官方
-Harness 历史、流式内容与审批，DS Bot 问答/交互卡片用原生控件展示，通过固定 Bot 接口提交。
-模式切换仅影响本机导航，按服务器、账号、主机及固定身份记住 Agent/Bot 选择，再次进入主机或重启 App 后恢复；主机未启用 ds-bot 或 Remote 缺少能力时展示错误，不显示本地或
-其他主机数据。记忆、连接器等 Host 本地管理边界不变。源码实现不等于真机/跨设备验收。
