@@ -23,7 +23,7 @@ Gateway carrier；`dsh-v0.1.5-rc.1` Host 使用 Session V3 Typert carrier。
 > **Developer preview:** live streaming, automatic reconnect, and question response
 > UI are still in progress for the VS Code client.
 
-The Server defaults to `https://dsh.r2049.cn`. Open **DS Harness Remote** from the
+The Server defaults to `https://dsh.gaolin.ink`. Open **DS Harness Remote** from the
 Activity Bar, sign in, then choose an online Host. Opening a Session shows its
 conversation in an editor beside the Host list.
 

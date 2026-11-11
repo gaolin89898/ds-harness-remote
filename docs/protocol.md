@@ -202,7 +202,7 @@ REST/Control JSON 中的 key、nonce、handshake 和 ciphertext 使用无 paddin
 
 Host 和 Client 的首次账号归属必须携带由同一 Server 签发的站点账号 Bearer token；
 同一安装的相反角色可按 §8.1.2 从已有 device credential 继承 owner。插件默认连接
-`https://dsh.r2049.cn`，也可以由用户配置自定义 Server；登录、注册、refresh、
+`https://dsh.gaolin.ink`，也可以由用户配置自定义 Server；登录、注册、refresh、
 WebSocket 不得跨域混用。注册成功后，Server 为同一账号下的 Host 与 Client 自动
 建立或恢复 membership。
 

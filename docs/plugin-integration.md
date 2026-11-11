@@ -25,7 +25,7 @@ Host 接入分为两层认证：
 插件默认 Server：
 
 ```text
-https://dsh.r2049.cn
+https://remote.gaolin.ink
 ```
 
 同时允许用户输入自定义部署地址，例如：
@@ -303,7 +303,7 @@ Client 登录完成时，以 Host bearer 和本机 Client bearer 调用可选的
 
 ```json
 {
-  "serverUrl": "https://dsh.r2049.cn",
+  "serverUrl": "https://remote.gaolin.ink",
   "authorizationMethod": "account",
   "account": "user@example.com",
   "deviceId": "0198...",
@@ -371,7 +371,7 @@ Windows Harness Host 的锁恢复未在本次范围内完成验收。Windows 上
 连接：
 
 ```text
-wss://dsh.r2049.cn/ws/v1/connect
+wss://remote.gaolin.ink/ws/v1/connect
 ```
 
 自定义 Server 则从 HTTPS origin 派生 `wss` URL。access token 必须放在首个 `hello` frame 中，禁止放在 URL query：

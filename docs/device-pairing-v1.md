@@ -113,7 +113,7 @@ Node / Dart 可直接使用既有 X25519 实现，加 RFC 5869 HKDF-SHA256 和 H
 {
   "type": "dsh.remote.pairing",
   "v": 1,
-  "serverUrl": "https://dsh.r2049.cn",
+  "serverUrl": "https://remote.gaolin.ink",
   "sessionId": "<from-response>",
   "expiresAt": 1790000000000,
   "serverPublicKey": "<from-response>",
@@ -312,7 +312,7 @@ This advertises Host pairing, not Client/controller authorization.
 新 Remote 仅在服务端明确声明 `devicePairingQr` 时生成短二维码，否则保留旧 JSON 格式；旧 Remote 的创建响应和配对 API 不变。既有未完成的 JSON 二维码继续有效，重启后保留会话原格式。能力发现的网络/非法响应错误不能静默当成不支持；旧发现接口 404 可以保留 JSON 格式。
 
 ```text
-https://dsh.r2049.cn/pair#v1.<ticket>
+https://remote.gaolin.ink/pair#v1.<ticket>
 ```
 
 `ticket` 是现有 `scanSecret`：32 随机字节的 canonical base64url，无 padding，43 个字符（256 位熵），不是可猜测数字短码。二维码不再包含 sessionId、Host 信息或公钥。服务端只存其 SHA-256 摘要，无新增数据库字段或迁移。

@@ -38,7 +38,7 @@ body:
       options:
         - "DSH Go 移动端 (dsh-go)"
         - "DSH 桌面插件 (插件市场)"
-        - "官方托管 Web 端 (dsh.r2049.cn/app)"
+        - "官方托管 Web 端 (dsh.gaolin.ink/app)"
         - "自建 Docker 服务端 (Self-hosted Server)"
         - "npm / CLI (ds-harness-remote 包)"
         - "源码编译安装 (Built from source)"

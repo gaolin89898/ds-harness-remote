@@ -13,7 +13,7 @@ The extension handles only the data needed to provide its launcher functionality
 - Basic linked-computer metadata returned by Remote Web, including device name, platform, version, online status, and last-seen time.
 - Your existing Remote Web authorization token during sign-in. This token is used once to request extension-specific credentials and is not stored by the extension.
 
-The extension does not collect browsing history, page content from other websites, prompts, conversations, source code, or tool output. Its website access is limited to `https://dsh.r2049.cn/*`.
+The extension does not collect browsing history, page content from other websites, prompts, conversations, source code, or tool output. Its website access is limited to `https://dsh.gaolin.ink/*`.
 
 ## How data is used
 
@@ -28,7 +28,7 @@ The extension does not sell user data, use it for advertising, or transfer it fo
 
 ## Storage and transmission
 
-Extension-specific device data and credentials are stored locally using Chrome extension storage. Requests to Remote Web are sent over HTTPS to `dsh.r2049.cn`.
+Extension-specific device data and credentials are stored locally using Chrome extension storage. Requests to Remote Web are sent over HTTPS to `dsh.gaolin.ink`.
 
 When you sign out, the extension requests revocation of its device authorization and clears its local identity and credentials. Removing the extension also removes its local extension storage according to Chrome's behavior.
 
@@ -55,7 +55,7 @@ DeepSeek Harness Remote 是一个用于从 Remote Web 打开已连接电脑的�
 - Remote Web 返回的基础设备信息，包括设备名称、平台、版本、在线状态和最近在线时间。
 - 登录过程中已有的 Remote Web 授权凭证。该凭证只用于换取插件自己的设备凭证，不会由插件保存。
 
-插件不会收集浏览记录、其他网站的页面内容、Prompt、对话、源代码或工具输出。插件的网站访问范围仅限 `https://dsh.r2049.cn/*`。
+插件不会收集浏览记录、其他网站的页面内容、Prompt、对话、源代码或工具输出。插件的网站访问范围仅限 `https://dsh.gaolin.ink/*`。
 
 ## 数据用途
 
@@ -70,7 +70,7 @@ DeepSeek Harness Remote 是一个用于从 Remote Web 打开已连接电脑的�
 
 ## 存储与传输
 
-插件自己的设备数据和凭证保存在 Chrome 插件本地存储中。访问 Remote Web 的请求通过 HTTPS 发送至 `dsh.r2049.cn`。
+插件自己的设备数据和凭证保存在 Chrome 插件本地存储中。访问 Remote Web 的请求通过 HTTPS 发送至 `dsh.gaolin.ink`。
 
 退出插件时，插件会请求撤销自己的设备授权，并清理本地身份和凭证。卸载插件后，Chrome 也会按照浏览器行为清理该插件的本地存储。
 

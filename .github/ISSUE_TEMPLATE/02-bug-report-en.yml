@@ -38,7 +38,7 @@ body:
       options:
         - "DSH Go mobile client (dsh-go)"
         - "DSH Desktop Plugin (Marketplace)"
-        - "Hosted Web Client (dsh.r2049.cn/app)"
+        - "Hosted Web Client (dsh.gaolin.ink/app)"
         - "Self-hosted Docker Server"
         - "npm / CLI package (ds-harness-remote)"
         - "Built from source"

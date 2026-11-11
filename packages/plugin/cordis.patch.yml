@@ -6,7 +6,7 @@
       config:
         enabled: true
         role: host
-        serverUrl: https://dsh.r2049.cn
+        serverUrl: https://remote.gaolin.ink
         codex:
           enabled: true
           binary: codex

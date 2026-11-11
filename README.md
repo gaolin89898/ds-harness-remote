@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="docs/README.md"><img src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-blue?logo=googledocs&amp;logoColor=white" alt="文档"></a>
-  <a href="https://dsh.r2049.cn/app"><img src="https://img.shields.io/badge/Web-4D6BFE?logo=googlechrome&amp;logoColor=white" alt="Web"></a>
+  <a href="https://dsh.gaolin.ink/app"><img src="https://img.shields.io/badge/Web-4D6BFE?logo=googlechrome&amp;logoColor=white" alt="Web"></a>
   <a href="https://github.com/ccch1mneyyy/dsh-go"><img src="https://img.shields.io/badge/Android-3DDC84?logo=android&amp;logoColor=white" alt="Android"></a>
 </p>
 
@@ -45,11 +45,11 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 | 客户端 | 形态 | 状态 | 说明 |
 | --- | --- | --- | --- |
 | DSH&nbsp;Desktop&nbsp;插件 | Remote 侧栏 | 已支持 | 装 `ds-harness-remote@0.6.4`；Host 也可以就是这台电脑 |
-| Web | 浏览器页面 | 已支持 | 打开 [https://dsh.r2049.cn](https://dsh.r2049.cn)，复用 Harness 原生界面 |
+| Web | 浏览器页面 | 已支持 | 打开 [https://dsh.gaolin.ink](https://dsh.gaolin.ink)，复用 Harness 原生界面 |
 | DSH Go | C佬精品 | 已支持 | 移动端客户端，详情见：[ccch1mneyyy/dsh-go: DeepSeek Harness 的 Android 客户端。手机上直接跑，也能遥控你电脑上的 DSH。](https://github.com/ccch1mneyyy/dsh-go) |
 | 浏览器扩展 | Chrome | 仅入口 | 读取已登录 Web 的授权换取独立设备凭据、列出在线 Host、打开同源 Remote Web，不承载会话界面 |
 | dsh-TUI | 纯终端 CLI | 计划中 | 本版本不包含该集成，将在后续版本单独提供；安装脚本不会为它自动创建 Web 服务 |
-| Linux  | 云服务器  | 已支持 | [官网](https://dsh.r2049.cn/)登录后一键安装。
+| Linux  | 云服务器  | 已支持 | 使用仓库内[安装脚本](docs/installation.md)，需要一次性 Host 注册 Token。
 
 多个客户端可以同时连接同一个 Host，RPC 与数据流按连接隔离。
 
@@ -68,7 +68,7 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
 
 ### Linux 一键安装
 
-见官网首页[https://dsh.r2049.cn](https://dsh.r2049.cn/)，登陆后获取一键安装授权码安装即可。
+使用仓库内 `scripts/install.sh`（需要 root，支持一次性 Host 注册 Token 与 systemd 服务），步骤见[安装指南](docs/installation.md#linuxdsh--一次性注册--开机自启)。
 
 ### 移动端客户端
 
@@ -83,11 +83,11 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
 ## 快速开始
 
 1. 从 DeepSeek Harness 侧边栏打开 **Remote** 入口。
-2. 按需选择登录方式：「知乎」、「Github」、[Google ] 授权登录均已支持，账号密码登录（使用邀请码注册，可邮件本仓库作者申请）
+2. 使用账号密码登录（自部署 Server 为环境变量单账号；如需更换服务地址，在登录页保存新的 Server 地址即可）
 3. 在另一台设备上使用 DeepSeek Harness安装同样插件，根据1、2完成同样方式的登录。也可以按需使用Remote Web、DSH Go等客户端，即开即用，无需安装任何插件。
 4. 选择在线 Host，再选择已有 Workspace 或浏览远端目录后打开。
 
-默认使用本项目提供的[https://dsh.r2049.cn](https://dsh.r2049.cn)托管 Remote Server。
+本项目使用自部署的 [Remote Server](https://remote.gaolin.ink)（基于仓库内 [apps/server](apps/server/README.md) 部署）托管 Remote 连接。
 
 自建托管Server可使用仓库内的[最小 Server](apps/server/README.md)，当前版本已包含 WebRTC LAN/P2P/TURN 连接协调（TURN 需自行部署 coturn）与加密 Relay Server 等功能，暂不支持托管Remote Web的完整功能。
 
@@ -103,7 +103,7 @@ DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更
   <img src="docs/images/remote.png" alt="通过端到端加密远程连接运行的 Harness 会话" width="40%">
 </p>
 
-注意：如果想关闭当前电脑远控其他主机功能，可在[https://dsh.r2049.cn/](https://dsh.r2049.cn/) 「主机列表」中，打开「仅被控」开关，开启「仅被控」后当前设备无法看到账号下其他设备，Web端、其他客户端依旧可以远程当前设备。
+注意：如果想关闭当前电脑远控其他主机功能，可在[设备页](https://dsh.gaolin.ink/) 主机列表中，打开「仅被控」开关，开启「仅被控」后当前设备无法看到账号下其他设备，Web端、其他客户端依旧可以远程当前设备。
 
 ## 工作方式
 
@@ -257,7 +257,7 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=liguobao%2Fds-harness-remote&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=gaolin89898%2Fds-harness-remote&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=gaolin89898/ds-harness-remote&type=date&theme=dark&legend=top-left" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=gaolin89898/ds-harness-remote&type=date&legend=top-left" />
@@ -277,8 +277,8 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 - **代码与代码审查**：认领待办事项、修复缺陷、实现新特性，或是协助 Review 社区的 Pull Request。
 
 <p align="center">
-  <a href="https://github.com/liguobao/ds-harness-remote/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=liguobao/ds-harness-remote&max=30" alt="贡献者头像墙" />
+  <a href="https://github.com/gaolin89898/ds-harness-remote/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=gaolin89898/ds-harness-remote&max=30" alt="贡献者头像墙" />
   </a>
 </p>
 
