@@ -255,16 +255,6 @@ DS Bot 是一个基于 DeepSeek Harness（简称 dsh）的 bot 插件，插件�
 - 友情链接：[LINUX DO 社区](https://linux.do/)
 - 友情链接：[赛博刘看山](https://kanshan.r2049.cn/)
 
-## Star History
-
-<a href="https://www.star-history.com/?repos=gaolin89898%2Fdsh-kite&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=gaolin89898/dsh-kite&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=gaolin89898/dsh-kite&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=gaolin89898/dsh-kite&type=date&legend=top-left" />
- </picture>
-</a>
-
 ## 项目声明与商标
 
 本项目是独立的社区项目，不是 DeepSeek 官方产品。DeepSeek 及相关名称和商标归其各自权利人所有。
