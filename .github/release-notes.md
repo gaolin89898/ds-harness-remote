@@ -1,83 +1,43 @@
 ## 中文
 
-**v0.6.4**
+**v1.0.0**
 
-### 远程工作区
+### 品牌与版本
 
-- 支持离线会话秒开、主机离线时读取缓存历史、会话抽屉直接创建工作区和远程主机切换。
-- 改进 Codex 会话标题、空会话重连提示、聊天活动展示、侧栏导航和工作区层级。
-- 新增设备发现诊断日志、连接日志导出、错误横幅和设置诊断页。
-- 支持按偏好选择 LAN、P2P、TURN 和 Relay 传输，并补齐传输说明与图标。
+- 项目更名为 Kite（风筝），仓库迁移至 `gaolin89898/dsh-kite`；npm 包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变，已安装用户不受影响。
+- 新仓库版本号自 1.0.0 重新开始。
 
-### 配对与登录
+### 远程体验
 
-- 新增 DSH-Go Host 单次配对流程，并将配对入口整合到登录页签。
-- 新增紧凑配对二维码、倒计时和取消操作，优化扫码指引与按钮布局。
-- 支持编辑服务地址，改进账号标签、密码提示和非 DeepSeek 账号说明。
-- 完成 Host-only 登录流程，移除不必要的 provider 重试。
+- 主机列表新增「重启」操作：按平台执行受监管的重启，重启期间显示忙碌徽标并禁用点击，设备刷新失败自动重试一次。
+- 主机筛选改为自绘下拉菜单，支持方向键导航、Escape 关闭与外点关闭。
+- 工作区选择页目录浏览重做：标题与目录数徽章、路径栏固定主机名、目录行单击选中。
+- 退出登录并入账号名下拉菜单，移除 footer 的「连接已断开」误报通知。
 
-### 稳定性与恢复
+### 移动端与稳定性
 
-- 超大会话目录先按 workspace 和 subagent 过滤并限制行数，避免 Remote 列表整体失败。
-- 修复损坏身份、旧凭据目录迁移、重置恢复和并发创建身份时的边界问题。
-- 修复控制连接重连、已销毁链路延迟包限流和 WebSocket hello 超时处理。
-- 自部署 Server 在刷新成功响应丢失时恢复后继凭据，不撤销仍有效的账号授权。
-- 修复会话图片跨版本加载、空会话图标和文件预览授权边界。
-
-### 工具与兼容性
-
-- 新增 Windows Codex Desktop CLI 发现。
-- 继续兼容 Harness 0.2.2-rc.1 与 0.2.1-rc.5，补齐 Remote 会话、附件和事件帧兼容处理。
-- 修复 Harness 0.2.2 owner Peer 缺失导致的事件流重连循环。
-- 升级 werift 至 0.26.0，改进 WebRTC、TURN 和 Relay 回退行为。
-
-### Server 与发布工程
-
-- 自部署 Server 支持可选 LAN/P2P/TURN 信令协调、短期 coturn 凭据、反向代理 IP 限流和握手诊断。
-- 支持行内修改设备名称、登录后跳转、前端路由刷新和 HTML 入口缓存重新校验。
-- Host bundle 内联运行时依赖，改善本地 link、手工复制和生成式安装。
-- 统一发布 bundle 路径，新增中英文 Issue 表单与仓库许可证。
-
-感谢 @dreamfarer-space、@bluesmilery、@ltmroberthk915、@jinnian0703、@joeatgp，以及所有参与评审、测试、反馈问题和改进文档的贡献者。
+- 移除仓库内置 Android 应用，移动端改由外部 DSH Go 客户端提供。
+- 凭据存储归属检查与迁移忽略 `.DS_Store`、`desktop.ini`、`Thumbs.db` 等系统元文件。
+- 可选 OAuth 发现失败时保持密码登录表单可见，保留已手选的配对方式。
 
 ## English
 
-**v0.6.4**
+**v1.0.0**
 
-### Remote workspaces
+### Brand and version
 
-- Add offline session instant-open, cached history while a Host is offline, direct workspace creation from the session drawer and remote Host switching.
-- Refine Codex titles, empty-session reconnect prompts, chat activity, sidebar navigation and workspace hierarchy.
-- Add device discovery diagnostics, connection-log export, error banners and a diagnostics settings page.
-- Support LAN, P2P, TURN and Relay transport preferences with clearer copy and icons.
+- The project is rebranded as Kite and the repository moves to `gaolin89898/dsh-kite`. The npm package name `ds-harness-remote`, the plugin ID and credential storage paths stay unchanged, so existing installations keep working.
+- Version numbering restarts at 1.0.0 for the new repository.
 
-### Pairing and sign-in
+### Remote experience
 
-- Add the single-attempt DSH-Go Host pairing flow and integrate pairing into sign-in tabs.
-- Add compact pairing QR, countdown and cancel actions, with improved scan guidance and controls.
-- Allow editing the service address and improve account labels, password hints and non-DeepSeek account guidance.
-- Complete the Host-only sign-in flow and remove unnecessary provider retries.
+- Add per-Host restart actions: platform-specific supervised restarts, a busy badge with disabled clicks while restarting, and one automatic device-refresh retry.
+- Replace the Host filter with a custom dropdown supporting arrow-key navigation, Escape and outside-click closing.
+- Redesign the workspace directory picker: title with a directory-count badge, a Host-anchored path bar and single-click row selection.
+- Move sign-out into the account-name dropdown menu and remove the sticky footer disconnect notice.
 
-### Stability and recovery
+### Mobile and stability
 
-- Filter oversized session catalogues by workspace and subagent before applying row limits, preventing complete Remote list failures.
-- Fix corrupt identity handling, legacy credential migration, reset recovery and concurrent identity creation.
-- Fix control reconnects, rate limiting of delayed packets on destroyed links and WebSocket hello timeout handling.
-- Recover successor credentials when a self-hosted Server loses a successful refresh response without revoking still-valid account authorization.
-- Fix cross-version session image loading, empty-session icons and file-preview authorization boundaries.
-
-### Tools and compatibility
-
-- Discover the Windows Codex Desktop CLI.
-- Maintain Harness 0.2.2-rc.1 and 0.2.1-rc.5 compatibility, including Remote session, attachment and event-frame handling.
-- Fix the Harness 0.2.2 reconnect loop caused by a missing owner Peer on forwarded event streams.
-- Upgrade werift to 0.26.0 and improve WebRTC, TURN and Relay fallback behavior.
-
-### Server and release engineering
-
-- Add optional LAN/P2P/TURN signaling, short-lived coturn credentials, reverse-proxy client-IP rate limits and handshake diagnostics to the self-hosted Server.
-- Add inline device renaming, post-login redirects, frontend route refresh support and HTML entry cache revalidation.
-- Inline Host bundle runtime dependencies for local links, manual copies and generated installations.
-- Normalize release bundle paths and add bilingual issue forms and the repository license.
-
-Thanks to @dreamfarer-space, @bluesmilery, @ltmroberthk915, @jinnian0703, @joeatgp, and everyone who contributed through reviews, testing, issue reports and documentation improvements.
+- Remove the in-repo Android app; mobile access is provided by the external DSH Go client.
+- Ignore OS metadata files (`.DS_Store`, `desktop.ini`, `Thumbs.db`) during credential storage ownership checks and migration.
+- Keep the password sign-in form visible when optional OAuth discovery fails and preserve a manually selected pairing method.

@@ -1,3 +1,23 @@
+## 1.0.0 — 2026-11-12
+
+### English
+
+- Rebrand the project as Kite and move the repository to `gaolin89898/dsh-kite`. The npm package name `ds-harness-remote`, the plugin ID and credential storage paths stay unchanged, so existing installations keep working.
+- Restart version numbering at 1.0.0 for the new repository.
+- Add per-Host restart actions: platform-specific supervised restarts, a busy badge while restarting and one automatic device-refresh retry.
+- Redesign the Host filter dropdown, the workspace directory picker and the account menu in the Remote clients.
+- Remove the in-repo Android app; mobile access is provided by the external DSH Go client.
+- Ignore OS metadata files (`.DS_Store`, `desktop.ini`, `Thumbs.db`) during credential storage ownership checks and migration, and keep the password sign-in form visible when optional OAuth discovery fails.
+
+### 中文
+
+- 项目更名为 Kite，仓库迁移至 `gaolin89898/dsh-kite`；npm 包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变，已安装用户不受影响。
+- 新仓库版本号自 1.0.0 重新开始。
+- 新增主机行「重启」操作：按平台执行受监管的重启，重启期间显示忙碌徽标并禁用点击，设备刷新失败自动重试一次。
+- 重做远程客户端的主机筛选下拉、工作区目录选择器与账号菜单。
+- 移除仓库内置 Android 应用；移动端改由外部 DSH Go 客户端提供。
+- 凭据存储归属检查与迁移忽略 `.DS_Store`、`desktop.ini`、`Thumbs.db` 等系统元文件；可选 OAuth 发现失败时保持密码登录表单可见。
+
 ## 0.6.3 — 2026-11-05
 
 Android build 71.

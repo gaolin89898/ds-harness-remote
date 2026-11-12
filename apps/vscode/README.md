@@ -36,7 +36,7 @@ account before the Host can appear in the device list.
 [`ds-harness-remote`](https://www.npmjs.com/package/ds-harness-remote) 插件；远端 Host
 插件与 VS Code 客户端还必须登录同一账号，设备才会出现在列表中。
 
-The current extension version is `0.4.13`. Cross-machine Extension Host testing is still
+The current extension version is `1.0.0`. Cross-machine Extension Host testing is still
 in progress; use the current `ds-harness-remote` Host plugin while developing and testing it.
 
 ## Development
