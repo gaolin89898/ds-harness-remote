@@ -9,12 +9,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gaolin89898/ds-harness-remote.git",
+    "url": "git+https://github.com/gaolin89898/dsh-kite.git",
     "directory": "apps/vscode"
   },
-  "homepage": "https://github.com/gaolin89898/ds-harness-remote#readme",
+  "homepage": "https://github.com/gaolin89898/dsh-kite#readme",
   "bugs": {
-    "url": "https://github.com/gaolin89898/ds-harness-remote/issues"
+    "url": "https://github.com/gaolin89898/dsh-kite/issues"
   },
   "keywords": [
     "deepseek",

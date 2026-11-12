@@ -81,7 +81,7 @@ elif [[ "$os" = Linux ]]; then
   { printf '#!/usr/bin/env bash\n# ds-harness-remote managed private runtime\n'; printf 'export PATH=%q:"$PATH"\n' "$runtime/node/bin:$runtime/harness/node_modules/.bin"; printf 'exec %q "$@"\n' "$runtime/harness/node_modules/.bin/dsh"; } > "$DSH_COMMAND"
   chmod 755 "$DSH_COMMAND"
 else
-  fail "No existing dsh command found. Install via Desktop Extensions / Plugin management (https://github.com/gaolin89898/ds-harness-remote), or enable Desktop's official dsh launcher."
+  fail "No existing dsh command found. Install via Desktop Extensions / Plugin management (https://github.com/gaolin89898/dsh-kite), or enable Desktop's official dsh launcher."
 fi
 # plugin exec changes cwd; service ExecStart must also use an absolute executable.
 if [[ "$DSH_COMMAND" != /* ]]; then DSH_COMMAND="$(pwd -P)/$DSH_COMMAND"; fi
@@ -216,7 +216,7 @@ function abort(message) { const error = new Error(message); error.installerSafe 
   // Reject paths the unit parser would trim or treat as line continuation.
   if(home.trim() !== home || /[\\\x00-\x1f\x7f]/.test(home)) abort('Unsupported service working directory');
   const workingDirectory = home.replace(/%/g, '%%');
-  const contents = [marker,'[Unit]','Description=DeepSeek Harness Remote Host','After=network-online.target','Wants=network-online.target','[Service]','Type=simple','User=root',`WorkingDirectory=${workingDirectory}`,...Object.entries(env).map(([key,value])=>`Environment=${quote(key+'='+value)}`),`ExecStart=${[command,'--profile',profile,'--no-open','--host','127.0.0.1'].map(x=>quote(x,true)).join(' ')}`,'Restart=on-failure','RestartSec=5','StandardOutput=null','StandardError=null','[Install]','WantedBy=multi-user.target',''].join('\n');
+  const contents = [marker,'[Unit]','Description=Kite Host','After=network-online.target','Wants=network-online.target','[Service]','Type=simple','User=root',`WorkingDirectory=${workingDirectory}`,...Object.entries(env).map(([key,value])=>`Environment=${quote(key+'='+value)}`),`ExecStart=${[command,'--profile',profile,'--no-open','--host','127.0.0.1'].map(x=>quote(x,true)).join(' ')}`,'Restart=on-failure','RestartSec=5','StandardOutput=null','StandardError=null','[Install]','WantedBy=multi-user.target',''].join('\n');
   fs.mkdirSync(systemdDir, {recursive:true});
   // Refuse a link swap or concurrent fresh creation; never truncate before verifying.
   let previous;

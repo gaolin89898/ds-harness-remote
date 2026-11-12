@@ -1,8 +1,8 @@
-# Privacy Policy for DeepSeek Harness Remote
+# Privacy Policy for Kite
 
 Effective date: August 23, 2026
 
-DeepSeek Harness Remote is a browser extension that opens your linked DeepSeek Harness computers in Remote Web. This policy covers the browser extension.
+Kite is a browser extension that opens your linked DeepSeek Harness computers in Remote Web. This policy covers the browser extension.
 
 ## Data the extension handles
 
@@ -19,7 +19,7 @@ The extension does not collect browsing history, page content from other website
 
 The data is used only to:
 
-- Authorize this browser as a DeepSeek Harness Remote device.
+- Authorize this browser as a Kite device.
 - List your linked computers and show whether they are online.
 - Open the selected computer in Remote Web.
 - Refresh or revoke the extension's own authorization.
@@ -36,15 +36,15 @@ When you sign out, the extension requests revocation of its device authorization
 
 For privacy questions or requests, open an issue at:
 
-https://github.com/gaolin89898/ds-harness-remote/issues
+https://github.com/gaolin89898/dsh-kite/issues
 
 ---
 
-# DeepSeek Harness Remote 隐私政策
+# Kite 隐私政策
 
 生效日期：2026 年 8 月 23 日
 
-DeepSeek Harness Remote 是一个用于从 Remote Web 打开已连接电脑的浏览器插件。本政策仅适用于该浏览器插件。
+Kite 是一个用于从 Remote Web 打开已连接电脑的浏览器插件。本政策仅适用于该浏览器插件。
 
 ## 插件处理的数据
 
@@ -61,7 +61,7 @@ DeepSeek Harness Remote 是一个用于从 Remote Web 打开已连接电脑的�
 
 这些数据只用于：
 
-- 将当前浏览器授权为 DeepSeek Harness Remote 设备。
+- 将当前浏览器授权为 Kite 设备。
 - 展示已连接的电脑及其在线状态。
 - 在 Remote Web 中打开所选电脑。
 - 刷新或撤销插件自己的授权。
@@ -78,4 +78,4 @@ DeepSeek Harness Remote 是一个用于从 Remote Web 打开已连接电脑的�
 
 如有隐私问题或请求，请在以下地址提交 Issue：
 
-https://github.com/gaolin89898/ds-harness-remote/issues
+https://github.com/gaolin89898/dsh-kite/issues

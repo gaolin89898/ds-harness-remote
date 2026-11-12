@@ -2,9 +2,9 @@
   "version": "0.6.4",
   "author": "liguobao <lgb835485368@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/gaolin89898/ds-harness-remote#readme",
+  "homepage": "https://github.com/gaolin89898/dsh-kite#readme",
   "bugs": {
-    "url": "https://github.com/gaolin89898/ds-harness-remote/issues"
+    "url": "https://github.com/gaolin89898/dsh-kite/issues"
   },
   "name": "ds-harness-remote-tui",
   "description": "Remote Host integration for DeepSeek Harness TUI.",
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gaolin89898/ds-harness-remote.git",
+    "url": "git+https://github.com/gaolin89898/dsh-kite.git",
     "directory": "packages/tui"
   },
   "engines": {

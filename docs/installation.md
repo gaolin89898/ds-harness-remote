@@ -48,7 +48,7 @@ cat "$DSH_HOME/ds-harness-remote/servers/<哈希>/host/device.key"
 下载并检查脚本后运行。下面的命令让 Token 在 root Shell 中隐藏输入，不写入命令行参数或 shell 历史：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gaolin89898/ds-harness-remote/main/scripts/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/gaolin89898/dsh-kite/main/scripts/install.sh -o install.sh
 # 检查下载的脚本内容后执行：
 sudo -H bash -c '
   read -r -s -p "一次性 Host 注册 Token: " token; printf "\n"
@@ -104,7 +104,7 @@ Remote 凭据存于 `$DSH_HOME/ds-harness-remote`（默认 `~/.dsh/ds-harness-re
 macOS 使用普通用户：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gaolin89898/ds-harness-remote/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gaolin89898/dsh-kite/main/scripts/install.sh | bash
 ```
 
 优先使用 `~/Applications` 或 `/Applications` 的 Desktop 官方 launcher，否则 PATH 中的 `dsh`。两者都有时优先 Desktop；都没有才停止，不安装 Desktop、DSH 或 Node.js，不创建服务。
