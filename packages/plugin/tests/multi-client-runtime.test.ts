@@ -51,7 +51,8 @@ describe('HostPluginRuntime multi-Client routing', () => {
             index,
           ),
           run: async () => {
-            const settings = { ...config(), codex: { enabled: scenario !== 'disabled', binary: '/test/codex' } }
+            // Keep unrelated supervisor capabilities independent of the test runner.
+            const settings = { ...config(), hostControl: { enabled: false }, codex: { enabled: scenario !== 'disabled', binary: '/test/codex' } }
             const runtime = new HostPluginRuntime(settings, identities(), logger())
             let ready = false
             const app: CodexAppServerLike = {
@@ -119,7 +120,7 @@ describe('HostPluginRuntime multi-Client routing', () => {
                 scenario === 'ready'
                   ? [
                       'workspace.upload.v1',
-                                  'codex.appserver.v1',
+                      'codex.appserver.v1',
                       'codex.appserver.transfer.v1',
                       'remote.history.compact.v1',
                     ]

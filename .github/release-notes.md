@@ -1,6 +1,6 @@
 ## 中文
 
-**v1.0.0**
+**v1.0.1**
 
 ### 品牌与版本
 
@@ -9,7 +9,7 @@
 - 安装脚本、版本检查与更新链接均使用本仓库，避免误装 npm 上的同名旧包。
 
 ```sh
-dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 Web 用户将 `desktop` 换为实际 profile（通常为 `web`）。已有安装可在同一 profile 执行此命令切换来源，然后按提示重启。
@@ -29,7 +29,7 @@ Web 用户将 `desktop` 换为实际 profile（通常为 `web`）。已有安装
 
 ## English
 
-**v1.0.0**
+**v1.0.1**
 
 ### Brand and version
 

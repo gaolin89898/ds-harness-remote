@@ -41,13 +41,13 @@ CodeX/ACP currently support workspace discovery only through these tools. This e
 In DeepSeek Harness Desktop, open **Extensions / Plugin management** and install this GitHub Release archive:
 
 ```text
-https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 Restart Desktop after installation. Its official `dsh` launcher can also install the package:
 
 ```sh
-dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 Use Desktop's official launcher to manage its reserved `desktop` profile.
@@ -57,7 +57,7 @@ Use Desktop's official launcher to manage its reserved `desktop` profile.
 Add the current package version to the `web` profile, then restart Harness:
 
 ```sh
-dsh plugin --profile web add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+dsh plugin --profile web add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 ## Highlights

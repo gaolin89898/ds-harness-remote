@@ -8,7 +8,7 @@
 - [x] CI 在本地 XFS 挂载上验证硬链接，并通过凭据锁与迁移测试。
 - [ ] Windows Harness Host 在实际 Electron 44.7.0 / Node 24.21.0 环境验收。
 
-更新日期：2026-11-11。当前源码版本为 `1.0.0`；Tag、npm 与 GitHub Release 状态以实际发布结果为准。
+更新日期：2026-11-11。当前源码版本为 `1.0.1`；Tag、npm 与 GitHub Release 状态以实际发布结果为准。
 
 构建与测试基线见 AGENTS.md 的验证记录；本轮移除移动端后重新执行了全仓 check、生产 build 与打包检查。Metro noble/hashes exports fallback 警告仍保留。
 

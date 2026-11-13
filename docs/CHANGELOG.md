@@ -1,3 +1,8 @@
+## 1.0.1 — 2026-11-13
+
+- DSH 插件显示名称统一为 `dsh-kite`，安装与更新使用 `gaolin89898/dsh-kite` 的 GitHub Release。
+- 保留 `ds-harness-remote` 包名和已有设备身份；安装脚本不再从 npm 同名包安装旧版。
+
 ## 1.0.0 — 2026-11-12
 
 ### English

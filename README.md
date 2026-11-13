@@ -26,7 +26,7 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 已支持 DeepSeek Harness 桌面版，使用最新版本安装即可：
 
 ```sh
-dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 ## 主要特性
@@ -61,10 +61,10 @@ dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/rele
 
 在 DeepSeek Harness Desktop 的 **扩展 / 插件管理** 中，使用以下 GitHub Release 安装包地址安装 **dsh-kite**：
 
-`https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz`
+`https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz`
 
 安装后重启 Desktop。也可使用它的官方 `dsh` 启动器安装固定版本：
-`dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz`。
+`dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz`。
 
 内部包名仍为 `ds-harness-remote`；请使用本仓库的 Release 地址，直接按包名从 npm 安装会得到另一个发布源的版本。后续更新从[本仓库 Releases](https://github.com/gaolin89898/dsh-kite/releases)下载，见[更新说明](docs/installation.md#dsh-插件页在线更新)。
 

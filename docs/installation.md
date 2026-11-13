@@ -9,7 +9,7 @@
 在 Desktop 的官方 `dsh` 启动器中执行：
 
 ```sh
-dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 Web Host 改用实际启动它的 `dsh`、`DSH_HOME` 和 profile（通常为 `web`）。已有同名插件时，在同一 profile 重新执行上述命令以切换来源，按宿主提示重启；不要删除 profile 或 Remote 凭据目录。
@@ -116,7 +116,7 @@ Desktop 默认 `desktop` profile，独立 CLI 默认 `web`，可用 `DSH_COMMAND
 Desktop 也可打开 **扩展 / 插件管理**，使用本仓库的安装包地址：
 
 ```text
-https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.1/ds-harness-remote-1.0.1.tgz
 ```
 
 普通独立 CLI 不能管理保留的 `desktop` profile，必须使用 Desktop 官方 launcher。
@@ -128,7 +128,7 @@ https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remo
 | `DSH_COMMAND` | 已有 launcher 路径；显式指定却找不到时失败，不静默换实例 |
 | `DSH_PROFILE` | 所选 profile；独立默认 `web`，Desktop 默认 `desktop` |
 | `DSH_HOME` | 保留已有值，注册凭据与运行实例使用同一 home；Linux 通常为 root 的 home 下 `.dsh` |
-| `REMOTE_VERSION` | 本仓库 GitHub Release 版本，默认 `latest`；可指定 `1.0.0` 或 `v1.0.0` |
+| `REMOTE_VERSION` | 本仓库 GitHub Release 版本，默认 `latest`；可指定 `1.0.1` 或 `v1.0.1` |
 | `INTELLIGENT_UI` | 为 `1` 时同时把 Intelligent UI 安装到同一 profile；默认 `0` |
 | `INTELLIGENT_UI_VERSION` | `INTELLIGENT_UI=1` 时的 Intelligent UI 版本，默认 npm `latest` |
 | `DSH_VERSION` | Linux 缺少 DSH 时的新安装版本，默认 npm `latest`，不升级已有 DSH |

@@ -17,6 +17,11 @@ dshfind 的推导优先 npm 同名包；保留包名时必须在市场侧单独�
 仅清除测试子进程的这四个变量后通过，无源码或测试断言变更。真实 Desktop 交互与
 跨设备 E2E 未执行；GitHub 发布状态以 workflow 和实际 Release 为准。
 
+干净 Linux CI 暴露并修复两项发布验证问题：完整构建需先于 Server 嵌入页面测试；
+CodeX 能力矩阵显式禁用无关的 hostControl，避免 systemd runner 的重启能力污染精确
+能力断言。保留原断言，本地 multi-client runtime 9 tests 通过。候选升级为 `1.0.1`，
+不重写已创建的 `v1.0.0` 标签；Release 支持手动按既有标签触发。
+
 ## Restart UX, picker redesign and account menu (2026-11-11)
 
 在 Host restart 功能之上完成四项 Remote 客户端界面改动：
@@ -563,7 +568,7 @@ macOS 仍使用普通用户，优先复用 Desktop 官方 launcher，否则已�
 Desktop 默认保留的 `desktop` profile，只能由其官方 launcher 管理。一次性 Token 复用官方身份/凭据与既有注册码接口，
 不得记录或作为持久设备凭据使用。Windows 用户使用官方插件管理或已有 Harness 的官方命令。
 卸载先按安装指南停用 Linux 系统服务，再通过官方插件管理或 `dsh plugin remove` 移除 Remote；不自动删除 runtime、
-凭据或迁移旧 service。当前版本为 `1.0.0`；Tag、npm 与 GitHub Release 的发布状态以实际发布结果为准。
+凭据或迁移旧 service。当前版本为 `1.0.1`；Tag 与 GitHub Release 的发布状态以实际发布结果为准。
 
 ## Validation Baseline
 
