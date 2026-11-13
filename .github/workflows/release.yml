@@ -76,11 +76,11 @@ jobs:
           pnpm --filter './packages/**' -r build
           pnpm -r check
 
-      - name: Run tests
-        run: pnpm -r test
-
       - name: Build workspace
         run: NODE_ENV=production pnpm --workspace-concurrency=1 -r build
+
+      - name: Run tests
+        run: pnpm -r test
 
       - name: Verify production Plugin bundles
         run: |
