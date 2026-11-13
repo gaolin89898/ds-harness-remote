@@ -1,6 +1,13 @@
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag (for example v1.0.0)'
+        required: true
+        type: string
+        default: 'v1.0.0'
   push:
     tags:
       - "v*"
@@ -9,11 +16,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 env:
   CI: true
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   release:
@@ -23,6 +31,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -53,8 +63,8 @@ jobs:
           if (versions.size !== 1) {
             throw new Error(`Release versions do not match: ${[...versions].join(', ')}`)
           }
-          if (process.env.GITHUB_REF_NAME !== expectedTag) {
-            throw new Error(`Expected tag ${expectedTag}, received ${process.env.GITHUB_REF_NAME}`)
+          if (process.env.RELEASE_TAG !== expectedTag) {
+            throw new Error(`Expected tag ${expectedTag}, received ${process.env.RELEASE_TAG}`)
           }
           NODE
 
@@ -84,7 +94,7 @@ jobs:
 
       - name: Stage release assets
         run: |
-          cp "release-assets/ds-harness-remote-${GITHUB_REF_NAME#v}.tgz" release-assets/dsh-kite.tgz
+          cp "release-assets/ds-harness-remote-${RELEASE_TAG#v}.tgz" release-assets/dsh-kite.tgz
           cd release-assets
           sha256sum *.tgz > SHA256SUMS.txt
 
@@ -93,7 +103,7 @@ jobs:
           NODE_ENV=production pnpm --dir apps/browser build
           mkdir -p release-assets/browser-extension
           cd apps/browser
-          zip -qr "$GITHUB_WORKSPACE/release-assets/dsh-remote-browser-${GITHUB_REF_NAME}.zip" \
+          zip -qr "$GITHUB_WORKSPACE/release-assets/dsh-remote-browser-${RELEASE_TAG}.zip" \
             manifest.json popup.html styles.css media _locales dist
 
       - name: Update release checksums
@@ -104,8 +114,8 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: dsh-kite ${{ github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: dsh-kite ${{ env.RELEASE_TAG }}
           files: release-assets/*
           fail_on_unmatched_files: true
           body_path: .github/release-notes.md
