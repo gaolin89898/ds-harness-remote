@@ -22,6 +22,13 @@ CodeX 能力矩阵显式禁用无关的 hostControl，避免 systemd runner 的�
 能力断言。保留原断言，本地 multi-client runtime 9 tests 通过。候选升级为 `1.0.1`，
 不重写已创建的 `v1.0.0` 标签；Release 支持手动按既有标签触发。
 
+已发布 [dsh-kite v1.0.1](https://github.com/gaolin89898/dsh-kite/releases/tag/v1.0.1)，
+源码标签指向 `26f21261`；[Release workflow](https://github.com/gaolin89898/dsh-kite/actions/runs/43365127180)
+成功，全仓类型检查、生产构建、全套测试（Plugin 76 文件 / 646 tests）与 bundle 一致性
+校验通过。版本化安装包与 `dsh-kite.tgz` 公开下载均 HTTP 200，下载后 SHA-256 一致且
+匹配发布清单：`e205090a63de81b846653f19a1560dba1896d78046f2135e6f8689b3b06f4e0f`。
+下载包的名称/版本/显示文案/更新源及 Host 入口加载复验通过。未修改 dshfind 市场记录。
+
 ## Restart UX, picker redesign and account menu (2026-11-11)
 
 在 Host restart 功能之上完成四项 Remote 客户端界面改动：
