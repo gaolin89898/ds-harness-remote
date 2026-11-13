@@ -2,7 +2,8 @@
 
 ### English
 
-- Rebrand the project as Kite and move the repository to `gaolin89898/dsh-kite`. The npm package name `ds-harness-remote`, the plugin ID and credential storage paths stay unchanged, so existing installations keep working.
+- Display the DSH plugin as `dsh-kite` and install from `gaolin89898/dsh-kite` GitHub Releases. The internal package name `ds-harness-remote`, plugin ID and credential storage paths stay unchanged.
+- Use this repository for the installer, version checks and update links, avoiding the independently published npm package.
 - Restart version numbering at 1.0.0 for the new repository.
 - Add per-Host restart actions: platform-specific supervised restarts, a busy badge while restarting and one automatic device-refresh retry.
 - Redesign the Host filter dropdown, the workspace directory picker and the account menu in the Remote clients.
@@ -11,7 +12,8 @@
 
 ### 中文
 
-- 项目更名为 Kite，仓库迁移至 `gaolin89898/dsh-kite`；npm 包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变，已安装用户不受影响。
+- DSH 插件显示为 `dsh-kite`，从 `gaolin89898/dsh-kite` 的 GitHub Release 安装；内部包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变。
+- 安装脚本、版本检查与更新链接使用本仓库，避免误装 npm 上的同名旧包。
 - 新仓库版本号自 1.0.0 重新开始。
 - 新增主机行「重启」操作：按平台执行受监管的重启，重启期间显示忙碌徽标并禁用点击，设备刷新失败自动重试一次。
 - 重做远程客户端的主机筛选下拉、工作区目录选择器与账号菜单。

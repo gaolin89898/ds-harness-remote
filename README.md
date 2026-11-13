@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/ds-harness-remote"><img src="https://img.shields.io/npm/v/ds-harness-remote?color=CB3837&amp;logo=npm" alt="npm"></a>
+  <a href="https://github.com/gaolin89898/dsh-kite/releases"><img src="https://img.shields.io/github/v/release/gaolin89898/dsh-kite?color=4D6BFE" alt="GitHub Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue" alt="License: MIT"></a>
   <a href="apps/server/README.md"><img src="https://img.shields.io/badge/%E8%87%AA%E9%83%A8%E7%BD%B2-Docker-2496ED?logo=docker&amp;logoColor=white" alt="自部署"></a>
   <a href="https://dshfind.com/zh/plugins/gaolin89898/dsh-kite?ref=badge"><img src="https://dshfind.com/api/badge/gaolin89898/dsh-kite?metric=downloads&amp;lang=zh" alt="dshfind 下载量"></a>
@@ -25,7 +25,9 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 
 已支持 DeepSeek Harness 桌面版，使用最新版本安装即可：
 
-`ds-harness-remote@1.0.0`
+```sh
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+```
 
 ## 主要特性
 
@@ -44,7 +46,7 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 
 | 客户端 | 形态 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| DSH&nbsp;Desktop&nbsp;插件 | Remote 侧栏 | 已支持 | 装 `ds-harness-remote@1.0.0`；Host 也可以就是这台电脑 |
+| DSH&nbsp;Desktop&nbsp;插件 | Remote 侧栏 | 已支持 | 从本仓库 GitHub Release 安装；Host 也可以就是这台电脑 |
 | Web | 浏览器页面 | 已支持 | 打开 [https://dsh.gaolin.ink](https://dsh.gaolin.ink)，复用 Harness 原生界面 |
 | DSH Go | C佬精品 | 已支持 | 移动端客户端，详情见：[ccch1mneyyy/dsh-go: DeepSeek Harness 的 Android 客户端。手机上直接跑，也能遥控你电脑上的 DSH。](https://github.com/ccch1mneyyy/dsh-go) |
 | 浏览器扩展 | Chrome | 仅入口 | 读取已登录 Web 的授权换取独立设备凭据、列出在线 Host、打开同源 Remote Web，不承载会话界面 |
@@ -57,14 +59,14 @@ Harness 始终运行在工作电脑上，原有的工作区、工具和项目配
 
 ### 支持 DeepSeek Harness 桌面版
 
-在 DeepSeek Harness Desktop 的 **扩展 / 插件管理** 中，选择从 **npm** 安装，输入包名和版本：
+在 DeepSeek Harness Desktop 的 **扩展 / 插件管理** 中，使用以下 GitHub Release 安装包地址安装 **dsh-kite**：
 
-`ds-harness-remote@1.0.0`
+`https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz`
 
 安装后重启 Desktop。也可使用它的官方 `dsh` 启动器安装固定版本：
-`dsh plugin --profile desktop add -w ds-harness-remote@1.0.0`。
+`dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz`。
 
-DSH 0.2.2 起，npm 安装支持在插件页检查版本和一键更新；热更新失败时由 DSH 尝试恢复旧版。GitHub / 本地 link 安装需先切换到 npm，见[在线更新说明](docs/installation.md#dsh-插件页在线更新)。
+内部包名仍为 `ds-harness-remote`；请使用本仓库的 Release 地址，直接按包名从 npm 安装会得到另一个发布源的版本。后续更新从[本仓库 Releases](https://github.com/gaolin89898/dsh-kite/releases)下载，见[更新说明](docs/installation.md#dsh-插件页在线更新)。
 
 ### Linux 一键安装
 

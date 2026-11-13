@@ -1,4 +1,4 @@
-# Kite · 风筝
+# dsh-kite
 
 [官方网站](https://dsh.gaolin.ink/) · [Web 客户端](https://dsh.gaolin.ink/app) · [iOS 内测](https://github.com/gaolin89898/dsh-kite/issues/20) · [DSH Go](https://github.com/ccch1mneyyy/dsh-go)
 

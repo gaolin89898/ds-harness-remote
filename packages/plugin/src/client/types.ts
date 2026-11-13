@@ -53,7 +53,7 @@ export interface RemoteStatus {
     workspaceTypes?: ReadonlyArray<{ id: string; name: string; capability: string; available: boolean }>
   }
   network?: RemoteNetworkDetails
-  /** npm dist-tags lookup result; present after the plugin's first successful registry check. */
+  /** Latest GitHub Release; present after the plugin's first successful update check. */
   update?: {
     currentVersion: string
     latestVersion: string

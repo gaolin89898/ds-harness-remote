@@ -1,5 +1,22 @@
 # Repository Guide for Agents
 
+## dsh-kite distribution (2026-11-13)
+
+用户明确要求：只将 DSH 插件显示名称改为 `dsh-kite`，保留 npm 包名
+`ds-harness-remote`、内部 workspace 包名、插件标识、配置与凭据路径；安装来源改为
+`gaolin89898/dsh-kite` 的 GitHub Release。不得将本 fork 发布到 npm 同名包。
+Release workflow 仅构建并发布 GitHub 安装包，保留版本化 `.tgz`，另提供同字节的
+`dsh-kite.tgz` 供安装器的 `latest` URL 使用。更新检查和链接使用本仓库 Releases。
+dshfind 的推导优先 npm 同名包；保留包名时必须在市场侧单独覆盖安装命令，不能声称
+仅发布本仓库就会修正市场页面。
+
+本轮本地验证：Node 24.22.1 全仓类型检查、串行生产构建、DSH bundle 校验、安装器
+语法及 latest/固定版本下载地址烟测、GitHub Release 更新检查烟测、打包清单与 Host
+入口加载、CLI help 通过。Client runtime 与 Plugin lifecycle 共 32 tests 通过。
+生命周期测试初跑受终端继承的固定 Host/Client 身份环境变量影响，未改动基线也复现；
+仅清除测试子进程的这四个变量后通过，无源码或测试断言变更。真实 Desktop 交互与
+跨设备 E2E 未执行；GitHub 发布状态以 workflow 和实际 Release 为准。
+
 ## Restart UX, picker redesign and account menu (2026-11-11)
 
 在 Host restart 功能之上完成四项 Remote 客户端界面改动：

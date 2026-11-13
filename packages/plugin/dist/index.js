@@ -102732,13 +102732,10 @@ function runHmrSafe(run, hmr) {
 }
 
 // packages/plugin/src/update-check.ts
-var DIST_TAG_URLS = [
-  "https://registry.npmjs.org/-/package/ds-harness-remote/dist-tags",
-  "https://registry.npmmirror.com/-/package/ds-harness-remote/dist-tags"
-];
+var LATEST_RELEASE_URL = "https://api.github.com/repos/gaolin89898/dsh-kite/releases/latest";
 var FETCH_TIMEOUT_MS = 1e4;
 var RECHECK_INTERVAL_MS = 24 * 60 * 60 * 1e3;
-var SEMVER_PATTERN = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/;
+var RELEASE_TAG_PATTERN = /^v?(\d+\.\d+\.\d+)$/;
 var PluginUpdateChecker = class {
   constructor(logger2, fetchImplementation = fetch) {
     this.logger = logger2;
@@ -102768,7 +102765,7 @@ var PluginUpdateChecker = class {
       this.timer = void 0;
     }
   }
-  /** One registry check; concurrent callers share the in-flight request. */
+  /** One release check; concurrent callers share the in-flight request. */
   check() {
     if (this.stopped) return Promise.resolve();
     this.flight ??= this.run().finally(() => {
@@ -102786,47 +102783,19 @@ var PluginUpdateChecker = class {
       this.logger.debug("plugin update check failed", { code: "UPDATE_CHECK_FAILED" });
     }
   }
-  /**
-   * Race every dist-tags endpoint in parallel: the first valid answer wins, so
-   * a network that stalls the official registry does not wait out its timeout
-   * before the mirror is consulted.
-   */
-  fetchLatestVersion() {
-    return new Promise((resolve9) => {
-      let pending = DIST_TAG_URLS.length;
-      let settled = false;
-      const settle2 = (latest) => {
-        if (settled) return;
-        if (latest !== void 0) {
-          settled = true;
-          resolve9(latest);
-          return;
-        }
-        pending -= 1;
-        if (pending === 0) resolve9(void 0);
-      };
-      if (pending === 0) {
-        settle2(void 0);
-        return;
-      }
-      for (const url2 of DIST_TAG_URLS) {
-        this.fetchDistTags(url2).then(settle2, () => settle2(void 0));
-      }
-    });
-  }
-  async fetchDistTags(url2) {
+  async fetchLatestVersion() {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     timeout.unref?.();
     try {
-      const response = await this.fetchImplementation(url2, {
+      const response = await this.fetchImplementation(LATEST_RELEASE_URL, {
         signal: controller.signal,
-        headers: { accept: "application/json" }
+        headers: { accept: "application/vnd.github+json" }
       });
-      if (!response.ok) throw new Error(`dist-tags responded ${response.status}`);
-      const tags = await response.json();
-      if (typeof tags.latest !== "string" || !SEMVER_PATTERN.test(tags.latest)) return void 0;
-      return tags.latest;
+      if (!response.ok) throw new Error(`GitHub Releases responded ${response.status}`);
+      const release = await response.json();
+      if (release.draft !== false || release.prerelease !== false || typeof release.tag_name !== "string") return void 0;
+      return RELEASE_TAG_PATTERN.exec(release.tag_name)?.[1];
     } finally {
       clearTimeout(timeout);
     }

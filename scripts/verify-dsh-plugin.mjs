@@ -164,10 +164,7 @@ assert.doesNotMatch(
   /settings\.plugin\.item/,
   'browser client must not target the settings.plugin.item slot retired in DSH 0.1.7-rc.1',
 )
-assert.ok(
-  clientBundle.includes('DeepSeek 远程连接') || clientBundle.includes('DeepSeek \\u8FDC\\u7A0B\\u8FDE\\u63A5'),
-  'browser client must expose the Chinese plugin name',
-)
+assert.ok(clientBundle.includes('dsh-kite'), 'browser client must expose the plugin display name')
 assert.doesNotMatch(clientBundle, /settings\.plugins\.tab/, 'browser client must not create a separate plugin settings tab')
 assert.doesNotMatch(clientBundle, /require\(["']qrcode["']\)/, 'browser client must inline its QR encoder')
 

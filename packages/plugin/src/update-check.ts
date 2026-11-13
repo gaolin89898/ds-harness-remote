@@ -6,7 +6,7 @@ import { PLUGIN_VERSION } from './version.js'
  * Update state published through the control-plane `status` payload. It is
  * kept after every successful registry check, even when the local version is
  * current, because the client also marks remote Hosts running an older
- * plugin than the registry's `latest`.
+ * plugin than this repository's latest GitHub Release.
  */
 export interface PluginUpdateSnapshot {
   currentVersion: string
@@ -14,18 +14,14 @@ export interface PluginUpdateSnapshot {
   checkedAt: number
 }
 
-/** dist-tags endpoints raced in parallel; the mirror backs up the official registry. */
-const DIST_TAG_URLS = [
-  'https://registry.npmjs.org/-/package/ds-harness-remote/dist-tags',
-  'https://registry.npmmirror.com/-/package/ds-harness-remote/dist-tags',
-]
+const LATEST_RELEASE_URL = 'https://api.github.com/repos/gaolin89898/dsh-kite/releases/latest'
 const FETCH_TIMEOUT_MS = 10_000
 const RECHECK_INTERVAL_MS = 24 * 60 * 60 * 1000
-const SEMVER_PATTERN = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/
+const RELEASE_TAG_PATTERN = /^v?(\d+\.\d+\.\d+)$/
 
 /**
  * Startup and daily lookup of the plugin's latest published version against
- * the npm registry. The check is fire-and-forget: failures are logged at
+ * this repository's GitHub Releases. The check is fire-and-forget: failures are logged at
  * debug level and never surface to the user or block plugin startup.
  */
 export class PluginUpdateChecker {
@@ -60,7 +56,7 @@ export class PluginUpdateChecker {
     }
   }
 
-  /** One registry check; concurrent callers share the in-flight request. */
+  /** One release check; concurrent callers share the in-flight request. */
   check(): Promise<void> {
     if (this.stopped) return Promise.resolve()
     this.flight ??= this.run().finally(() => { this.flight = undefined })
@@ -74,52 +70,24 @@ export class PluginUpdateChecker {
       this.state = { currentVersion: PLUGIN_VERSION, latestVersion: latest, checkedAt: Date.now() }
       this.logger.debug('plugin update check complete', { current: PLUGIN_VERSION, latest })
     } catch {
-      // Registry reachability varies by network; a failed check must stay invisible.
+      // GitHub reachability varies by network; a failed check must stay invisible.
       this.logger.debug('plugin update check failed', { code: 'UPDATE_CHECK_FAILED' })
     }
   }
 
-  /**
-   * Race every dist-tags endpoint in parallel: the first valid answer wins, so
-   * a network that stalls the official registry does not wait out its timeout
-   * before the mirror is consulted.
-   */
-  private fetchLatestVersion(): Promise<string | undefined> {
-    return new Promise(resolve => {
-      let pending = DIST_TAG_URLS.length
-      let settled = false
-      const settle = (latest: string | undefined): void => {
-        if (settled) return
-        if (latest !== undefined) {
-          settled = true
-          resolve(latest)
-          return
-        }
-        pending -= 1
-        if (pending === 0) resolve(undefined)
-      }
-      // An empty source list must still resolve, or the shared in-flight
-      // promise would hang and block every later check.
-      if (pending === 0) { settle(undefined); return }
-      for (const url of DIST_TAG_URLS) {
-        this.fetchDistTags(url).then(settle, () => settle(undefined))
-      }
-    })
-  }
-
-  private async fetchDistTags(url: string): Promise<string | undefined> {
+  private async fetchLatestVersion(): Promise<string | undefined> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
     timeout.unref?.()
     try {
-      const response = await this.fetchImplementation(url, {
+      const response = await this.fetchImplementation(LATEST_RELEASE_URL, {
         signal: controller.signal,
-        headers: { accept: 'application/json' },
+        headers: { accept: 'application/vnd.github+json' },
       })
-      if (!response.ok) throw new Error(`dist-tags responded ${response.status}`)
-      const tags = await response.json() as Record<string, unknown>
-      if (typeof tags.latest !== 'string' || !SEMVER_PATTERN.test(tags.latest)) return undefined
-      return tags.latest
+      if (!response.ok) throw new Error(`GitHub Releases responded ${response.status}`)
+      const release = await response.json() as Record<string, unknown>
+      if (release.draft !== false || release.prerelease !== false || typeof release.tag_name !== 'string') return undefined
+      return RELEASE_TAG_PATTERN.exec(release.tag_name)?.[1]
     } finally {
       clearTimeout(timeout)
     }

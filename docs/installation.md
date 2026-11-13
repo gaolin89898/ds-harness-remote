@@ -4,17 +4,19 @@
 
 ## DSH 插件页在线更新
 
-DSH 0.2.2 起，**从 npm 安装**的 Remote 可在 **扩展 / 插件管理 → ds-harness-remote** 中检查版本并确认更新。更新由 DSH 官方插件管理器执行；支持热更新的宿主会先停止旧版再安装新版，失败或取消时尝试恢复旧版。恢复也可能失败，请以插件页的最终结果为准；宿主要求重启时按提示重启。
+本分支在 DSH 中显示为 **dsh-kite**，内部包名仍为 `ds-harness-remote`。安装与更新使用 `gaolin89898/dsh-kite` 的 GitHub Release，不从 npm 同名包获取版本。
 
-GitHub、本地目录、`file:` 和 `link:` 安装不会出现官方在线更新入口。要改用 npm，在同一 Desktop 的官方 `dsh` 启动器中执行：
+在 Desktop 的官方 `dsh` 启动器中执行：
 
 ```sh
-dsh plugin --profile desktop add -w ds-harness-remote@latest
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
 ```
 
-Web Host 改用实际启动它的 `dsh`、`DSH_HOME` 和 profile（通常为 `web`）。切换安装来源后按宿主提示重启，再回插件页检查版本；不要删除 profile 或 Remote 凭据目录。
+Web Host 改用实际启动它的 `dsh`、`DSH_HOME` 和 profile（通常为 `web`）。已有同名插件时，在同一 profile 重新执行上述命令以切换来源，按宿主提示重启；不要删除 profile 或 Remote 凭据目录。
 
-Remote 侧栏的版本徽标仍是更新提示，点击链接打开发布页；实际安装在本机 DSH 插件页完成。更新 Remote 会中断它承载的远程连接，请在运行该插件的本机操作。
+侧栏版本提示检查本仓库的 GitHub Releases。GitHub 安装不提供 DSH 的 npm 在线更新入口；后续版本从[发布页](https://github.com/gaolin89898/dsh-kite/releases)获取新的 `.tgz` 地址，并在本机安装。更新会中断该插件承载的远程连接。
+
+若插件市场仍显示 `dsh plugin … add ds-harness-remote` 或 0.6.4，它仍在推导 npm 同名包。请使用本页的 GitHub Release 地址；市场需要单独更新安装命令，仓库改动不会自动覆盖其记录。
 
 ## 固定设备身份（可选）
 
@@ -62,7 +64,7 @@ sudo -H bash -c '
 
 1. 检查已有 `DSH_COMMAND` 或 PATH 中的 DSH；存在则复用，不自动升级它。
 2. 找不到 DSH 时，在 `/opt/ds-harness-remote/runtime.*` 中安装官方 Node.js 24.9.0、DSH 与插件管理所需的私有 pnpm 9.15.4。Node.js 归档按[官方校验清单](https://nodejs.org/dist/v24.9.0/SHASUMS256.txt)中的固定 SHA-256 校验。稳定 launcher 为 `/opt/ds-harness-remote/bin/dsh`，重复运行会复用。
-3. 使用官方 `dsh plugin` 安装或更新所选 profile 的 Remote，默认 `web` profile 和 npm `latest`。
+3. 使用官方 `dsh plugin` 安装或更新所选 profile 的 Remote，默认 `web` profile 和本仓库的最新 GitHub Release。
 4. 传入 Token 时，通过既有 Host 注册码接口兑换并保存设备凭据。Token 不写入日志、服务配置或持久设备凭据字段；不是模型 API Key。
 5. 检查 profile 确认启用了官方 Web Host 入口，配置 systemd **系统服务**，启用开机自启并启动/重启本安装器管理的匹配实例。无需登录或开启 linger。
 
@@ -111,10 +113,10 @@ curl -fsSL https://raw.githubusercontent.com/gaolin89898/dsh-kite/main/scripts/i
 
 Desktop 默认 `desktop` profile，独立 CLI 默认 `web`，可用 `DSH_COMMAND` / `DSH_PROFILE` 显式选择。Token 注册使用同一安装入口，安装后仍需手动重启所选 Desktop/CLI 实例。不传 Token 时在 Remote 或 `/remote login` 登录。
 
-Desktop 也可打开 **扩展 / 插件管理**，从 npm 安装：
+Desktop 也可打开 **扩展 / 插件管理**，使用本仓库的安装包地址：
 
 ```text
-ds-harness-remote@0.6.3
+https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
 ```
 
 普通独立 CLI 不能管理保留的 `desktop` profile，必须使用 Desktop 官方 launcher。
@@ -126,7 +128,7 @@ ds-harness-remote@0.6.3
 | `DSH_COMMAND` | 已有 launcher 路径；显式指定却找不到时失败，不静默换实例 |
 | `DSH_PROFILE` | 所选 profile；独立默认 `web`，Desktop 默认 `desktop` |
 | `DSH_HOME` | 保留已有值，注册凭据与运行实例使用同一 home；Linux 通常为 root 的 home 下 `.dsh` |
-| `REMOTE_VERSION` | Remote 版本，默认 npm `latest` |
+| `REMOTE_VERSION` | 本仓库 GitHub Release 版本，默认 `latest`；可指定 `1.0.0` 或 `v1.0.0` |
 | `INTELLIGENT_UI` | 为 `1` 时同时把 Intelligent UI 安装到同一 profile；默认 `0` |
 | `INTELLIGENT_UI_VERSION` | `INTELLIGENT_UI=1` 时的 Intelligent UI 版本，默认 npm `latest` |
 | `DSH_VERSION` | Linux 缺少 DSH 时的新安装版本，默认 npm `latest`，不升级已有 DSH |

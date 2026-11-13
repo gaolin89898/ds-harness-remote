@@ -1,21 +1,12 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'TUI prerelease version (for example 0.6.4-tui.1); publishes to tui-test'
-        required: true
-        type: string
-        default: '0.6.4-tui.1'
   push:
     tags:
       - "v*"
 
 permissions:
   contents: write
-  id-token: write
-  packages: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -25,49 +16,8 @@ env:
   CI: true
 
 jobs:
-  tui-manual:
-    if: github.event_name == 'workflow_dispatch'
-    name: Publish TUI prerelease without a tag
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
-      - name: Prepare TUI package
-        env:
-          TUI_VERSION: ${{ inputs.version }}
-        run: |
-          node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs'
-          const file = 'packages/tui/package.json'
-          const manifest = JSON.parse(readFileSync(file, 'utf8'))
-          const base = JSON.parse(readFileSync('packages/plugin/package.json', 'utf8')).version
-          const version = process.env.TUI_VERSION
-          if (!version.startsWith(`${base}-tui.`) || !/^\d+\.\d+\.\d+-tui\.[1-9]\d*$/.test(version)) {
-            throw new Error(`Expected ${base}-tui.<positive integer>`)
-          }
-          manifest.version = version
-          manifest.dependencies['ds-harness-remote'] = base
-          writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n')
-          NODE
-      - name: Verify dependency and publish
-        env:
-          TUI_VERSION: ${{ inputs.version }}
-        run: |
-          BASE_VERSION="$(node -p "require('./packages/plugin/package.json').version")"
-          npm view "ds-harness-remote@$BASE_VERSION" version
-          npm pack ./packages/tui --dry-run
-          npm publish ./packages/tui --access public --provenance --tag tui-test
-
   release:
-    if: github.event_name == 'push'
-    name: Build and publish release
+    name: Build and publish GitHub release
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -82,9 +32,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          # npm trusted publishing requires the npm version bundled with Node 24.
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 24.9.0
           cache: pnpm
 
       - name: Validate version tag
@@ -129,16 +77,14 @@ jobs:
           git diff --exit-code -- packages/plugin/dist/index.js packages/plugin/dist/client.github.js
           node scripts/verify-dsh-plugin.mjs
 
-      - name: Pack npm plugin
+      - name: Pack plugin
         run: |
           mkdir -p release-assets
           pnpm --dir packages/plugin pack --pack-destination "$GITHUB_WORKSPACE/release-assets"
 
-      - name: Pack npm TUI
-        run: pnpm --dir packages/tui pack --pack-destination "$GITHUB_WORKSPACE/release-assets"
-
       - name: Stage release assets
         run: |
+          cp "release-assets/ds-harness-remote-${GITHUB_REF_NAME#v}.tgz" release-assets/dsh-kite.tgz
           cd release-assets
           sha256sum *.tgz > SHA256SUMS.txt
 
@@ -155,81 +101,11 @@ jobs:
           cd release-assets
           sha256sum *.tgz *.zip > SHA256SUMS.txt
 
-      - name: Publish npm plugin
-        id: npm-publish
-        continue-on-error: true
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          PACKAGE_NAME="$(node -p "JSON.parse(require('fs').readFileSync('packages/plugin/package.json', 'utf8')).name")"
-          echo "Checking if version already exists on npm..."
-          if npm view "$PACKAGE_NAME"@"$VERSION" >/dev/null 2>&1; then
-            echo "Version already exists on npm, skip publish."
-          else
-            (cd packages/plugin && npm publish)
-          fi
-
-      - name: Report npm publish failure
-        if: steps.npm-publish.outcome == 'failure'
-        run: echo '::warning::npm publish failed; GitHub Packages and the GitHub Release will continue. Retry this tag after refreshing npm registry credentials.'
-
-      - name: Publish npm TUI
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          if npm view "ds-harness-remote@$VERSION" >/dev/null 2>&1; then
-            if npm view "ds-harness-remote-tui@$VERSION" >/dev/null 2>&1; then
-              echo "TUI version already exists on npm, skip publish."
-            else
-              npm publish "release-assets/ds-harness-remote-tui-$VERSION.tgz" --access public --provenance
-            fi
-          else
-            echo '::error::Publish ds-harness-remote before its matching TUI package.'
-            exit 1
-          fi
-
-      - name: Publish GitHub Packages plugin
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          PACKAGE_SCOPE="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
-          PACKAGE_NAME="@${PACKAGE_SCOPE}/ds-harness-remote"
-          NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/github-packages.npmrc"
-          export NPM_CONFIG_USERCONFIG PACKAGE_NAME
-
-          printf '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}\n' > "$NPM_CONFIG_USERCONFIG"
-          printf '@%s:registry=https://npm.pkg.github.com\n' "$PACKAGE_SCOPE" >> "$NPM_CONFIG_USERCONFIG"
-
-          echo "Checking if version already exists on GitHub Packages..."
-          if npm view "$PACKAGE_NAME@$VERSION" --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
-            echo "Version already exists on GitHub Packages, skip publish."
-            exit 0
-          fi
-
-          GITHUB_PACKAGE_DIR="$RUNNER_TEMP/github-package"
-          mkdir -p "$GITHUB_PACKAGE_DIR"
-          tar -xzf "release-assets/ds-harness-remote-$VERSION.tgz" -C "$GITHUB_PACKAGE_DIR"
-
-          node --input-type=module <<'NODE'
-          import { readFile, writeFile } from 'node:fs/promises'
-
-          const packageJsonPath = `${process.env.RUNNER_TEMP}/github-package/package/package.json`
-          const manifest = JSON.parse(await readFile(packageJsonPath, 'utf8'))
-          manifest.name = process.env.PACKAGE_NAME
-          manifest.publishConfig = {
-            ...(manifest.publishConfig ?? {}),
-            registry: 'https://npm.pkg.github.com',
-            provenance: false,
-          }
-          await writeFile(packageJsonPath, `${JSON.stringify(manifest, null, 2)}\n`)
-          NODE
-
-          npm publish "$GITHUB_PACKAGE_DIR/package" --registry=https://npm.pkg.github.com --access public
-
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          name: dsh-kite ${{ github.ref_name }}
           files: release-assets/*
           fail_on_unmatched_files: true
           body_path: .github/release-notes.md

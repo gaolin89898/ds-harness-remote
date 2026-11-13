@@ -4,8 +4,15 @@
 
 ### 品牌与版本
 
-- 项目更名为 Kite（风筝），仓库迁移至 `gaolin89898/dsh-kite`；npm 包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变，已安装用户不受影响。
+- DSH 插件显示名称统一为 `dsh-kite`，从 `gaolin89898/dsh-kite` 的 GitHub Release 安装；内部包名 `ds-harness-remote`、插件 ID 与凭据存储路径保持不变。
 - 新仓库版本号自 1.0.0 重新开始。
+- 安装脚本、版本检查与更新链接均使用本仓库，避免误装 npm 上的同名旧包。
+
+```sh
+dsh plugin --profile desktop add -w https://github.com/gaolin89898/dsh-kite/releases/download/v1.0.0/ds-harness-remote-1.0.0.tgz
+```
+
+Web 用户将 `desktop` 换为实际 profile（通常为 `web`）。已有安装可在同一 profile 执行此命令切换来源，然后按提示重启。
 
 ### 远程体验
 
@@ -26,8 +33,9 @@
 
 ### Brand and version
 
-- The project is rebranded as Kite and the repository moves to `gaolin89898/dsh-kite`. The npm package name `ds-harness-remote`, the plugin ID and credential storage paths stay unchanged, so existing installations keep working.
+- The DSH plugin is displayed as `dsh-kite` and installs from this repository's GitHub Releases. The internal package name `ds-harness-remote`, plugin ID and credential storage paths stay unchanged.
 - Version numbering restarts at 1.0.0 for the new repository.
+- The installer, version checks and update links use this repository instead of the independently published npm package.
 
 ### Remote experience
 
